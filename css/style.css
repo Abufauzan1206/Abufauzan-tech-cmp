@@ -1,0 +1,723 @@
+@import url("components/buttons.css");
+@import url("components/cards.css");
+@import url("components/forms.css");
+@import url("components/tables.css");
+@import url("components/badges.css");
+@import url("components/alerts.css");
+@import url("components/modal.css");
+@import url("components/wizard.css");
+@import url("components/animations.css");
+
+/* ==========================
+   ABUFAUZAN TECH CMP THEME
+   ========================== */
+
+body{
+
+margin:0;
+
+padding:0;
+
+font-family:Arial, Helvetica, sans-serif;
+
+background:#f8f9fa;
+
+color:#212529;
+
+}
+
+/* Containers */
+
+.container{
+
+max-width:1000px;
+
+margin:auto;
+
+padding:20px;
+
+}
+
+/* Headings */
+
+h1{
+
+color:#212529;
+
+margin-bottom:10px;
+
+}
+
+h2,h3,h4{
+
+color:#343a40;
+
+}
+
+/* Inputs */
+
+input,
+select,
+textarea{
+
+width:100%;
+
+padding:12px;
+
+border:1px solid #ced4da;
+
+border-radius:8px;
+
+box-sizing:border-box;
+
+font-size:16px;
+
+}
+
+/* Buttons */
+
+background:#adb5bd;
+
+cursor:not-allowed;
+
+}
+
+/* Tables */
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+background:white;
+
+}
+
+th{
+
+background:#343a40;
+
+color:white;
+
+padding:12px;
+
+}
+
+td{
+
+padding:12px;
+
+border:1px solid #dee2e6;
+
+}
+
+tr:nth-child(even){
+
+background:#f8f9fa;
+
+}
+
+/* Search */
+
+.search-box{
+
+margin:15px 0;
+
+}
+
+.search-box input{
+
+background:white;
+
+}
+
+/* Status */
+
+.badge-active{
+
+background:#198754;
+
+color:white;
+
+padding:5px 12px;
+
+border-radius:20px;
+
+font-size:14px;
+
+}
+
+.badge-inactive{
+
+background:#dc3545;
+
+color:white;
+
+padding:5px 12px;
+
+border-radius:20px;
+
+font-size:14px;
+
+}
+
+/* Avatar */
+
+.avatar{
+
+width:100px;
+
+height:100px;
+
+margin:auto;
+
+border-radius:50%;
+
+background:#600000;
+
+color:white;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:40px;
+
+font-weight:bold;
+
+margin-bottom:15px;
+
+}
+
+/* Links */
+
+a{
+
+text-decoration:none;
+
+}
+
+/* ==========================
+   LOGIN PAGE
+========================== */
+
+body.login-page{
+
+margin:0;
+
+font-family:Arial, Helvetica, sans-serif;
+
+background:linear-gradient(135deg,#334155,#1E3A8A);
+
+min-height:100vh;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+.login-card{
+
+width:90%;
+max-width:450px;
+
+background:#ffffff;
+
+padding:45px 40px;
+
+border-radius:20px;
+
+box-shadow:0 20px 50px rgba(0,0,0,.18);
+
+text-align:center;
+
+animation:fadeIn .7s ease;
+
+}
+
+.login-card h1{
+
+margin-bottom:5px;
+
+color:#334155;
+
+}
+
+.login-card h2{
+
+margin-top:0;
+
+font-size:20px;
+
+color:#600000;
+
+}
+
+.login-card input{
+
+margin-bottom:10px;
+
+padding:14px;
+
+font-size:16px;
+
+border:1px solid #CBD5E1;
+
+border-radius:10px;
+
+transition:.3s;
+
+}
+
+.login-card input:focus{
+
+outline:none;
+
+border-color:#334155;
+
+box-shadow:0 0 0 3px rgba(51,65,85,.15);
+
+}
+
+.login-card button{
+
+width:100%;
+
+}
+
+.login-card a{
+
+color:#334155;
+
+font-weight:bold;
+
+}
+
+.login-card .btn-primary{
+
+width:100%;
+
+padding:15px;
+
+font-size:17px;
+
+margin-top:10px;
+
+}
+
+.login-card hr{
+
+border:none;
+
+height:1px;
+
+background:#E2E8F0;
+
+margin:25px 0;
+
+}
+
+.login-card .version{
+
+margin-top:25px;
+
+font-size:14px;
+
+color:#94A3B8;
+
+}
+
+/* ==========================
+   SIDEBAR
+========================== */
+/* Sidebar Links */
+
+.sidebar-link{
+
+display:flex;
+
+align-items:center;
+
+background:#334155;
+
+color:white;
+
+padding:12px 16px;
+
+margin-bottom:8px;
+
+border-radius:8px;
+
+text-decoration:none;
+
+transition:0.3s;
+
+width:100%;
+
+box-sizing:border-box;
+
+}
+
+
+.sidebar-link:hover{
+
+background:#475569;
+
+}
+
+
+.sidebar-link.active{
+
+background:#1e293b;
+
+}
+
+.sidebar-link:hover{
+
+background:#475569;
+
+}
+
+.secondary-btn{
+
+display:inline-block;
+
+padding:12px 20px;
+
+background:#334155;
+
+color:white;
+
+text-decoration:none;
+
+border-radius:8px;
+
+transition:.3s;
+
+}
+
+
+.secondary-btn:hover{
+
+background:#475569;
+
+}
+
+/* ==========================================
+   CMP Landing Page
+========================================== */
+
+.landing-card{
+
+width:90%;
+max-width:520px;
+
+background:#ffffff;
+
+padding:50px 40px;
+
+border-radius:20px;
+
+box-shadow:0 20px 50px rgba(0,0,0,.18);
+
+text-align:center;
+
+animation:fadeIn .7s ease;
+
+}
+
+.landing-card h1{
+
+margin-top:0;
+
+margin-bottom:10px;
+
+color:#334155;
+
+font-size:34px;
+
+}
+
+.landing-card h2{
+
+margin-bottom:15px;
+
+font-size:24px;
+
+color:#1E3A8A;
+
+}
+
+.tagline{
+
+color:#64748B;
+
+font-size:17px;
+
+margin-bottom:25px;
+
+line-height:1.6;
+
+}
+
+.features{
+
+text-align:left;
+
+margin:30px 0;
+
+}
+
+.features p{
+
+margin:12px 0;
+
+font-size:17px;
+
+color:#334155;
+
+}
+
+.landing-card .btn-primary{
+
+width:100%;
+
+padding:16px;
+
+font-size:18px;
+
+margin-top:15px;
+
+}
+
+.version{
+
+margin-top:35px;
+
+font-size:14px;
+
+color:#94A3B8;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(20px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+/* ==========================================
+   CMP Dashboard
+========================================== */
+
+.dashboard-header{
+
+margin-bottom:35px;
+
+}
+
+.dashboard-header h1{
+
+margin-bottom:10px;
+
+color:#334155;
+
+}
+
+.dashboard-header p{
+
+color:#64748B;
+
+font-size:17px;
+
+}
+
+.stats-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+gap:20px;
+
+margin:30px 0;
+
+}
+
+.stat-card{
+
+background:#ffffff;
+
+padding:25px;
+
+border-radius:18px;
+
+text-align:center;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+transition:.3s;
+
+}
+
+.stat-card:hover{
+
+transform:translateY(-5px);
+
+box-shadow:0 18px 40px rgba(0,0,0,.15);
+
+}
+
+.stat-card h2{
+
+font-size:40px;
+
+margin:0;
+
+}
+
+.stat-card h3{
+
+font-size:34px;
+
+margin:15px 0 5px;
+
+color:#334155;
+
+}
+
+.stat-card p{
+
+color:#64748B;
+
+margin:0;
+
+}
+
+.dashboard-section{
+
+margin-top:40px;
+
+}
+
+.dashboard-section h2{
+
+margin-bottom:20px;
+
+color:#334155;
+
+}
+
+/* ==========================================
+   CMP Registration Page
+========================================== */
+
+#content form{
+
+background:#ffffff;
+
+padding:35px;
+
+border-radius:20px;
+
+box-shadow:0 12px 30px rgba(0,0,0,.08);
+
+margin-top:25px;
+
+}
+
+#content form h3{
+
+margin-top:30px;
+
+margin-bottom:20px;
+
+color:#334155;
+
+padding-bottom:10px;
+
+border-bottom:2px solid #E2E8F0;
+
+}
+
+#content form h3:first-child{
+
+margin-top:0;
+
+}
+
+#content hr{
+
+border:none;
+
+height:1px;
+
+background:#E2E8F0;
+
+margin:30px 0;
+
+}
+
+#content textarea{
+
+resize:vertical;
+
+min-height:90px;
+
+}
+
+#content .btn-primary{
+
+width:100%;
+
+padding:16px;
+
+font-size:17px;
+
+margin-top:15px;
+
+}
+
+.sidebar{
+
+background:#334155;
+
+color:white;
+
+padding:25px;
+
+}
+
+.sidebar h3{
+
+margin-top:0;
+
+color:white;
+
+}
+
+.sidebar p{
+
+color:#CBD5E1;
+
+line-height:1.6;
+
+}

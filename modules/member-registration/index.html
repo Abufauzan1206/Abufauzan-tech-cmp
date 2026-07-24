@@ -1,0 +1,209 @@
+<h2>Member Registration</h2>
+
+<form id="memberRegistrationForm">
+
+<p id="progressText">
+Step 1 of 4 • 25% Complete
+</p>
+
+<hr>
+
+<div id="personalInfoStep" class="step">
+
+<h3>Step 1 of 4</h3>
+
+<h4>Personal Information</h4>
+
+<input
+type="text"
+id="firstName"
+placeholder="First Name"
+required>
+
+<br><br>
+
+<input
+type="text"
+id="middleName"
+placeholder="Middle Name">
+
+<br><br>
+
+<input
+type="text"
+id="lastName"
+placeholder="Last Name"
+required>
+
+<br><br>
+
+<select id="gender">
+
+<option value="">
+Select Gender
+</option>
+
+<option>
+Male
+</option>
+
+<option>
+Female
+</option>
+
+</select>
+
+<br><br>
+
+<button
+type="button"
+id="nextStep1">
+
+Next →
+
+</button>
+
+</div>
+
+<div id="contactInfoStep" class="step" style="display:none;">
+
+<h3>Step 2 of 4</h3>
+
+<h4>Contact Information</h4>
+
+<input
+type="tel"
+id="phone"
+placeholder="Phone Number"
+required>
+
+<br><br>
+
+<input
+type="email"
+id="email"
+placeholder="Email Address">
+
+<br><br>
+
+<button
+type="button"
+id="previousStep2">
+
+← Previous
+
+</button>
+
+<button
+type="button"
+id="nextStep2">
+
+Next →
+
+</button>
+
+</div>
+
+<div id="nextOfKinStep" class="step" style="display:none;">
+
+<h3>Step 3 of 4</h3>
+
+<h4>Next of Kin Information</h4>
+
+<input
+type="text"
+id="nokName"
+placeholder="Next of Kin Full Name"
+required>
+
+<br><br>
+
+<input
+type="text"
+id="nokRelationship"
+placeholder="Relationship">
+
+<br><br>
+
+<input
+type="tel"
+id="nokPhone"
+placeholder="Phone Number">
+
+<br><br>
+
+<textarea
+id="nokAddress"
+placeholder="Residential Address"></textarea>
+
+<br><br>
+
+<button
+type="button"
+id="previousStep3">
+
+← Previous
+
+</button>
+
+<button
+type="button"
+id="nextStep3">
+
+Next →
+
+</button>
+
+</div>
+
+<div id="cooperativeStep" class="step" style="display:none;">
+
+<h3>Step 4 of 4</h3>
+
+<h4>Cooperative Information</h4>
+
+<select id="cooperative">
+
+<option value="">
+Select Cooperative
+</option>
+
+<option>
+ABUFAUZAN TECH Cooperative
+</option>
+
+</select>
+
+<br><br>
+
+<input
+type="text"
+id="membershipNumber"
+placeholder="Membership Number (Optional)">
+
+<br><br>
+
+<button
+type="button"
+id="previousStep4">
+
+← Previous
+
+</button>
+
+<button
+type="submit"
+id="submitMember">
+
+✅ Register Member
+
+</button>
+
+</div>
+
+</form>
+
+<script type="module" src="script.js"></script>
+
+</body>
+</html>

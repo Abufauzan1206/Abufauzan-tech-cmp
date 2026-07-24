@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Draw Group Profile</title>
+
+<style>
+
+.workspace-item {
+    margin-bottom: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="groupProfile" style="display:none;">
+
+<h1 id="groupName">
+
+Loading...
+
+</h1>
+
+<p>
+
+<strong>Start Period:</strong>
+
+<span id="startPeriod">
+
+Loading...
+
+</span>
+
+</p>
+
+<p>
+
+<strong>Maximum Slots:</strong>
+
+<span id="maxSlots">
+
+0
+
+</span>
+
+</p>
+
+<p>
+
+<strong>Maximum Slots Per Member:</strong>
+
+<span id="maxSlotsPerMember">
+
+0
+
+</span>
+
+</p>
+
+<p>
+
+<strong>Status:</strong>
+
+<span id="groupStatus">
+
+Active
+
+</span>
+
+</p>
+
+<hr>
+
+<hr>
+
+<h2>📦 Capacity</h2>
+
+<p>
+
+<strong>
+Used Slots:
+</strong>
+
+<span id="usedSlots">
+
+0
+
+</span>
+
+</p>
+
+<p>
+
+<strong>
+Remaining Slots:
+</strong>
+
+<span id="remainingSlots">
+
+0
+
+</span>
+
+</p>
+
+<p>
+
+<strong>
+Participants:
+</strong>
+
+<span id="participantCount">
+
+0
+
+</span>
+
+</p>
+
+<hr>
+
+<h2>🎲 Group Workspace</h2>
+
+<div class="workspace-item">
+
+<button id="openRegistrationBtn">
+
+🟢 Open Registration
+
+</button>
+
+</div>
+
+<div class="workspace-item">
+
+<button id="closeRegistrationBtn">
+
+🔴 Close Registration
+
+</button>
+
+</div>
+
+<div class="workspace-item">
+
+<button id="prepareDrawBtn">
+
+🎲 Prepare Draw
+
+</button>
+
+<div class="workspace-item">
+
+<button id="runDrawBtn">
+
+▶️ Run Draw
+
+</button>
+
+</div>
+
+</div>
+
+<div class="workspace-item">
+
+<button id="participantsBtn">
+
+👥 Participants
+
+</button>
+
+</div>
+
+<div class="workspace-item">
+
+<button id="boxesBtn">
+
+📦 Boxes
+
+</button>
+
+</div>
+
+<div class="workspace-item">
+
+<button id="reservedMonthsBtn">
+
+🔒 Reserved Months
+
+</button>
+
+</div>
+
+<div class="workspace-item">
+
+<button disabled>
+
+🏛️ Transparency Hall
+
+</button>
+
+</div>
+
+<div class="workspace-item">
+
+<a href="../group-directory/index.html">
+
+<button>
+
+⬅ Back
+
+</button>
+
+</a>
+
+</div>
+
+</div>
+
+<script
+type="module"
+src="script.js"></script>
+
+</body>
+
+</html>

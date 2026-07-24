@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Register Cooperative</title>
+
+<link rel="stylesheet"
+href="css/style.css">
+
+<link rel="stylesheet"
+href="css/layout.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+
+ TECH CMP
+
+</div>
+
+<div class="profile">
+
+<a href="super-admin.html">
+
+<button>
+
+⬅ Dashboard
+
+</button>
+
+</a>
+
+</div>
+
+</header>
+
+<div class="main-container">
+
+<nav class="sidebar">
+
+<h3>Registration</h3>
+
+<p>
+Complete the cooperative details below.
+</p>
+
+</nav>
+
+<main id="content">
+
+<h1>🏢 Register a Cooperative</h1>
+
+<p class="tagline">
+
+Create and onboard a new cooperative into the
+ABUFAUZAN TECH Cooperative Management Platform.
+
+</p>
+
+<hr>
+
+<form id="registerCooperativeForm">
+
+<div class="wizard">
+
+<div class="wizard-progress">
+
+<div class="wizard-step active">
+
+<div class="step-number" data-icon="🏢">🏢</div>
+
+<p>Cooperative</p>
+
+</div>
+
+<div class="wizard-step">
+
+<div class="step-number" data-icon="📞">📞</div>
+
+<p>Contact</p>
+
+</div>
+
+<div class="wizard-step">
+
+<div class="step-number" data-icon="👤">👤</div>
+
+<p>Administrator</p>
+
+</div>
+
+<div class="wizard-step">
+
+<div class="step-number" data-icon="💎">💎</div>
+
+<p>Subscription</p>
+
+</div>
+
+</div>
+
+<div class="wizard-page active" data-step="1">
+
+<h3>🏢 Cooperative Information</h3>
+
+<input
+type="text"
+id="coopName"
+name="coopName"
+placeholder="Cooperative Name"
+required>
+
+<br><br>
+
+<input
+type="text"
+id="registrationNumber"
+name="registrationNumber"
+placeholder="Registration Number (Optional)">
+
+<br><br>
+
+<select
+id="coopType"
+name="coopType"
+required>
+
+<option value="">Select Cooperative Type</option>
+
+<option value="Multipurpose">Multipurpose</option>
+
+<option value="Staff">Staff</option>
+
+<option value="Community">Community</option>
+
+<option value="Religious">Religious</option>
+
+<option value="Agricultural">Agricultural</option>
+
+<option value="Investment">Investment</option>
+
+</select>
+
+<br><br>
+
+<select
+id="country"
+name="country"
+required>
+
+<option value="">
+Select Country
+</option>
+
+<option value="Nigeria">
+🇳🇬 Nigeria
+</option>
+
+<option value="Ghana">
+🇬🇭 Ghana
+</option>
+
+<option value="Kenya">
+🇰🇪 Kenya
+</option>
+
+<option value="South Africa">
+🇿🇦 South Africa
+</option>
+
+<option value="United Kingdom">
+🇬🇧 United Kingdom
+</option>
+
+<option value="United States">
+🇺🇸 United States
+</option>
+
+<option value="Canada">
+🇨🇦 Canada
+</option>
+
+<option value="India">
+🇮🇳 India
+</option>
+
+</select>
+
+<br><br>
+
+<input
+type="text"
+id="state"
+name="state"
+placeholder="State / Province"
+required>
+
+<br><br>
+
+<input
+type="text"
+id="city"
+name="city"
+placeholder="City / Local Government"
+required>
+
+<br><br>
+
+<textarea
+id="officeAddress"
+name="officeAddress"
+placeholder="Office Address"
+rows="3"></textarea>
+
+</div>
+
+<div class="wizard-page" data-step="2">
+
+<h3>📞 Official Contact</h3>
+
+<input
+type="email"
+id="coopEmail"
+name="coopEmail"
+placeholder="Official Email"
+required>
+
+<br><br>
+
+<input
+type="tel"
+id="coopPhone"
+name="coopPhone"
+placeholder="Official Phone Number"
+required>
+
+</div>
+
+<div class="wizard-page" data-step="3">
+  
+<h3>👤 Administrator Account</h3>
+
+<input
+type="text"
+id="adminName"
+name="adminName"
+placeholder="Administrator Full Name"
+required>
+
+<br><br>
+
+<input
+type="email"
+id="adminEmail"
+name="adminEmail"
+placeholder="Administrator Email"
+required>
+
+<br><br>
+
+<input
+type="password"
+id="adminPassword"
+name="adminPassword"
+placeholder="Temporary Password"
+required>
+
+</div>
+
+<div class="wizard-page" data-step="4">
+  
+<h3>💎 Subscription Plan</h3>
+
+<select
+id="subscriptionPlan"
+name="subscriptionPlan">
+
+<option value="Trial">Trial</option>
+
+<option value="Basic">Basic</option>
+
+<option value="Standard">Standard</option>
+
+<option value="Premium">Premium</option>
+
+</select>
+
+<br><br>
+
+<div class="wizard-navigation">
+
+<button
+type="button"
+id="prevBtn"
+class="btn-secondary">
+
+⬅ Previous
+
+</button>
+
+<button
+type="button"
+id="nextBtn"
+class="btn-primary">
+
+Next ➜
+
+</button>
+
+<button
+type="submit"
+id="submitBtn"
+class="btn-primary"
+style="display:none;">
+
+🚀 Create Cooperative
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</form>
+
+</main>
+
+</div>
+
+<footer>
+
+© 2026 ABUFAUZAN TECH
+
+</footer>
+
+<script type="module"
+src="modules/register-cooperative/script.js"></script>
+
+</body>
+
+</html>

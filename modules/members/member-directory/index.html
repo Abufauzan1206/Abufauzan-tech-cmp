@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Member Directory</title>
+
+<link rel="stylesheet"
+href="../../css/style.css">
+
+<link rel="stylesheet"
+href="style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📋 Member Directory</h1>
+
+<p>
+
+All registered cooperative members
+
+</p>
+
+<h3 id="memberCount">
+👥 Total Members: 0
+</h3>
+
+<div class="filters">
+
+<button id="allFilter">
+All
+</button>
+
+<button id="activeFilter">
+Active
+</button>
+
+<button id="pendingFilter">
+Pending
+</button>
+
+<button id="inactiveFilter">
+Inactive
+</button>
+
+</div>
+
+<br>
+
+<input
+type="text"
+id="searchMember"
+placeholder="🔍 Search by Membership No., Name or Phone">
+
+<br><br>
+
+<table id="membersTable" width="100%">
+
+<thead>
+
+<tr>
+
+<th>Membership No.</th>
+
+<th>Full Name</th>
+
+<th>Phone</th>
+
+<th>Status</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="membersBody">
+
+<tr>
+
+<td colspan="5">
+
+Loading members...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+<br><br>
+<a href="../index.html" class="secondary-btn">
+
+⬅ Back to Members
+
+</a>
+
+</div>
+
+<script type="module"
+src="script.js"></script>
+
+</body>
+
+</html>
