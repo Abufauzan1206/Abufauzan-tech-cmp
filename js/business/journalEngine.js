@@ -46,4 +46,30 @@ export class CMPJournalEngine {
 
     }
 
+    /**
+     * Validate a journal before posting
+     */
+    static validate(journal) {
+
+        if (!journal.entries || !Array.isArray(journal.entries)) {
+            throw new Error("Journal entries are required.");
+        }
+
+        let totalDebit = 0;
+        let totalCredit = 0;
+
+        for (const entry of journal.entries) {
+            totalDebit += Number(entry.debit || 0);
+            totalCredit += Number(entry.credit || 0);
+        }
+
+        if (totalDebit !== totalCredit) {
+            throw new Error(
+                `Journal is not balanced. Debit=${totalDebit}, Credit=${totalCredit}`
+            );
+        }
+
+        return true;
+
+    }
 }
