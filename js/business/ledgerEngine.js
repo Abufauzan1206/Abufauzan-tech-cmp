@@ -21,37 +21,35 @@ export class CMPLedgerEngine {
 
         const newEntry = {
 
-    ledgerId:
-        CMPIdService.generate("LED"),
+            ledgerId:
+                CMPIdService.generate("LED"),
 
-    transactionId:
-        entry.transactionId ?? null,
+            transactionId:
+                entry.transactionId ?? null,
 
-    account:
-        entry.account ?? null,
+            account:
+                entry.account ?? null,
 
-    debit:
-        entry.debit ?? 0,
+            debit:
+                entry.debit ?? 0,
 
-    credit:
-        entry.credit ?? 0,
+            credit:
+                entry.credit ?? 0,
 
-    currency:
-        entry.currency ?? "NGN",
+            currency:
+                entry.currency ?? "NGN",
 
-    description:
-        entry.description ?? "",
+            description:
+                entry.description ?? "",
 
-    createdAt:
-        new Date(),
+            createdAt:
+                new Date(),
 
-    ...entry
+            ...entry
 
-};
+        };
 
-        this.entries.push(
-            newEntry
-        );
+        this.entries.push(newEntry);
 
         return newEntry;
 
@@ -63,6 +61,15 @@ export class CMPLedgerEngine {
     static getAll() {
 
         return [...this.entries];
+
+    }
+
+    /**
+     * Post to ledger
+     */
+    static post(entry) {
+
+        return this.create(entry);
 
     }
 

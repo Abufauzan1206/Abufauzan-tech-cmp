@@ -4,54 +4,37 @@
  * Business Module: BM-010
  *
  * File: transactionEngine.js
- * Version: 1.0.0
+ * Version: 2.0.0
  * =====================================================
  */
 
 import { CMPIdService } from "./idService.js";
-
 import { CMPRepositoryManager } from "../repositories/repositoryManager.js";
+import { CMPJournalBuilderEngine } from "./journalBuilderEngine.js";
+import { CMPJournalEngine } from "./journalEngine.js";
+import { CMPJournalPostingEngine } from "./journalPostingEngine.js";
 
 export class CMPTransactionEngine {
-    
-    /**
- * Supported transaction types
- */
-static TYPES = {
 
-    CONTRIBUTION: "CONTRIBUTION",
+    static TYPES = {
 
-    LOAN_DISBURSEMENT: "LOAN_DISBURSEMENT",
+        CONTRIBUTION: "CONTRIBUTION",
+        LOAN_DISBURSEMENT: "LOAN_DISBURSEMENT",
+        LOAN_REPAYMENT: "LOAN_REPAYMENT",
+        INVESTMENT: "INVESTMENT",
+        DONATION: "DONATION",
+        BONANZA: "BONANZA",
+        SAVINGS: "SAVINGS",
+        WITHDRAWAL: "WITHDRAWAL",
+        EXPENSE: "EXPENSE"
 
-    LOAN_REPAYMENT: "LOAN_REPAYMENT",
+    };
 
-    INVESTMENT: "INVESTMENT",
-
-    DONATION: "DONATION",
-
-    BONANZA: "BONANZA",
-
-    SAVINGS: "SAVINGS",
-
-    WITHDRAWAL: "WITHDRAWAL",
-
-    EXPENSE: "EXPENSE"
-
-};
-
-    /**
-     * Record a financial transaction
-     */
-     
     static create(transaction) {
-      
-      if (!transaction.type) {
 
-    throw new Error(
-        "Transaction type is required."
-    );
-
-}
+        if (!transaction.type) {
+            throw new Error("Transaction type is required.");
+        }
 
         const newTransaction = {
 
@@ -60,37 +43,42 @@ static TYPES = {
 
             createdAt:
                 new Date(),
-                
-                transactionDate:
-    new Date(),
+
+            transactionDate:
+                new Date(),
 
             status:
-    "pending",
+                "pending",
 
-currency:
-    "NGN",
+            currency:
+                "NGN",
 
-...transaction
+            ...transaction
 
         };
 
         CMPRepositoryManager
-    .transaction
-    .save(newTransaction);
+            .transaction
+            .save(newTransaction);
 
-return newTransaction;
+        const builtJournal =
+            CMPJournalBuilderEngine.build(newTransaction);
+
+        const journal =
+            CMPJournalEngine.create(builtJournal);
+
+        CMPJournalPostingEngine.post(journal);
+
+        return newTransaction;
 
     }
 
-    /**
-     * Get all transactions
-     */
     static getAll() {
 
-    return CMPRepositoryManager
-        .transaction
-        .getAll();
+        return CMPRepositoryManager
+            .transaction
+            .getAll();
 
-}
+    }
 
 }
