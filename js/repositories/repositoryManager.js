@@ -4,7 +4,7 @@
  * Repository Module: RP-007
  *
  * File: repositoryManager.js
- * Version: 1.0.0
+ * Version: 1.1.0
  * =====================================================
  */
 
@@ -13,6 +13,7 @@ import { CMPContributionRepository } from "./contributionRepository.js";
 import { CMPTransactionRepository } from "./transactionRepository.js";
 import { CMPLedgerRepository } from "./ledgerRepository.js";
 import { CMPJournalRepository } from "./journalRepository.js";
+import { CMPChartOfAccountsRepository } from "./chartOfAccountsRepository.js";
 
 export class CMPRepositoryManager {
 
@@ -30,5 +31,8 @@ export class CMPRepositoryManager {
 
     static journal =
         new CMPJournalRepository();
+
+    static chartOfAccounts =
+        new CMPChartOfAccountsRepository();
 
 }
