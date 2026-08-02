@@ -17,7 +17,6 @@ pre{
     white-space:pre-wrap;
 }
 </style>
-
 </head>
 <body>
 
@@ -44,23 +43,23 @@ try {
     const adapter = new CMPFirebaseAdapter("adapterTest");
 
     const documentId = await adapter.create({
-
         name: "Adapter Test",
-
         status: "SUCCESS",
-
         createdBy: "CMP"
-
     });
 
     report += "CREATE(): PASS\n";
-    report += "Document ID:\n";
-    report += documentId + "\n\n";
+    report += "Document ID: " + documentId + "\n\n";
 
     const record = await adapter.findById(documentId);
 
-    report += "FIND BY ID(): PASS\n\n";
-    report += JSON.stringify(record, null, 4);
+    report += "FIND BY ID(): PASS\n";
+    report += JSON.stringify(record, null, 4) + "\n\n";
+
+    const records = await adapter.findAll();
+
+    report += "FIND ALL(): PASS\n";
+    report += "Total Records: " + records.length + "\n";
 
 }
 catch(error){
@@ -70,7 +69,7 @@ catch(error){
 
 }
 
-report += "\n\n=========================================\n";
+report += "\n=========================================\n";
 report += "TEST COMPLETE\n";
 report += "=========================================";
 

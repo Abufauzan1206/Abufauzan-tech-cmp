@@ -5,7 +5,7 @@
  *
  * File: firebaseAdapter.js
  * Module: DA-002
- * Version: 1.3.0
+ * Version: 1.4.0
  *
  * Firebase Database Adapter
  * =====================================================
@@ -64,6 +64,30 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
             ...snapshot.data()
 
         };
+
+    }
+
+    async findAll() {
+
+        const snapshot = await getDocs(
+            collection(db, this.collectionName)
+        );
+
+        const records = [];
+
+        snapshot.forEach((document) => {
+
+            records.push({
+
+                id: document.id,
+
+                ...document.data()
+
+            });
+
+        });
+
+        return records;
 
     }
 
