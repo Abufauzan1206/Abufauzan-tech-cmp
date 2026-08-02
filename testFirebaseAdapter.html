@@ -1,19 +1,9 @@
-cat > testFirebaseAdapter.html <<'EOF'
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMP Firebase Adapter Test</title>
-<style>
-body{font-family:Arial,sans-serif;margin:20px;}
-pre{background:#f4f4f4;padding:15px;border-radius:8px;white-space:pre-wrap;}
-</style>
-</head>
+<html>
 <body>
 
 <h2>ABUFAUZAN TECH CMP</h2>
-<h3>Firebase Adapter Test</h3>
+<h3>Firebase Adapter CRUD Test</h3>
 
 <pre id="output">Running...</pre>
 
@@ -25,54 +15,89 @@ const output = document.getElementById("output");
 
 let report = "";
 
-report += "=========================================\n";
-report += "ABUFAUZAN TECH CMP\n";
-report += "FIREBASE ADAPTER TEST\n";
-report += "=========================================\n\n";
-
 try {
 
-    const adapter = new CMPFirebaseAdapter("adapterTest");
+const adapter = new CMPFirebaseAdapter("adapterTest");
 
-    const id = await adapter.create({
-        name: "Adapter Test",
-        status: "SUCCESS",
-        createdBy: "CMP"
-    });
+report += "=========================================\n";
+report += "ABUFAUZAN TECH CMP\n";
+report += "FIREBASE ADAPTER CRUD TEST\n";
+report += "=========================================\n\n";
 
-    report += "CREATE(): PASS\n";
-    report += "Document ID: " + id + "\n\n";
 
-    const record = await adapter.findById(id);
+const id = await adapter.create({
 
-    report += "FIND BY ID(): PASS\n";
-    report += JSON.stringify(record, null, 4) + "\n\n";
+    name:"Adapter Test",
+    status:"SUCCESS",
+    createdBy:"CMP"
 
-    const all = await adapter.findAll();
+});
 
-    report += "FIND ALL(): PASS\n";
-    report += "Total Records: " + all.length + "\n\n";
 
-    const updated = await adapter.update(id, {
-        status: "UPDATED"
-    });
+report += "CREATE(): PASS\n";
+report += "ID: " + id + "\n\n";
 
-    report += "UPDATE(): PASS\n";
-    report += JSON.stringify(updated, null, 4) + "\n";
+
+const record = await adapter.findById(id);
+
+
+report += "FIND BY ID(): PASS\n";
+report += JSON.stringify(record,null,4) + "\n\n";
+
+
+const all = await adapter.findAll();
+
+
+report += "FIND ALL(): PASS\n";
+report += "Total Records: " + all.length + "\n\n";
+
+
+const updated = await adapter.update(id,{
+
+    status:"UPDATED"
+
+});
+
+
+report += "UPDATE(): PASS\n";
+report += JSON.stringify(updated,null,4) + "\n\n";
+
+
+await adapter.delete(id);
+
+
+const deleted = await adapter.findById(id);
+
+
+if(deleted === null){
+
+    report += "DELETE(): PASS\n";
 
 }
+else{
+
+    report += "DELETE(): FAILED\n";
+
+}
+
+
+}
+
 catch(error){
 
-    report += "TEST FAILED\n\n";
-    report += error.message;
+report += "ERROR:\n";
+report += error.message;
 
 }
+
 
 report += "\n=========================================\n";
 report += "TEST COMPLETE\n";
 report += "=========================================";
 
+
 output.textContent = report;
+
 
 </script>
 

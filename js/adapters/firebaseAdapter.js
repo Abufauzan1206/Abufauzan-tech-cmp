@@ -5,7 +5,7 @@
  *
  * File: firebaseAdapter.js
  * Module: DA-002
- * Version: 1.5.0
+ * Version: 1.6.0
  *
  * Firebase Database Adapter
  * =====================================================
@@ -24,6 +24,7 @@ import {
     doc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+
 export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
 
     constructor(collectionName) {
@@ -33,6 +34,7 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
         this.collectionName = collectionName;
 
     }
+
 
     async create(data) {
 
@@ -44,6 +46,7 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
         return document.id;
 
     }
+
 
     async findById(id) {
 
@@ -58,11 +61,15 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
         }
 
         return {
+
             id: snapshot.id,
+
             ...snapshot.data()
+
         };
 
     }
+
 
     async findAll() {
 
@@ -75,8 +82,11 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
         snapshot.forEach((document) => {
 
             records.push({
+
                 id: document.id,
+
                 ...document.data()
+
             });
 
         });
@@ -85,14 +95,31 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
 
     }
 
+
     async update(id, data) {
 
         await updateDoc(
+
             doc(db, this.collectionName, id),
+
             data
+
         );
 
         return this.findById(id);
+
+    }
+
+
+    async delete(id) {
+
+        await deleteDoc(
+
+            doc(db, this.collectionName, id)
+
+        );
+
+        return true;
 
     }
 
