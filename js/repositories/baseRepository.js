@@ -1,128 +1,113 @@
 /**
  * =====================================================
- * ABUFAUZAN TECH Cooperative Management Platform
- * Repository Module: RP-001
+ * ABUFAUZAN TECH CMP
+ * Repository Layer
  *
  * File: baseRepository.js
+ * Module: RP-001
  * Version: 1.0.0
  * =====================================================
  */
 
+
 export class CMPBaseRepository {
+
 
     constructor() {
 
         this.records = [];
 
+        this.sequence = 1;
+
     }
 
-    /**
-     * Save a record
-     */
-    save(record) {
+
+
+    create(data) {
+
+        const record = {
+
+            id: this.sequence++,
+
+            ...data,
+
+            createdAt: new Date()
+
+        };
+
 
         this.records.push(record);
+
 
         return record;
 
     }
 
-    /**
-     * Get all records
-     */
-    getAll() {
 
-        return [...this.records];
 
-    }
+    findById(id) {
 
-    /**
-     * Find a record
-     */
-    find(predicate) {
-
-        return this.records.find(predicate);
+        return this.records.find(
+            record => record.id === id
+        );
 
     }
 
-    /**
-     * Remove a record
-     */
-    remove(predicate) {
 
-        this.records =
-            this.records.filter(
-                record => !predicate(record)
+
+    findAll() {
+
+        return this.records;
+
+    }
+
+
+
+    update(id, updates) {
+
+        const record =
+            this.findById(id);
+
+
+        if (!record) {
+
+            return null;
+
+        }
+
+
+        Object.assign(
+            record,
+            updates
+        );
+
+
+        return record;
+
+    }
+
+
+
+    delete(id) {
+
+        const index =
+            this.records.findIndex(
+                record => record.id === id
             );
 
-    }
-    
-    /**
- * Count records
- */
-count() {
 
-    return this.records.length;
+        if (index === -1) {
 
-}
+            return false;
 
-/**
- * Remove all records
- */
-clear() {
+        }
 
-    this.records = [];
 
-}
+        this.records.splice(index,1);
 
-/**
- * Check if a record exists
- */
-exists(predicate) {
 
-    return this.records.some(predicate);
-
-}
-
-/**
- * Update a record
- */
-update(predicate, updater) {
-
-    const index =
-        this.records.findIndex(predicate);
-
-    if (index === -1) {
-
-        return null;
+        return true;
 
     }
-
-    this.records[index] = {
-
-        ...this.records[index],
-
-        ...updater
-
-    };
-
-    return this.records[index];
-
-}
-
-/**
- * Find a record by ID
- */
-findById(idField, idValue) {
-
-    return this.records.find(
-
-        record =>
-
-            record[idField] === idValue
-
-    );
-
-}
 
 }
