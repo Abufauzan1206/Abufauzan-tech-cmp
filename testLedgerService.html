@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Ledger Service Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    createLedger,
+    getLedgerById,
+    updateLedger,
+    deleteLedger
+}
+from "./js/services/ledgerService.js";
+
+
+const output = document.getElementById("output");
+
+let report = "";
+
+
+try {
+
+
+report += "=========================================\n";
+report += "ABUFAUZAN TECH CMP\n";
+report += "LEDGER SERVICE TEST\n";
+report += "=========================================\n\n";
+
+
+const id = await createLedger({
+
+    account:"Cash Ledger",
+
+    debit:75000,
+
+    credit:0,
+
+    status:"SUCCESS",
+
+    createdBy:"CMP"
+
+});
+
+
+report += "CREATE LEDGER SERVICE(): PASS\n";
+report += "ID: " + id + "\n\n";
+
+
+const record = await getLedgerById(id);
+
+
+report += "GET LEDGER SERVICE(): PASS\n";
+report += JSON.stringify(record,null,4) + "\n\n";
+
+
+await updateLedger(id,{
+    status:"UPDATED"
+});
+
+
+report += "UPDATE LEDGER SERVICE(): PASS\n\n";
+
+
+await deleteLedger(id);
+
+
+report += "DELETE LEDGER SERVICE(): PASS\n";
+
+
+}
+
+catch(error){
+
+report += "ERROR:\n";
+report += error.message;
+
+}
+
+
+report += "\n=========================================\n";
+report += "TEST COMPLETE\n";
+report += "=========================================";
+
+
+output.textContent = report;
+
+
+</script>
+
+</body>
+</html>

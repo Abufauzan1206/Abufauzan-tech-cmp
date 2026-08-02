@@ -1,81 +1,54 @@
-import { db } from "../firebase-config.js";
+/**
+ * =====================================================
+ * ABUFAUZAN TECH Cooperative Management Platform
+ *
+ * Service Layer
+ *
+ * File: memberService.js
+ * Version: 2.0.0
+ *
+ * Member Business Service
+ * =====================================================
+ */
 
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { CMPRepositoryManager }
+from "../repositories/repositoryManager.js";
 
-export async function registerMember(memberData) {
 
-  // Count existing members
-  const snapshot = await getDocs(collection(db, "members"));
+const memberRepository =
+    CMPRepositoryManager.get("member");
 
-  const nextNumber = snapshot.size + 1;
 
-  const year = new Date().getFullYear();
+export async function createMember(data) {
 
-  const memberNumber =
-    `ABT-M-${year}-${String(nextNumber).padStart(6, "0")}`;
-
-  memberData.memberNumber = memberNumber;
-
-memberData.createdAt = serverTimestamp();
-
-memberData.status = "active";
-
-  const docRef = await addDoc(
-    collection(db, "members"),
-    memberData
-  );
-
-  return {
-    documentId: docRef.id,
-    memberNumber: memberNumber
-  };
+    return await memberRepository.create(data);
 
 }
 
-export async function getMembers() {
 
-  const snapshot = await getDocs(collection(db, "members"));
+export async function getMemberById(id) {
 
-  const members = [];
-
-  snapshot.forEach((doc) => {
-
-    members.push({
-      id: doc.id,
-      ...doc.data()
-    });
-
-  });
-
-  return members;
+    return await memberRepository.findById(id);
 
 }
 
-export async function getMemberById(memberId) {
 
-  const memberRef = doc(db, "members", memberId);
+export async function getAllMembers() {
 
-  const memberSnap = await getDoc(memberRef);
+    return await memberRepository.findAll();
 
-  if (!memberSnap.exists()) {
+}
 
-    return null;
 
-  }
+export async function updateMember(id, data) {
 
-  return {
+    return await memberRepository.update(id, data);
 
-    id: memberSnap.id,
+}
 
-    ...memberSnap.data()
 
-  };
+export async function deleteMember(id) {
+
+    return await memberRepository.delete(id);
 
 }

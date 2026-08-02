@@ -1,115 +1,54 @@
-import { db } from "../firebase-config.js";
+/**
+ * =====================================================
+ * ABUFAUZAN TECH Cooperative Management Platform
+ *
+ * Service Layer
+ *
+ * File: contributionService.js
+ * Version: 2.0.0
+ *
+ * Contribution Business Service
+ * =====================================================
+ */
 
-// import { CMPTransactionEngine }
-// from "../business/transactionEngine.js";
+import { CMPRepositoryManager }
+from "../repositories/repositoryManager.js";
 
-import {
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    where,
-    serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-export async function recordContribution(
-    contributionData
-) {
+const contributionRepository =
+    CMPRepositoryManager.get("contribution");
 
-    contributionData.createdAt =
-        serverTimestamp();
 
-    const docRef = await addDoc(
-        collection(db, "contributions"),
-        contributionData
-    );
-    
-   /*
-   CMPTransactionEngine.create({
+export async function createContribution(data) {
 
-    type:
-    CMPTransactionEngine
-    .TYPES
-    .CONTRIBUTION,
-
-    memberId:
-    contributionData.memberId,
-
-    amount:
-    contributionData.amount,
-
-    debitCredit:
-    "CREDIT",
-
-    description:
-`Contribution by member ${contributionData.memberId}`
-
-});*/
-
-    return docRef.id;
+    return await contributionRepository.create(data);
 
 }
 
-export async function getMemberContributions(
-    memberId
-) {
 
-    const q = query(
-        collection(db, "contributions"),
-        where("memberId", "==", memberId)
-    );
+export async function getContributionById(id) {
 
-    const snapshot =
-        await getDocs(q);
-
-    const contributions = [];
-
-    snapshot.forEach(doc => {
-
-        contributions.push({
-
-            id: doc.id,
-
-            ...doc.data()
-
-        });
-
-    });
-
-    return contributions;
+    return await contributionRepository.findById(id);
 
 }
 
-export async function
-getContributionSummary(memberId) {
 
-    const contributions =
-        await getMemberContributions(
-            memberId
-        );
+export async function getAllContributions() {
 
-    const totalAmount =
-        contributions.reduce(
+    return await contributionRepository.findAll();
 
-            (sum, contribution) =>
+}
 
-                sum +
-                Number(
-                    contribution.amount || 0
-                ),
 
-            0
+export async function updateContribution(id, data) {
 
-        );
+    return await contributionRepository.update(id, data);
 
-    return {
+}
 
-        totalContributions:
-            contributions.length,
 
-        totalAmount
+export async function deleteContribution(id) {
 
-    };
+    return await contributionRepository.delete(id);
 
 }

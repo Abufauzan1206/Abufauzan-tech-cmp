@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Member Service Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    createMember,
+    getMemberById,
+    updateMember,
+    deleteMember
+} from "./js/services/memberService.js";
+
+const output = document.getElementById("output");
+
+let report = "";
+
+try {
+
+report += "=========================================\n";
+report += "ABUFAUZAN TECH CMP\n";
+report += "MEMBER SERVICE TEST\n";
+report += "=========================================\n\n";
+
+const id = await createMember({
+
+    name: "John Doe",
+
+    phone: "08012345678",
+
+    role: "MEMBER",
+
+    status: "ACTIVE",
+
+    createdBy: "CMP"
+
+});
+
+report += "CREATE MEMBER SERVICE(): PASS\n";
+report += "ID: " + id + "\n\n";
+
+const record = await getMemberById(id);
+
+report += "GET MEMBER SERVICE(): PASS\n";
+report += JSON.stringify(record, null, 4) + "\n\n";
+
+await updateMember(id, {
+    status: "UPDATED"
+});
+
+report += "UPDATE MEMBER SERVICE(): PASS\n\n";
+
+await deleteMember(id);
+
+report += "DELETE MEMBER SERVICE(): PASS\n";
+
+}
+
+catch(error){
+
+report += "ERROR:\n";
+report += error.message;
+
+}
+
+report += "\n=========================================\n";
+report += "TEST COMPLETE\n";
+report += "=========================================";
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>
