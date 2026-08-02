@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Generator Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    generateCMPId,
+    generateDocumentNumber
+} from "./js/utils/generator.js";
+
+const output = document.getElementById("output");
+
+let report = "";
+
+report += "=========================================\n";
+report += "ABUFAUZAN TECH CMP\n";
+report += "GENERATOR TEST\n";
+report += "=========================================\n\n";
+
+report += "CMP ID:\n";
+report += generateCMPId("Nigeria") + "\n\n";
+
+report += "Journal Number:\n";
+report += generateDocumentNumber("JRN", 1) + "\n\n";
+
+report += "Transaction Number:\n";
+report += generateDocumentNumber("TRX", 25) + "\n\n";
+
+report += "Contribution Number:\n";
+report += generateDocumentNumber("CON", 103) + "\n\n";
+
+report += "=========================================\n";
+report += "TEST COMPLETE\n";
+report += "=========================================";
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>
