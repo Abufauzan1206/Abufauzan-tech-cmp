@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Journal Service Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    createJournal,
+    getJournalById,
+    updateJournal,
+    deleteJournal
+}
+from "./js/services/journalService.js";
+
+
+const output = document.getElementById("output");
+
+let report = "";
+
+
+try {
+
+
+report += "=========================================\n";
+report += "ABUFAUZAN TECH CMP\n";
+report += "JOURNAL SERVICE TEST\n";
+report += "=========================================\n\n";
+
+
+const id = await createJournal({
+
+    title:"Journal Service Test",
+
+    debit:50000,
+
+    credit:50000,
+
+    status:"SUCCESS",
+
+    createdBy:"CMP"
+
+});
+
+
+report += "CREATE JOURNAL SERVICE(): PASS\n";
+report += "ID: " + id + "\n\n";
+
+
+const record = await getJournalById(id);
+
+
+report += "GET JOURNAL SERVICE(): PASS\n";
+report += JSON.stringify(record,null,4) + "\n\n";
+
+
+await updateJournal(id,{
+    status:"UPDATED"
+});
+
+
+report += "UPDATE JOURNAL SERVICE(): PASS\n\n";
+
+
+await deleteJournal(id);
+
+
+report += "DELETE JOURNAL SERVICE(): PASS\n";
+
+
+}
+
+catch(error){
+
+report += "ERROR:\n";
+report += error.message;
+
+}
+
+
+report += "\n=========================================\n";
+report += "TEST COMPLETE\n";
+report += "=========================================";
+
+
+output.textContent = report;
+
+
+</script>
+
+</body>
+</html>
