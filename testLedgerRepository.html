@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Ledger Repository Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import { CMPLedgerRepository } from "./js/repositories/ledgerRepository.js";
+
+const output = document.getElementById("output");
+
+let report = "";
+
+try {
+
+const repository = new CMPLedgerRepository();
+
+
+report += "=========================================\n";
+report += "ABUFAUZAN TECH CMP\n";
+report += "LEDGER REPOSITORY TEST\n";
+report += "=========================================\n\n";
+
+
+const id = await repository.create({
+
+    account:"Cash Account",
+
+    debit:20000,
+
+    credit:0,
+
+    status:"SUCCESS",
+
+    createdBy:"CMP"
+
+});
+
+
+report += "CREATE(): PASS\n";
+report += "ID: " + id + "\n\n";
+
+
+const record = await repository.findById(id);
+
+report += "FIND BY ID(): PASS\n";
+report += JSON.stringify(record,null,4) + "\n\n";
+
+
+const all = await repository.findAll();
+
+report += "FIND ALL(): PASS\n";
+report += "Total Ledgers: " + all.length + "\n\n";
+
+
+await repository.update(id,{
+    status:"UPDATED"
+});
+
+report += "UPDATE(): PASS\n\n";
+
+
+await repository.delete(id);
+
+report += "DELETE(): PASS\n";
+
+
+}
+
+catch(error){
+
+report += "ERROR:\n";
+report += error.message;
+
+}
+
+
+report += "\n=========================================\n";
+report += "TEST COMPLETE\n";
+report += "=========================================";
+
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>
