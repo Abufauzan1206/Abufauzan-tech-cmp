@@ -1,112 +1,56 @@
 /**
  * =====================================================
- * ABUFAUZAN TECH CMP
+ * ABUFAUZAN TECH Cooperative Management Platform
  * Repository Layer
  *
  * File: baseRepository.js
  * Module: RP-001
- * Version: 1.0.0
+ * Version: 2.0.0
+ *
+ * Adapter-Based Base Repository
  * =====================================================
  */
 
-
 export class CMPBaseRepository {
 
+    constructor(adapter) {
 
-    constructor() {
-
-        this.records = [];
-
-        this.sequence = 1;
+        this.adapter = adapter;
 
     }
 
 
+    async create(data) {
 
-    create(data) {
-
-        const record = {
-
-            id: this.sequence++,
-
-            ...data,
-
-            createdAt: new Date()
-
-        };
-
-
-        this.records.push(record);
-
-
-        return record;
+        return await this.adapter.create(data);
 
     }
 
 
+    async findById(id) {
 
-    findById(id) {
-
-        return this.records.find(
-            record => record.id === id
-        );
+        return await this.adapter.findById(id);
 
     }
 
 
+    async findAll() {
 
-    findAll() {
-
-        return this.records;
-
-    }
-
-
-
-    update(id, updates) {
-
-        const record =
-            this.findById(id);
-
-
-        if (!record) {
-
-            return null;
-
-        }
-
-
-        Object.assign(
-            record,
-            updates
-        );
-
-
-        return record;
+        return await this.adapter.findAll();
 
     }
 
 
+    async update(id, data) {
 
-    delete(id) {
+        return await this.adapter.update(id, data);
 
-        const index =
-            this.records.findIndex(
-                record => record.id === id
-            );
+    }
 
 
-        if (index === -1) {
+    async delete(id) {
 
-            return false;
-
-        }
-
-
-        this.records.splice(index,1);
-
-
-        return true;
+        return await this.adapter.delete(id);
 
     }
 
