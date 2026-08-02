@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Repository Factory Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import { CMPRepositoryFactory } from "./js/repositories/repositoryFactory.js";
+
+
+const output = document.getElementById("output");
+
+let report = "";
+
+
+try {
+
+
+report += "=========================================\n";
+report += "ABUFAUZAN TECH CMP\n";
+report += "REPOSITORY FACTORY TEST\n";
+report += "=========================================\n\n";
+
+
+const journalRepository = CMPRepositoryFactory.journal();
+
+
+
+const id = await journalRepository.create({
+
+    title:"Journal Test Entry",
+
+    amount:5000,
+
+    status:"SUCCESS",
+
+    createdBy:"CMP"
+
+});
+
+
+report += "JOURNAL CREATE(): PASS\n";
+report += "ID: " + id + "\n\n";
+
+
+
+const journal = await journalRepository.findById(id);
+
+
+report += "JOURNAL FIND BY ID(): PASS\n";
+report += JSON.stringify(journal,null,4) + "\n\n";
+
+
+
+const all = await journalRepository.findAll();
+
+
+report += "JOURNAL FIND ALL(): PASS\n";
+report += "Total Journals: " + all.length + "\n\n";
+
+
+
+await journalRepository.update(id, {
+
+    status:"UPDATED"
+
+});
+
+
+report += "JOURNAL UPDATE(): PASS\n\n";
+
+
+
+await journalRepository.delete(id);
+
+
+report += "JOURNAL DELETE(): PASS\n";
+
+
+
+}
+
+catch(error){
+
+report += "ERROR:\n";
+report += error.message;
+
+}
+
+
+
+report += "\n=========================================\n";
+report += "TEST COMPLETE\n";
+report += "=========================================";
+
+
+output.textContent = report;
+
+
+</script>
+
+</body>
+</html>
