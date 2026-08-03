@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Financial Year Lifecycle Engine Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    createYear,
+    closeYear,
+    lockYear,
+    unlockYear,
+    reopenYear
+} from "./js/business/financialYearEngine.js";
+
+const output = document.getElementById("output");
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "FINANCIAL YEAR LIFECYCLE ENGINE TEST\n";
+    report += "=========================================\n\n";
+
+    const year = await createYear({
+
+        name: "FY 2029",
+
+        startDate: "2029-01-01",
+
+        endDate: "2029-12-31"
+
+    });
+
+    report += "CREATE YEAR(): PASS\n";
+    report += JSON.stringify(year, null, 4);
+    report += "\n\n";
+
+    await closeYear(year.id);
+    report += "CLOSE YEAR(): PASS\n\n";
+
+    await lockYear(year.id);
+    report += "LOCK YEAR(): PASS\n\n";
+
+    await unlockYear(year.id);
+    report += "UNLOCK YEAR(): PASS\n\n";
+
+    await reopenYear(year.id);
+    report += "REOPEN YEAR(): PASS\n\n";
+
+}
+catch (error) {
+
+    report += "TEST FAIL\n\n";
+    report += error.message;
+
+}
+
+report += "=========================================\n";
+report += "TEST COMPLETE\n";
+report += "=========================================";
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>

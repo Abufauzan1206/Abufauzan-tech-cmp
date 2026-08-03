@@ -5,7 +5,7 @@
  * Business Engine Layer
  *
  * File: financialYearEngine.js
- * Version: 1.0.0
+ * Version: 2.0.0
  *
  * Financial Year Lifecycle Engine
  * =====================================================
@@ -55,10 +55,8 @@ export async function createYear(data) {
     }
 
 
-
     const years =
         await getAllFinancialYears();
-
 
 
     const exists =
@@ -69,7 +67,6 @@ export async function createYear(data) {
         );
 
 
-
     if (exists) {
 
         throw new Error(
@@ -77,7 +74,6 @@ export async function createYear(data) {
         );
 
     }
-
 
 
     const year = {
@@ -103,12 +99,10 @@ export async function createYear(data) {
     };
 
 
-
     const result =
         await createFinancialYear(
             year
         );
-
 
 
     return {
@@ -121,6 +115,188 @@ export async function createYear(data) {
             result.id ?? result,
 
         year
+
+    };
+
+}
+
+
+
+/**
+ * Close Financial Year
+ */
+export async function closeYear(
+    id
+) {
+
+    const year =
+        await getFinancialYearById(id);
+
+
+    if (!year) {
+
+        throw new Error(
+            "Financial year not found."
+        );
+
+    }
+
+
+    await updateFinancialYear(
+        id,
+        {
+            status:
+                "CLOSED"
+        }
+    );
+
+
+    return {
+
+        success: true,
+
+        closed: true,
+
+        message:
+            "Financial year closed successfully."
+
+    };
+
+}
+
+
+
+/**
+ * Lock Financial Year
+ */
+export async function lockYear(
+    id
+) {
+
+    const year =
+        await getFinancialYearById(id);
+
+
+    if (!year) {
+
+        throw new Error(
+            "Financial year not found."
+        );
+
+    }
+
+
+    await updateFinancialYear(
+        id,
+        {
+            locked:
+                true,
+
+            status:
+                "CLOSED"
+        }
+    );
+
+
+    return {
+
+        success: true,
+
+        locked: true,
+
+        message:
+            "Financial year locked successfully."
+
+    };
+
+}
+
+
+
+/**
+ * Unlock Financial Year
+ */
+export async function unlockYear(
+    id
+) {
+
+    const year =
+        await getFinancialYearById(id);
+
+
+    if (!year) {
+
+        throw new Error(
+            "Financial year not found."
+        );
+
+    }
+
+
+    await updateFinancialYear(
+        id,
+        {
+            locked:
+                false
+        }
+    );
+
+
+    return {
+
+        success: true,
+
+        unlocked: true,
+
+        message:
+            "Financial year unlocked."
+
+    };
+
+}
+
+
+
+/**
+ * Reopen Financial Year
+ */
+export async function reopenYear(
+    id
+) {
+
+    const year =
+        await getFinancialYearById(id);
+
+
+    if (!year) {
+
+        throw new Error(
+            "Financial year not found."
+        );
+
+    }
+
+
+    await updateFinancialYear(
+        id,
+        {
+            status:
+                "OPEN",
+
+            locked:
+                false
+        }
+    );
+
+
+    return {
+
+        success: true,
+
+        reopened: true,
+
+        message:
+            "Financial year reopened."
 
     };
 
