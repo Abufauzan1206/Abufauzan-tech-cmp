@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Chart of Accounts Seeder Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    seedChartOfAccounts
+} from "./js/seeders/chartOfAccountsSeeder.js";
+
+const output = document.getElementById("output");
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "CHART OF ACCOUNTS SEEDER TEST\n";
+    report += "=========================================\n\n";
+
+    const result =
+        await seedChartOfAccounts();
+
+    report += "SEED CHART OF ACCOUNTS(): PASS\n\n";
+
+    report += JSON.stringify(result, null, 4);
+
+    report += "\n\n=========================================\n";
+    report += "TEST COMPLETE\n";
+    report += "=========================================";
+
+}
+catch (error) {
+
+    report += "SEED CHART OF ACCOUNTS(): FAIL\n\n";
+    report += error.message;
+
+}
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>

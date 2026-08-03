@@ -1,82 +1,79 @@
 /**
  * =====================================================
  * ABUFAUZAN TECH Cooperative Management Platform
- * Business Module: BM-016
+ *
+ * Business Engine Layer
  *
  * File: incomeExpenditureEngine.js
- * Version: 1.1.0
+ * Version: 2.0.0
+ *
+ * Smart Income & Expenditure Engine
  * =====================================================
  */
 
-import { CMPTrialBalanceEngine } from "./trialBalanceEngine.js";
+import {
+    generateTrialBalance
+} from "./trialBalanceEngine.js";
 
-export class CMPIncomeExpenditureEngine {
+import {
+    getAccountByName
+} from "../services/chartOfAccountsService.js";
 
-    static generate() {
+export async function generateIncomeExpenditure() {
 
-        const trialBalance =
-            CMPTrialBalanceEngine.generate();
+    const trialBalance =
+        await generateTrialBalance();
 
-        const income = [];
-        const expenses = [];
+    const incomeAccounts = [];
+    const expenseAccounts = [];
 
-        let totalIncome = 0;
-        let totalExpenses = 0;
+    let totalIncome = 0;
+    let totalExpenses = 0;
 
-        for (const account of trialBalance.accounts) {
+    for (const account of trialBalance.accounts) {
 
-            const name =
-                account.account.toUpperCase();
+        const chartAccount =
+            await getAccountByName(account.account);
 
-            if (
+        if (!chartAccount) {
+            continue;
+        }
 
-                name.includes("CONTRIBUTION") ||
-                name.includes("INCOME") ||
-                name.includes("INTEREST") ||
-                name.includes("DONATION") ||
-                name.includes("INVESTMENT")
+        switch (chartAccount.type) {
 
-            ) {
+            case "INCOME":
 
-                income.push(account);
+                incomeAccounts.push(account);
+                totalIncome += Number(account.credit || 0);
+                break;
 
-                totalIncome += account.credit;
+            case "EXPENSE":
 
-            }
+                expenseAccounts.push(account);
+                totalExpenses += Number(account.debit || 0);
+                break;
 
-            if (
-
-                name.includes("EXPENSE") ||
-                name.includes("SALARY") ||
-                name.includes("UTILITY") ||
-                name.includes("WELFARE") ||
-                name.includes("ADMIN")
-
-            ) {
-
-                expenses.push(account);
-
-                totalExpenses += account.debit;
-
-            }
+            default:
+                // Ignore ASSET, LIABILITY and EQUITY
+                break;
 
         }
 
-        return {
-
-            income,
-
-            expenses,
-
-            totalIncome,
-
-            totalExpenses,
-
-            surplus:
-                totalIncome - totalExpenses
-
-        };
-
     }
+
+    return {
+
+        success: true,
+        incomeAccounts,
+        expenseAccounts,
+        totalIncome,
+        totalExpenses,
+        netSurplus: totalIncome - totalExpenses,
+        netDeficit:
+            totalExpenses > totalIncome
+                ? totalExpenses - totalIncome
+                : 0
+
+    };
 
 }
