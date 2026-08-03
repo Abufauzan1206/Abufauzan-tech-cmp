@@ -28,11 +28,12 @@ try {
         title: "Cash Contribution",
         debit: 50000,
         credit: 50000,
+        debitAccount: "Cash Account",
+        creditAccount: "Contribution Income",
         createdBy: "CMP"
     });
 
     report += "POST JOURNAL(): PASS\n\n";
-
     report += JSON.stringify(result, null, 4);
 
     report += "\n\n=========================================\n";

@@ -5,15 +5,19 @@
  * Business Engine Layer
  *
  * File: journalPostingEngine.js
- * Version: 1.0.0
+ * Version: 2.0.0
  *
- * Journal Posting Engine
+ * Automatic Journal Posting Engine
  * =====================================================
  */
 
 import {
     createJournal
 } from "../services/journalService.js";
+
+import {
+    postLedgerBatch
+} from "./ledgerBatchPostingEngine.js";
 
 import {
     getNextSequence
@@ -38,7 +42,8 @@ export async function postJournal(data) {
         throw new Error("Journal is not balanced.");
     }
 
-    const sequence = await getNextSequence("JRN");
+    const sequence =
+        await getNextSequence("JRN");
 
     const journalNumber =
         generateDocumentNumber("JRN", sequence);
@@ -50,12 +55,28 @@ export async function postJournal(data) {
         createdAt: new Date().toISOString()
     };
 
-    const result = await createJournal(journal);
+    const journalResult =
+        await createJournal(journal);
+
+    const ledgerResult =
+        await postLedgerBatch([
+            {
+                account: data.debitAccount ?? "Cash Account",
+                debit: data.debit,
+                credit: 0
+            },
+            {
+                account: data.creditAccount ?? "General Income",
+                debit: 0,
+                credit: data.credit
+            }
+        ], data.createdBy ?? "CMP");
 
     return {
         success: true,
         journalNumber,
-        documentId: result.id ?? result,
+        ledgerBatchNumber: ledgerResult.batchNumber,
+        documentId: journalResult.id ?? journalResult,
         message: "Journal posted successfully."
     };
 
