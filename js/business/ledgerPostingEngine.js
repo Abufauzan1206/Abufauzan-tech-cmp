@@ -4,16 +4,16 @@
  *
  * Business Engine Layer
  *
- * File: journalPostingEngine.js
+ * File: ledgerPostingEngine.js
  * Version: 1.0.0
  *
- * Journal Posting Engine
+ * Ledger Posting Engine
  * =====================================================
  */
 
 import {
-    createJournal
-} from "../services/journalService.js";
+    createLedger
+} from "../services/ledgerService.js";
 
 import {
     getNextSequence
@@ -24,39 +24,35 @@ import {
 } from "../utils/generator.js";
 
 
-export async function postJournal(data) {
+export async function postLedger(data) {
 
-    if (!data.title) {
-        throw new Error("Journal title is required.");
+    if (!data.account) {
+        throw new Error("Ledger account is required.");
     }
 
     if (data.debit == null || data.credit == null) {
         throw new Error("Debit and Credit are required.");
     }
 
-    if (Number(data.debit) !== Number(data.credit)) {
-        throw new Error("Journal is not balanced.");
-    }
+    const sequence = await getNextSequence("LED");
 
-    const sequence = await getNextSequence("JRN");
+    const ledgerNumber =
+        generateDocumentNumber("LED", sequence);
 
-    const journalNumber =
-        generateDocumentNumber("JRN", sequence);
-
-    const journal = {
+    const ledger = {
         ...data,
-        journalNumber,
+        ledgerNumber,
         status: "POSTED",
         createdAt: new Date().toISOString()
     };
 
-    const result = await createJournal(journal);
+    const result = await createLedger(ledger);
 
     return {
         success: true,
-        journalNumber,
+        ledgerNumber,
         documentId: result.id ?? result,
-        message: "Journal posted successfully."
+        message: "Ledger posted successfully."
     };
 
 }

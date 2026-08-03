@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Contribution Posting Engine Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    postContribution
+} from "./js/business/contributionPostingEngine.js";
+
+const output = document.getElementById("output");
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "CONTRIBUTION POSTING ENGINE TEST\n";
+    report += "=========================================\n\n";
+
+    const result = await postContribution({
+        memberId: "MEMBER001",
+        amount: 25000,
+        month: "August 2026",
+        createdBy: "CMP"
+    });
+
+    report += "POST CONTRIBUTION(): PASS\n\n";
+    report += JSON.stringify(result, null, 4);
+
+    report += "\n\n=========================================\n";
+    report += "TEST COMPLETE\n";
+    report += "=========================================";
+
+}
+catch (error) {
+
+    report += "POST CONTRIBUTION(): FAIL\n\n";
+    report += error.message;
+
+}
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>
