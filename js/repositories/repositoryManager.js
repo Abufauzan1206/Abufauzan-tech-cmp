@@ -5,7 +5,7 @@
  * Repository Module: RP-002
  *
  * File: repositoryManager.js
- * Version: 3.0.0
+ * Version: 4.0.0
  *
  * Repository Registry & Access Manager
  * =====================================================
@@ -16,6 +16,7 @@ import { CMPContributionRepository } from "./contributionRepository.js";
 import { CMPTransactionRepository } from "./transactionRepository.js";
 import { CMPLedgerRepository } from "./ledgerRepository.js";
 import { CMPLedgerBatchRepository } from "./ledgerBatchRepository.js";
+import { CMPTrialBalanceRepository } from "./trialBalanceRepository.js";
 import { CMPJournalRepository } from "./journalRepository.js";
 import { CMPChartOfAccountsRepository } from "./chartOfAccountsRepository.js";
 
@@ -38,12 +39,14 @@ export class CMPRepositoryManager {
     static ledgerBatch =
         new CMPLedgerBatchRepository();
 
+    static trialBalance =
+        new CMPTrialBalanceRepository();
+
     static journal =
         new CMPJournalRepository();
 
     static chartOfAccounts =
         new CMPChartOfAccountsRepository();
-
 
     static initialize() {
 
@@ -73,6 +76,11 @@ export class CMPRepositoryManager {
         );
 
         this.register(
+            "trialBalance",
+            this.trialBalance
+        );
+
+        this.register(
             "journal",
             this.journal
         );
@@ -83,7 +91,6 @@ export class CMPRepositoryManager {
         );
 
     }
-
 
     static register(name, repository) {
 
@@ -97,11 +104,9 @@ export class CMPRepositoryManager {
 
     }
 
-
     static get(name) {
         return this.repositories.get(name);
     }
-
 
     static getAll() {
         return this.repositories;

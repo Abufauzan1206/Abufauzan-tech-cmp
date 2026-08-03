@@ -1,62 +1,92 @@
 /**
  * =====================================================
  * ABUFAUZAN TECH Cooperative Management Platform
- * Business Module: BM-015
+ *
+ * Business Engine Layer
  *
  * File: trialBalanceEngine.js
- * Version: 1.1.0
+ * Version: 1.0.0
+ *
+ * Trial Balance Engine
  * =====================================================
  */
 
-import { CMPLedgerEngine } from "./ledgerEngine.js";
+import {
+    getAllLedgerBatches
+} from "../services/trialBalanceService.js";
 
-export class CMPTrialBalanceEngine {
 
-    static generate() {
+export async function generateTrialBalance() {
 
-        const ledger = CMPLedgerEngine.getAll();
+    const batches =
+        await getAllLedgerBatches();
 
-        const balances = {};
+    const accounts = {};
 
-        let totalDebit = 0;
-        let totalCredit = 0;
+    for (const batch of batches) {
 
-        for (const entry of ledger) {
+        for (const entry of batch.entries || []) {
 
-            if (!balances[entry.account]) {
+            if (!accounts[entry.account]) {
 
-                balances[entry.account] = {
-
+                accounts[entry.account] = {
                     account: entry.account,
-
                     debit: 0,
-
-                    credit: 0
-
+                    credit: 0,
+                    balance: 0
                 };
 
             }
 
-            balances[entry.account].debit += entry.debit ?? 0;
-            balances[entry.account].credit += entry.credit ?? 0;
+            accounts[entry.account].debit +=
+                Number(entry.debit || 0);
 
-            totalDebit += entry.debit ?? 0;
-            totalCredit += entry.credit ?? 0;
+            accounts[entry.account].credit +=
+                Number(entry.credit || 0);
 
         }
 
-        return {
+    }
 
-            accounts: Object.values(balances),
 
-            totalDebit,
+    const report =
+        Object.values(accounts);
 
-            totalCredit,
 
-            balanced: totalDebit === totalCredit
+    for (const account of report) {
 
-        };
+        account.balance =
+            account.debit - account.credit;
 
     }
+
+
+    const totalDebit =
+        report.reduce(
+            (sum, item) => sum + item.debit,
+            0
+        );
+
+    const totalCredit =
+        report.reduce(
+            (sum, item) => sum + item.credit,
+            0
+        );
+
+
+    return {
+
+        success: true,
+
+        balanced:
+            totalDebit === totalCredit,
+
+        totalDebit,
+
+        totalCredit,
+
+        accounts: report
+
+    };
 
 }
