@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Ledger Batch Posting Engine Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    postLedgerBatch
+} from "./js/business/ledgerBatchPostingEngine.js";
+
+const output = document.getElementById("output");
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "LEDGER BATCH POSTING ENGINE TEST\n";
+    report += "=========================================\n\n";
+
+    const result = await postLedgerBatch([
+        {
+            account: "Cash Account",
+            debit: 25000,
+            credit: 0
+        },
+        {
+            account: "Contribution Income",
+            debit: 0,
+            credit: 25000
+        }
+    ]);
+
+    report += "POST LEDGER BATCH(): PASS\n\n";
+    report += JSON.stringify(result, null, 4);
+
+    report += "\n\n=========================================\n";
+    report += "TEST COMPLETE\n";
+    report += "=========================================";
+
+}
+catch (error) {
+
+    report += "POST LEDGER BATCH(): FAIL\n\n";
+    report += error.message;
+
+}
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>
