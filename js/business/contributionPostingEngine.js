@@ -5,7 +5,7 @@
  * Business Engine Layer
  *
  * File: contributionPostingEngine.js
- * Version: 1.0.0
+ * Version: 2.0.0
  *
  * Contribution Posting Engine
  * =====================================================
@@ -24,10 +24,6 @@ import {
 } from "./journalPostingEngine.js";
 
 import {
-    postLedger
-} from "./ledgerPostingEngine.js";
-
-import {
     getNextSequence
 } from "../services/counterService.js";
 
@@ -43,10 +39,13 @@ export async function postContribution(data) {
     }
 
     if (!data.amount || Number(data.amount) <= 0) {
-        throw new Error("Contribution amount must be greater than zero.");
+        throw new Error(
+            "Contribution amount must be greater than zero."
+        );
     }
 
-    const sequence = await getNextSequence("CON");
+    const sequence =
+        await getNextSequence("CON");
 
     const contributionNumber =
         generateDocumentNumber("CON", sequence);
@@ -74,14 +73,8 @@ export async function postContribution(data) {
             title: "Contribution Received",
             debit: data.amount,
             credit: data.amount,
-            createdBy: data.createdBy ?? "CMP"
-        });
-
-    const ledgerResult =
-        await postLedger({
-            account: "Cash Account",
-            debit: data.amount,
-            credit: 0,
+            debitAccount: "Cash Account",
+            creditAccount: "Contribution Income",
             createdBy: data.createdBy ?? "CMP"
         });
 
@@ -91,7 +84,7 @@ export async function postContribution(data) {
         contributionId: contributionResult.id ?? contributionResult,
         transactionId: transactionResult.id ?? transactionResult,
         journalNumber: journalResult.journalNumber,
-        ledgerNumber: ledgerResult.ledgerNumber
+        ledgerBatchNumber: journalResult.ledgerBatchNumber
     };
 
 }
