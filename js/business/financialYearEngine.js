@@ -1,68 +1,127 @@
 /**
  * =====================================================
  * ABUFAUZAN TECH Cooperative Management Platform
- * Business Module: BM-021
+ *
+ * Business Engine Layer
  *
  * File: financialYearEngine.js
  * Version: 1.0.0
+ *
+ * Financial Year Lifecycle Engine
  * =====================================================
  */
 
-export class CMPFinancialYearEngine {
+import {
+    createFinancialYear,
+    getAllFinancialYears,
+    updateFinancialYear,
+    getFinancialYearById
+} from "../services/financialYearService.js";
 
-    static currentYear = new Date().getFullYear();
 
-    static closedYears = [];
 
-    static close(year = this.currentYear) {
+export async function createYear(data) {
 
-        if (this.closedYears.includes(year)) {
+    if (!data?.name) {
 
-            throw new Error(
-                "Financial year already closed."
-            );
-
-        }
-
-        this.closedYears.push(year);
-
-        return {
-
-            year,
-
-            status: "CLOSED",
-
-            closedAt: new Date()
-
-        };
+        throw new Error(
+            "Financial year name is required."
+        );
 
     }
 
-    static isClosed(year = this.currentYear) {
 
-        return this.closedYears.includes(year);
+    if (
+        !data?.startDate ||
+        !data?.endDate
+    ) {
+
+        throw new Error(
+            "Start date and end date are required."
+        );
+
+    }
+
+
+    if (
+        new Date(data.startDate) >=
+        new Date(data.endDate)
+    ) {
+
+        throw new Error(
+            "Start date must be before end date."
+        );
 
     }
 
-    static reopen(year) {
 
-        this.closedYears =
-            this.closedYears.filter(
 
-                y => y !== year
+    const years =
+        await getAllFinancialYears();
 
-            );
 
-        return {
 
-            year,
+    const exists =
+        years.find(
+            year =>
+                year.name.toLowerCase() ===
+                data.name.toLowerCase()
+        );
 
-            status: "REOPENED",
 
-            reopenedAt: new Date()
 
-        };
+    if (exists) {
+
+        throw new Error(
+            "Financial year already exists."
+        );
 
     }
+
+
+
+    const year = {
+
+        name:
+            data.name,
+
+        startDate:
+            data.startDate,
+
+        endDate:
+            data.endDate,
+
+        status:
+            data.status || "OPEN",
+
+        locked:
+            false,
+
+        createdAt:
+            new Date().toISOString()
+
+    };
+
+
+
+    const result =
+        await createFinancialYear(
+            year
+        );
+
+
+
+    return {
+
+        success: true,
+
+        created: true,
+
+        id:
+            result.id ?? result,
+
+        year
+
+    };
 
 }
