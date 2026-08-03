@@ -37,3 +37,45 @@ export async function updateAccountingPeriod(id, data) {
 export async function deleteAccountingPeriod(id) {
     return await accountingPeriodRepository.delete(id);
 }
+/**
+ * Get currently open accounting period
+ */
+export async function getOpenAccountingPeriod() {
+
+    const periods =
+        await getAllAccountingPeriods();
+
+    return periods.find(
+        period =>
+            period.status === "OPEN" &&
+            period.locked !== true
+    ) ?? null;
+
+}
+/**
+ * Get accounting period containing a specific date
+ */
+export async function getAccountingPeriodByDate(date) {
+
+    const periods =
+        await getAllAccountingPeriods();
+
+    const targetDate =
+        new Date(date);
+
+    return periods.find(period => {
+
+        const start =
+            new Date(period.startDate);
+
+        const end =
+            new Date(period.endDate);
+
+        return (
+            targetDate >= start &&
+            targetDate <= end
+        );
+
+    }) ?? null;
+
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Journal Period Control Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+import {
+    createPeriod,
+    lockPeriod
+} from "./js/business/accountingPeriodEngine.js";
+
+
+const output =
+    document.getElementById("output");
+
+let report = "";
+
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "JOURNAL PERIOD CONTROL TEST\n";
+    report += "=========================================\n\n";
+
+
+    const period =
+        await createPeriod({
+
+            name: "November 2026",
+
+            startDate: "2026-11-01",
+
+            endDate: "2026-11-30"
+
+        });
+
+
+    report += "CREATE OPEN PERIOD(): PASS\n\n";
+
+
+    const journal =
+        await postJournal({
+
+            title:
+                "Opening Contribution",
+
+            date:
+                "2026-11-15",
+
+            debit:
+                50000,
+
+            credit:
+                50000,
+
+            debitAccount:
+                "Cash Account",
+
+            creditAccount:
+                "Contribution Income",
+
+            createdBy:
+                "CMP"
+
+        });
+
+
+    report +=
+        "POST JOURNAL WITH OPEN PERIOD(): PASS\n";
+
+    report +=
+        JSON.stringify(
+            journal,
+            null,
+            4
+        );
+
+
+    report += "\n\n";
+
+
+    await lockPeriod(
+        period.id,
+        "CMP",
+        "Month end lock"
+    );
+
+
+    report +=
+        "LOCK PERIOD(): PASS\n\n";
+
+
+    try {
+
+        await postJournal({
+
+            title:
+                "Blocked Contribution",
+
+            date:
+                "2026-11-20",
+
+            debit:
+                25000,
+
+            credit:
+                25000,
+
+            debitAccount:
+                "Cash Account",
+
+            creditAccount:
+                "Contribution Income",
+
+            createdBy:
+                "CMP"
+
+        });
+
+
+        report +=
+            "POST LOCKED PERIOD(): FAIL\n";
+
+
+    }
+    catch(error) {
+
+        report +=
+            "POST LOCKED PERIOD(): PASS\n";
+
+        report +=
+            error.message;
+
+    }
+
+
+    report +=
+        "\n\n=========================================\n";
+
+    report +=
+        "TEST COMPLETE\n";
+
+    report +=
+        "=========================================";
+
+
+}
+catch(error) {
+
+    report +=
+        "TEST FAIL\n\n";
+
+    report +=
+        error.message;
+
+}
+
+
+output.textContent = report;
+
+
+</script>
+
+</body>
+</html>
