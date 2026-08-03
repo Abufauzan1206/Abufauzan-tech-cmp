@@ -1,107 +1,94 @@
 /**
  * =====================================================
  * ABUFAUZAN TECH Cooperative Management Platform
- * Business Module: BM-017
+ *
+ * Business Engine Layer
  *
  * File: balanceSheetEngine.js
- * Version: 2.0.0
+ * Version: 1.0.0
+ *
+ * Balance Sheet Engine
  * =====================================================
  */
 
-import { CMPTrialBalanceEngine } from "./trialBalanceEngine.js";
-import { CMPIncomeExpenditureEngine } from "./incomeExpenditureEngine.js";
+import {
+    generateTrialBalance
+} from "./trialBalanceEngine.js";
 
-export class CMPBalanceSheetEngine {
+import {
+    getAccountByName
+} from "../services/chartOfAccountsService.js";
 
-    static generate() {
+export async function generateBalanceSheet() {
 
-        const trialBalance =
-            CMPTrialBalanceEngine.generate();
+    const trialBalance =
+        await generateTrialBalance();
 
-        const incomeStatement =
-            CMPIncomeExpenditureEngine.generate();
+    const assets = [];
+    const liabilities = [];
+    const equity = [];
 
-        const assets = [];
-        const liabilities = [];
+    let totalAssets = 0;
+    let totalLiabilities = 0;
+    let totalEquity = 0;
 
-        let totalAssets = 0;
-        let totalLiabilities = 0;
+    for (const account of trialBalance.accounts) {
 
-        for (const account of trialBalance.accounts) {
+        const chartAccount =
+            await getAccountByName(account.account);
 
-            const name =
-                account.account.toUpperCase();
+        if (!chartAccount) {
+            continue;
+        }
 
-            if (
+        switch (chartAccount.type) {
 
-                name.includes("CASH") ||
-                name.includes("BANK") ||
-                name.includes("ASSET") ||
-                name.includes("LOAN")
-
-            ) {
+            case "ASSET":
 
                 assets.push(account);
+                totalAssets += Number(account.balance || 0);
+                break;
 
-                totalAssets += account.debit;
-
-            }
-
-            else if (
-
-                name.includes("PAYABLE") ||
-                name.includes("LIABILITY") ||
-                name.includes("SAVINGS")
-
-            ) {
+            case "LIABILITY":
 
                 liabilities.push(account);
+                totalLiabilities += Math.abs(
+                    Number(account.balance || 0)
+                );
+                break;
 
-                totalLiabilities += account.credit;
+            case "EQUITY":
 
-            }
+                equity.push(account);
+                totalEquity += Math.abs(
+                    Number(account.balance || 0)
+                );
+                break;
+
+            default:
+                // Ignore INCOME and EXPENSE accounts
+                break;
 
         }
 
-        const equity = [
-
-            {
-
-                account: "Current Surplus",
-
-                debit: 0,
-
-                credit: incomeStatement.surplus
-
-            }
-
-        ];
-
-        const totalEquity =
-            incomeStatement.surplus;
-
-        return {
-
-            assets,
-
-            liabilities,
-
-            equity,
-
-            totalAssets,
-
-            totalLiabilities,
-
-            totalEquity,
-
-            balanced:
-
-                totalAssets ===
-
-                (totalLiabilities + totalEquity)
-
-        };
-
     }
+
+    return {
+
+        success: true,
+
+        assets,
+        liabilities,
+        equity,
+
+        totalAssets,
+        totalLiabilities,
+        totalEquity,
+
+        balanced:
+            totalAssets ===
+            (totalLiabilities + totalEquity)
+
+    };
 
 }
