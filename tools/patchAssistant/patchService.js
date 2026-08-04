@@ -5,7 +5,7 @@
  * Developer Tools
  *
  * File: patchService.js
- * Version: 1.0.0
+ * Version: 2.0.0
  *
  * Patch Service
  * =====================================================
@@ -14,37 +14,38 @@
 import { CMPPatchRepository }
     from "./patchRepository.js";
 
+import {
+    validatePatchRequest
+} from "./core/validationService.js";
+
+import {
+    findMatch
+} from "./core/matchingService.js";
+
+import {
+    replaceContent
+} from "./core/replacementService.js";
+
+import {
+    createBackup
+} from "./core/backupService.js";
+
+
 const repository =
     new CMPPatchRepository();
 
+
 export async function applyPatch(data) {
 
-    if (!data?.path) {
+    validatePatchRequest(
+        data
+    );
 
-        throw new Error(
-            "File path is required."
-        );
-
-    }
-
-    if (!data?.search) {
-
-        throw new Error(
-            "Search text is required."
-        );
-
-    }
-
-    if (data.replace == null) {
-
-        throw new Error(
-            "Replacement text is required."
-        );
-
-    }
 
     const exists =
-        await repository.exists(data.path);
+        await repository.exists(
+            data.path
+        );
 
     if (!exists) {
 
@@ -57,9 +58,22 @@ export async function applyPatch(data) {
 
     const content =
         await repository.readFile(
-            data.path        );
+            data.path
+        );
 
-    if (!content.includes(data.search)) {
+
+    const match =
+        findMatch(
+            content,
+            data.search,
+            {
+                ignoreWhitespace:
+                    data.ignoreWhitespace ?? false
+            }
+        );
+
+
+    if (!match.found) {
 
         throw new Error(
             "Search text not found."
@@ -67,26 +81,36 @@ export async function applyPatch(data) {
 
     }
 
-const backup =
-        await repository.backupFile(
+
+    const backup =
+        await createBackup(
             data.path
         );
 
+
     const updated =
-        content.replace(
+        replaceContent(
+            content,
             data.search,
-            data.replace
+            data.replace,
+            match
         );
+
 
     await repository.writeFile(
         data.path,
         updated
     );
 
+
     return {
 
         success: true,
+
         backup,
+
+        strategy:
+            match.strategy,
 
         message:
             "Patch applied successfully."

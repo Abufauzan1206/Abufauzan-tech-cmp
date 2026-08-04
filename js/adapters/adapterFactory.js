@@ -12,6 +12,7 @@
  */
 
 import { CMPFirebaseAdapter } from "./firebaseAdapter.js";
+import { CMPMemoryAdapter } from "./memoryAdapter.js";
 
 
 export class CMPAdapterFactory {

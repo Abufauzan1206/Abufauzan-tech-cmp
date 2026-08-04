@@ -21,6 +21,10 @@ import {
 } from "../services/accountingPeriodService.js";
 
 import {
+    getAccountByName
+} from "../services/chartOfAccountsService.js";
+
+import {
     postLedgerBatch
 } from "./ledgerBatchPostingEngine.js";
 
@@ -100,6 +104,32 @@ export async function postJournal(data) {
             sequence
         );
 
+
+    const debitAccount =
+        await getAccountByName(
+            data.debitAccount
+        );
+
+    if (!debitAccount) {
+
+        throw new Error(
+            `Debit account not found: ${data.debitAccount}`
+        );
+
+    }
+
+    const creditAccount =
+        await getAccountByName(
+            data.creditAccount
+        );
+
+    if (!creditAccount) {
+
+        throw new Error(
+            `Credit account not found: ${data.creditAccount}`
+        );
+
+    }
 
     const journal = {
 

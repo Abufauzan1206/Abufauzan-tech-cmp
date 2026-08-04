@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>RC004 General Ledger Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    generateGeneralLedger
+} from "./js/business/generalLedgerEngine.js";
+
+
+const output =
+    document.getElementById("output");
+
+
+let report = "";
+
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "RC004 - GENERAL LEDGER TEST\n";
+    report += "=========================================\n\n";
+
+
+    const result =
+        await generateGeneralLedger(
+            "Members Capital"
+        );
+
+
+    if (!result.success) {
+
+        throw new Error(
+            "General Ledger generation failed."
+        );
+
+    }
+
+
+    report += "GENERAL LEDGER: PASS\n\n";
+
+    report += JSON.stringify(
+        result,
+        null,
+        4
+    );
+
+
+}
+catch(error) {
+
+    report += "GENERAL LEDGER: FAIL\n\n";
+    report += error.message;
+
+}
+
+
+output.textContent = report;
+
+
+</script>
+
+</body>
+</html>

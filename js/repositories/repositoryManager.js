@@ -22,6 +22,7 @@ import { CMPJournalRepository } from "./journalRepository.js";
 import { CMPChartOfAccountsRepository } from "./chartOfAccountsRepository.js";
 import { CMPAccountingPeriodRepository } from "./accountingPeriodRepository.js";
 import { CMPFinancialYearRepository } from "./financialYearRepository.js";
+import { CMPBudgetRepository } from "./budgetRepository.js";
 
 
 export class CMPRepositoryManager {
@@ -61,6 +62,9 @@ export class CMPRepositoryManager {
 
     static financialYear =
         new CMPFinancialYearRepository();
+
+    static budget =
+        new CMPBudgetRepository();
 
 
 
@@ -119,6 +123,11 @@ export class CMPRepositoryManager {
         this.register(
             "financialYear",
             this.financialYear
+        );
+
+        this.register(
+            "budget",
+            this.budget
         );
 
     }

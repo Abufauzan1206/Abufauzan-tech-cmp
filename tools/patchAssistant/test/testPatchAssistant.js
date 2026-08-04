@@ -5,7 +5,7 @@
  * Developer Tools Test
  *
  * File: testPatchAssistant.js
- * Version: 1.0.0
+ * Version: 1.1.0
  *
  * Patch Assistant Integration Test
  * =====================================================
@@ -20,12 +20,25 @@ try {
 
     report +=
         "=========================================\n";
+
     report +=
         "ABUFAUZAN TECH CMP\n";
+
     report +=
         "PATCH ASSISTANT TEST\n";
+
     report +=
         "=========================================\n\n";
+
+
+    await fs.copyFile(
+        "./tools/patchAssistant/test/sample.txt.bak",
+        "./tools/patchAssistant/test/sample.txt"
+    );
+
+    report +=
+        "RESET TEST DATA: PASS\n\n";
+
 
     const result =
         await patch({
@@ -41,6 +54,7 @@ try {
 
         });
 
+
     report +=
         "PATCH(): PASS\n";
 
@@ -51,13 +65,16 @@ try {
             4
         );
 
-    report += "\n\n";
+    report +=
+        "\n\n";
+
 
     const content =
         await fs.readFile(
             "./tools/patchAssistant/test/sample.txt",
             "utf8"
         );
+
 
     if (
         content.includes("Engineer")
@@ -85,6 +102,7 @@ catch (error) {
 
 }
 
+
 report +=
     "\n\n=========================================\n";
 
@@ -93,5 +111,6 @@ report +=
 
 report +=
     "=========================================\n";
+
 
 console.log(report);

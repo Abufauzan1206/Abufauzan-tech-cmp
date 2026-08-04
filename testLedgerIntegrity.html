@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>RC003 Ledger Integrity Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    getAllLedgerBatches
+} from "./js/services/ledgerBatchService.js";
+
+
+const output =
+    document.getElementById("output");
+
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "RC003 - LEDGER INTEGRITY TEST\n";
+    report += "=========================================\n\n";
+
+
+    const batches =
+        await getAllLedgerBatches();
+
+
+    if (!batches || batches.length === 0) {
+
+        throw new Error(
+            "No ledger batches found."
+        );
+
+    }
+
+
+    const latest =
+        batches[batches.length - 1];
+
+
+    if (
+        Number(latest.totalDebit) !==
+        Number(latest.totalCredit)
+    ) {
+
+        throw new Error(
+            "Ledger batch is not balanced."
+        );
+
+    }
+
+
+    report += "LEDGER INTEGRITY: PASS\n\n";
+
+    report += JSON.stringify(
+        latest,
+        null,
+        4
+    );
+
+
+}
+catch(error) {
+
+    report += "LEDGER INTEGRITY: FAIL\n\n";
+    report += error.message;
+
+}
+
+
+output.textContent = report;
+
+
+</script>
+
+</body>
+</html>
