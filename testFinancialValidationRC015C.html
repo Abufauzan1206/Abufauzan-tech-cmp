@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+ABUFAUZAN TECH CMP - RC015C Financial Validation Test
+</title>
+
+<style>
+
+body {
+    font-family: monospace;
+    padding: 20px;
+}
+
+pre {
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>
+ABUFAUZAN TECH CMP
+</h2>
+
+<h3>
+RC015C - Financial Validation Test
+</h3>
+
+<pre id="output">
+Running...
+</pre>
+
+
+<script type="module">
+
+import {
+    validateEntries
+} from "./js/services/financialValidationService.js";
+
+
+const output =
+    document.getElementById("output");
+
+
+function print(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+
+async function runTest() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC015C - FINANCIAL VALIDATION TEST\n" +
+        "=========================================\n";
+
+
+    try {
+
+        print("\nTEST 1: BALANCED JOURNAL");
+
+        await validateEntries(
+            [
+                {
+                    account:
+                        "Cash Account",
+
+                    debit:
+                        1000,
+
+                    credit:
+                        0
+                },
+
+                {
+                    account:
+                        "Contribution Income",
+
+                    debit:
+                        0,
+
+                    credit:
+                        1000
+                }
+
+            ]
+        );
+
+
+        print(
+            "BALANCED JOURNAL: PASS"
+        );        print(
+            "\nTEST 2: UNBALANCED JOURNAL"
+        );
+
+
+        try {
+
+            await validateEntries(
+                [
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            1000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Contribution Income",
+
+                        debit:
+                            0,
+
+                        credit:
+                            500
+                    }
+
+                ]
+            );
+
+
+            print(
+                "UNBALANCED JOURNAL: FAIL (should have been blocked)"
+            );
+
+        }
+
+        catch (error) {
+
+            print(
+                "UNBALANCED JOURNAL: PASS"
+            );
+
+            print(
+                error.message
+            );
+
+        }
+
+
+        print(
+            "\nTEST 3: INVALID ACCOUNT"
+        );
+
+
+        try {
+
+            await validateEntries(
+                [
+                    {
+                        account:
+                            "Invalid Test Account",
+
+                        debit:
+                            1000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            0,
+
+                        credit:
+                            1000
+                    }
+
+                ]
+            );
+
+
+            print(
+                "INVALID ACCOUNT: FAIL (should have been blocked)"
+            );
+
+        }
+
+        catch (error) {
+
+            print(
+                "INVALID ACCOUNT: PASS"
+            );
+
+            print(
+                error.message
+            );
+
+        }
+        print(
+            "\nRC015C VALIDATION TEST COMPLETE"
+        );
+
+    }
+
+    catch (error) {
+
+        print(
+            "\nTEST SUITE FAIL"
+        );
+
+        print(
+            error.message
+        );
+
+    }
+
+}
+
+
+runTest();
+
+</script>
+
+</body>
+
+</html>

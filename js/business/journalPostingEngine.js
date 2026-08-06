@@ -25,6 +25,10 @@ import {
 } from "../services/chartOfAccountsService.js";
 
 import {
+    validateEntries
+} from "../services/financialValidationService.js";
+
+import {
     postLedgerBatch
 } from "./ledgerBatchPostingEngine.js";
 
@@ -92,6 +96,11 @@ export async function postJournal(data) {
 
     const entries =
         normalizeJournalEntries(data);
+
+
+    await validateEntries(
+        entries
+    );
 
     if (
         !entries ||
