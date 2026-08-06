@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+ABUFAUZAN TECH CMP - RC014C Sandbox Journal Persistence Test
+</title>
+
+<style>
+
+body {
+    font-family: monospace;
+    padding: 20px;
+}
+
+pre {
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>
+ABUFAUZAN TECH CMP
+</h2>
+
+<h3>
+RC014C - Sandbox Journal Persistence Test
+</h3>
+
+<pre id="output">
+Running...
+</pre>
+
+
+<script type="module">
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+
+import {
+    getJournalById
+} from "./js/services/journalService.js";
+
+
+const output =
+    document.getElementById("output");
+
+
+function print(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+
+async function runTest() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC014C - SANDBOX JOURNAL PERSISTENCE TEST\n" +
+        "=========================================\n";
+
+
+    try {
+
+        startSandbox();
+
+        print("\nSandbox Started: PASS");
+        const result =
+            await postJournal({
+
+                title:
+                    "RC014C Persistence Test",
+
+                date:
+                    new Date().toISOString(),
+
+                entries: [
+
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            2000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Contribution Income",
+
+                        debit:
+                            0,
+
+                        credit:
+                            2000
+                    }
+
+                ],
+
+                createdBy:
+                    "RC014C-PERSISTENCE-TEST"
+
+            });
+
+
+        print("\nPOST JOURNAL(): PASS");
+
+
+        const journal =
+            await getJournalById(
+                result.documentId
+            );
+
+
+        print("\nRETRIEVE JOURNAL(): PASS");
+
+
+        print(
+            JSON.stringify(
+                journal,
+                null,
+                4
+            )
+        );
+
+
+        endSandbox();
+
+
+        print("\nEND SANDBOX(): PASS");
+
+
+    }
+
+    catch (error) {
+
+        print("\nTEST: FAIL");
+
+        print(
+            error.message
+        );
+
+    }
+
+}
+
+
+runTest();
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ABUFAUZAN TECH CMP - RC014C Sandbox-Aware Journal Test</title>
+
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            border: 1px solid #ccc;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+
+<h3>RC014C - Sandbox-Aware Journal Test</h3>
+
+<pre id="output">
+Running...
+</pre>
+
+<script type="module">
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+const output =
+    document.getElementById("output");
+
+function print(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+async function runTest() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC014C - SANDBOX AWARE JOURNAL TEST\n" +
+        "=========================================\n";
+
+    try {
+
+        startSandbox();
+
+        print("\nSandbox Started: PASS");
+
+        print("About to call postJournal...");
+
+        const result =
+            await postJournal({
+
+                title:
+                    "RC014C Sandbox Journal",                date:
+                    new Date().toISOString(),
+
+                entries: [
+
+                    {
+                        account:
+                            "Cash Account",
+                        debit:
+                            1000,
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Contribution Income",
+                        debit:
+                            0,
+                        credit:
+                            1000
+                    }
+
+                ],
+
+                createdBy:
+                    "RC014C-TEST"
+
+            });
+
+print("postJournal() returned.");
+
+        print("\nPOST JOURNAL(): PASS");
+
+        print(
+            JSON.stringify(
+                result,
+                null,
+                4
+            )
+        );
+
+        endSandbox();
+
+        print("\nEND SANDBOX(): PASS");
+
+    }
+
+    catch (error) {
+
+        print("\nTEST: FAIL");
+
+        print(error.message);
+
+    }
+
+}
+
+runTest();
+
+</script>
+
+</body>
+</html>

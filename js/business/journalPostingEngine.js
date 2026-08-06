@@ -36,6 +36,11 @@ import {
     generateDocumentNumber
 } from "../utils/generator.js";
 
+import {
+    isSandboxActive,
+    getCurrentSandbox
+} from "../utils/sandboxManager.js";
+
 
 function normalizeJournalEntries(data) {
 
@@ -184,9 +189,21 @@ export async function postJournal(data) {
 
     }
 
+    const sandbox =
+        isSandboxActive()
+            ? getCurrentSandbox()
+            : null;
+
     const journal = {
 
         ...data,
+
+        ...(sandbox
+            ? {
+                sandboxId:
+                    sandbox.sandboxId
+            }
+            : {}),
 
         accountingPeriod:
             period.name,
