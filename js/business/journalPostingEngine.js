@@ -228,7 +228,12 @@ export async function postJournal(data) {
             entries,
 
             data.createdBy ??
-            "CMP"
+            "CMP",
+
+            {
+                sandboxId:
+                    sandbox?.sandboxId
+            }
         );
 
 
@@ -236,14 +241,18 @@ export async function postJournal(data) {
 
         success: true,
 
+        journalDocumentId:
+            journalResult.id ??
+            journalResult,
+
+        ledgerDocumentId:
+            ledgerResult.documentId ??
+            ledgerResult,
+
         journalNumber,
 
         ledgerBatchNumber:
             ledgerResult.batchNumber,
-
-        documentId:
-            journalResult.id ??
-            journalResult,
 
         accountingPeriod:
             period.name,

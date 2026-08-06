@@ -24,7 +24,15 @@ import {
 } from "../utils/generator.js";
 
 
-export async function postLedgerBatch(entries, createdBy = "CMP") {
+export async function postLedgerBatch(
+
+    entries,
+
+    createdBy = "CMP",
+
+    options = {}
+
+) {
 
     if (!Array.isArray(entries) || entries.length === 0) {
         throw new Error("Ledger batch must contain at least one entry.");
@@ -55,6 +63,14 @@ export async function postLedgerBatch(entries, createdBy = "CMP") {
     const batch = {
         batchNumber,
         entries,
+
+        ...(options.sandboxId
+            ? {
+                sandboxId:
+                    options.sandboxId
+            }
+            : {}),
+
         totalDebit,
         totalCredit,
         createdBy,

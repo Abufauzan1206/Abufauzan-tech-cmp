@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+ABUFAUZAN TECH CMP - RC014G Sandbox Ledger Persistence Test
+</title>
+
+<style>
+
+body {
+    font-family: monospace;
+    padding: 20px;
+}
+
+pre {
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+
+<h3>RC014G - Sandbox Ledger Persistence Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+import {
+    getLedgerBatchById
+} from "./js/services/ledgerBatchService.js";
+
+const output =
+    document.getElementById("output");
+
+function print(message) {
+    output.textContent += "\n" + message;
+}
+
+async function runTest() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC014G - SANDBOX LEDGER PERSISTENCE TEST\n" +
+        "=========================================\n";
+
+    try {
+
+        startSandbox();
+
+        print("\nSandbox Started: PASS");
+        const result =
+            await postJournal({
+
+                title:
+                    "RC014G Ledger Persistence Test",
+
+                date:
+                    new Date().toISOString(),
+
+                entries: [
+
+                    {
+                        account:
+                            "Cash Account",
+                        debit:
+                            3000,
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Contribution Income",
+                        debit:
+                            0,
+                        credit:
+                            3000
+                    }
+
+                ],
+
+                createdBy:
+                    "RC014G-TEST"
+
+            });
+
+        print("\nPOST JOURNAL(): PASS");
+
+        const ledger =
+            await getLedgerBatchById(
+                result.ledgerDocumentId
+            );
+
+        print("\nRETRIEVE LEDGER(): PASS");
+
+        print(
+            JSON.stringify(
+                ledger,
+                null,
+                4
+            )
+        );
+
+        if (ledger?.sandboxId) {
+
+            print("\nSANDBOX ID: PASS");
+            print(ledger.sandboxId);
+
+        } else {
+
+            throw new Error(
+                "sandboxId not found in stored ledger batch."
+            );
+
+        }
+
+        endSandbox();
+
+        print("\nEND SANDBOX(): PASS");
+
+    }
+
+    catch (error) {
+
+        print("\nTEST: FAIL");
+
+        print(error.message);
+
+    }
+
+}
+
+runTest();
+
+</script>
+
+</body>
+
+</html>
