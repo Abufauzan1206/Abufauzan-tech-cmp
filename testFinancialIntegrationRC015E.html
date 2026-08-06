@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+ABUFAUZAN TECH CMP - RC015E Financial Integration Test
+</title>
+
+<style>
+
+body {
+    font-family: monospace;
+    padding: 20px;
+}
+
+pre {
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>
+ABUFAUZAN TECH CMP
+</h2>
+
+<h3>
+RC015E - Financial Integration Test
+</h3>
+
+<pre id="output">
+Running...
+</pre>
+
+
+<script type="module">
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+
+const output =
+    document.getElementById("output");
+
+
+function print(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+
+async function runTest() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC015E - FINANCIAL INTEGRATION TEST\n" +
+        "=========================================\n";
+
+
+    try {
+
+        startSandbox();
+
+        print(
+            "\nSandbox Started: PASS"
+        );
+
+
+        const result =
+            await postJournal({
+
+                title:
+                    "RC015E Full Integration Test",
+
+                date:
+                    new Date().toISOString(),
+
+                entries: [
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            5000,
+
+                        credit:
+                            0
+                    },
+
+
+                    {
+                        account:
+                            "Contribution Income",
+
+                        debit:
+                            0,
+
+                        credit:
+                            5000
+                    }
+
+                ],
+
+
+                createdBy:
+                    "RC015E-INTEGRATION-TEST"
+
+            });
+
+
+        print(
+            "\nPOST JOURNAL(): PASS"
+        );
+
+
+        print(
+            JSON.stringify(
+                result,
+                null,
+                4
+            )
+        );
+
+
+        if (
+            !result.journalDocumentId ||
+            !result.ledgerDocumentId
+        ) {
+
+            throw new Error(
+                "Financial document identity missing."
+            );
+
+        }
+
+
+        print(
+            "\nDOCUMENT IDENTITY: PASS"
+        );
+        endSandbox();
+
+
+        print(
+            "\nEND SANDBOX(): PASS"
+        );
+
+
+        print(
+            "\nRC015E FINANCIAL INTEGRATION TEST COMPLETE"
+        );
+
+
+    }
+
+    catch (error) {
+
+        print(
+            "\nTEST: FAIL"
+        );
+
+        print(
+            error.message
+        );
+
+    }
+
+}
+
+
+runTest();
+
+
+</script>
+
+
+</body>
+
+</html>
