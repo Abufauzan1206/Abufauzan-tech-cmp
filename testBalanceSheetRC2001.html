@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>RC2-001 Balance Sheet Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    generateBalanceSheet
+} from "./js/business/balanceSheetEngine.js";
+
+const output = document.getElementById("output");
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "RC2-001 - BALANCE SHEET TEST\n";
+    report += "=========================================\n\n";
+
+    const result =
+        await generateBalanceSheet();
+
+    if (!result.balanced) {
+        throw new Error(
+            "Balance Sheet is not balanced."
+        );
+    }
+
+    report += "BALANCE SHEET: PASS\n\n";
+    report += JSON.stringify(result, null, 4);
+
+}
+catch (error) {
+
+    report += "BALANCE SHEET: FAIL\n\n";
+    report += error.message;
+
+}
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>

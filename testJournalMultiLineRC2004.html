@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        ABUFAUZAN TECH CMP - RC004 Journal Multi-Line Test
+    </title>
+
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            border: 1px solid #ccc;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<h2>
+ABUFAUZAN TECH CMP
+</h2>
+
+<h3>
+RC004 - JOURNAL MULTI-LINE POSTING TEST
+</h3>
+
+
+<pre id="output">
+Running test...
+</pre>
+
+
+<script type="module">
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+
+const output =
+    document.getElementById(
+        "output"
+    );
+
+
+function print(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+
+async function runTest() {
+
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC004 - JOURNAL MULTI-LINE POSTING TEST\n" +
+        "=========================================\n";
+
+
+    try {
+
+
+        const result =
+            await postJournal({
+
+                title:
+                    "Multi Line Contribution Test",
+
+
+                date:
+                    new Date()
+                    .toISOString(),
+
+
+                entries: [
+
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            500000,
+
+                        credit:
+                            0
+                    },
+
+
+                    {
+                        account:
+                            "Contribution Income",
+
+                        debit:
+                            0,
+
+                        credit:
+                            500000
+                    }
+
+                ],
+
+
+                createdBy:
+                    "RC004-TEST"
+
+            });
+
+
+
+        print(
+            "\nMULTI-LINE JOURNAL: PASS"
+        );
+
+
+        print(
+            JSON.stringify(
+                result,
+                null,
+                4
+            )
+        );
+
+
+    }
+
+
+    catch(error) {
+
+
+        print(
+            "\nMULTI-LINE JOURNAL: FAIL"
+        );
+
+
+        print(
+            error.message
+        );
+
+
+    }
+
+
+}
+
+
+runTest();
+
+
+</script>
+
+
+</body>
+
+</html>

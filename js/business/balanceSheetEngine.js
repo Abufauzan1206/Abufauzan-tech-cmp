@@ -19,6 +19,10 @@ import {
     getAccountByName
 } from "../services/chartOfAccountsService.js";
 
+import {
+    generateIncomeExpenditure
+} from "./incomeExpenditureEngine.js";
+
 export async function generateBalanceSheet() {
 
     const trialBalance =
@@ -73,6 +77,15 @@ export async function generateBalanceSheet() {
 
     }
 
+    const incomeReport =
+        await generateIncomeExpenditure();
+
+    totalEquity +=
+        incomeReport.netSurplus;
+
+    totalEquity -=
+        incomeReport.netDeficit;
+
     return {
 
         success: true,
@@ -84,6 +97,11 @@ export async function generateBalanceSheet() {
         totalAssets,
         totalLiabilities,
         totalEquity,
+
+        incomeReport,
+
+        debugMarker:
+            "RC012_ACTIVE",
 
         balanced:
             totalAssets ===

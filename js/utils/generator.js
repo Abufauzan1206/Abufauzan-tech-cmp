@@ -38,6 +38,18 @@ export function generateCMPId(country) {
  * CON-2026-000001
  */
 
+export function generateSandboxId(sequence = 1) {
+
+    const year =
+        new Date().getFullYear();
+
+    return `SBX-${year}-${String(sequence).padStart(6, "0")}`;
+
+}
+
+/**
+ * Generate document numbers
+ */
 export function generateDocumentNumber(prefix, sequence = 1) {
 
     const year = new Date().getFullYear();

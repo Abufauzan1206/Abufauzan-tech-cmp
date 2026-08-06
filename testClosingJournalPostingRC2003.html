@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>RC2-003 Closing Journal Posting Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    postClosingJournal
+} from "./js/business/closingJournalPostingEngine.js";
+
+const output =
+    document.getElementById("output");
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "RC2-003 - CLOSING JOURNAL POSTING TEST\n";
+    report += "=========================================\n\n";
+
+    const result =
+        await postClosingJournal();
+
+    report += "CLOSING JOURNAL POSTING: PASS\n\n";
+
+    report += JSON.stringify(
+        result,
+        null,
+        4
+    );
+
+    report += "\n\n=========================================\n";
+    report += "TEST COMPLETE\n";
+    report += "=========================================";
+
+}
+catch (error) {
+
+    report += "CLOSING JOURNAL POSTING: FAIL\n\n";
+    report += error.message;
+
+}
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>

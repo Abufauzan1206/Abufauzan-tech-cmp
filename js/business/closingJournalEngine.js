@@ -8,17 +8,19 @@
  * =====================================================
  */
 
-import { CMPIncomeExpenditureEngine } from "./incomeExpenditureEngine.js";
+import {
+    generateIncomeExpenditure
+} from "./incomeExpenditureEngine.js";
 
 export class CMPClosingJournalEngine {
 
-    static generate() {
+    static async generate() {
 
         const incomeStatement =
-            CMPIncomeExpenditureEngine.generate();
+            await generateIncomeExpenditure();
 
         const surplus =
-            incomeStatement.surplus;
+            incomeStatement.netSurplus;
 
         const entries = [];
 

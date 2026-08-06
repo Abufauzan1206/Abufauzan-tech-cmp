@@ -5,7 +5,7 @@
  * Business Engine Layer
  *
  * File: journalPostingEngine.js
- * Version: 3.1.0
+ * Version: 4.0.0
  *
  * Automatic Journal Posting Engine
  * Date Aware Period Control
@@ -37,6 +37,45 @@ import {
 } from "../utils/generator.js";
 
 
+function normalizeJournalEntries(data) {
+
+    if (data.entries &&
+        Array.isArray(data.entries)) {
+
+        return data.entries;
+
+    }
+
+
+    return [
+
+        {
+            account:
+                data.debitAccount,
+
+            debit:
+                data.debit,
+
+            credit:
+                0
+        },
+
+        {
+            account:
+                data.creditAccount,
+
+            debit:
+                0,
+
+            credit:
+                data.credit
+        }
+
+    ];
+
+}
+
+
 export async function postJournal(data) {
 
     if (!data.title) {
@@ -45,22 +84,44 @@ export async function postJournal(data) {
         );
     }
 
-    if (
-        data.debit == null ||
-        data.credit == null
-    ) {
-        throw new Error(
-            "Debit and Credit are required."
-        );
-    }
+
+    const entries =
+        normalizeJournalEntries(data);
 
     if (
-        Number(data.debit) !==
-        Number(data.credit)
+        !entries ||
+        entries.length === 0
     ) {
+
+        throw new Error(
+            "Journal entries are required."
+        );
+
+    }
+
+
+    const totalDebit =
+        entries.reduce(
+            (sum, entry) =>
+                sum + Number(entry.debit || 0),
+            0
+        );
+
+
+    const totalCredit =
+        entries.reduce(
+            (sum, entry) =>
+                sum + Number(entry.credit || 0),
+            0
+        );
+
+
+    if (totalDebit !== totalCredit) {
+
         throw new Error(
             "Journal is not balanced."
         );
+
     }
 
 
@@ -105,29 +166,21 @@ export async function postJournal(data) {
         );
 
 
-    const debitAccount =
-        await getAccountByName(
-            data.debitAccount
-        );
+    for (const entry of entries) {
 
-    if (!debitAccount) {
+        const account =
+            await getAccountByName(
+                entry.account
+            );
 
-        throw new Error(
-            `Debit account not found: ${data.debitAccount}`
-        );
 
-    }
+        if (!account) {
 
-    const creditAccount =
-        await getAccountByName(
-            data.creditAccount
-        );
+            throw new Error(
+                `Account not found: ${entry.account}`
+            );
 
-    if (!creditAccount) {
-
-        throw new Error(
-            `Credit account not found: ${data.creditAccount}`
-        );
+        }
 
     }
 
@@ -155,30 +208,7 @@ export async function postJournal(data) {
 
     const ledgerResult =
         await postLedgerBatch(
-            [
-                {
-                    account:
-                        data.debitAccount ??
-                        "Cash Account",
-
-                    debit:
-                        data.debit,
-
-                    credit: 0
-                },
-
-                {
-                    account:
-                        data.creditAccount ??
-                        "General Income",
-
-                    debit: 0,
-
-                    credit:
-                        data.credit
-                }
-
-            ],
+            entries,
 
             data.createdBy ??
             "CMP"

@@ -27,6 +27,34 @@ try {
     const result =
         await generateIncomeExpenditure();
 
+    if (result.totalIncome < 0) {
+
+        throw new Error(
+            "Invalid total income."
+        );
+
+    }
+
+    if (result.totalExpenses < 0) {
+
+        throw new Error(
+            "Invalid total expenses."
+        );
+
+    }
+
+    if (
+        result.netSurplus !==
+        result.totalIncome -
+        result.totalExpenses
+    ) {
+
+        throw new Error(
+            "Net surplus calculation is incorrect."
+        );
+
+    }
+
     report += "GENERATE INCOME & EXPENDITURE(): PASS\n\n";
 
     report += JSON.stringify(result, null, 4);

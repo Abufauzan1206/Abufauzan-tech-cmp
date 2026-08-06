@@ -2,46 +2,59 @@
  * =====================================================
  * ABUFAUZAN TECH Cooperative Management Platform
  *
- * Developer Tools
+ * RC Patch #005
  *
- * File: replacementService.js
- * Version: 2.0.0
+ * File: rc005NormalizedReplacementUpgradePatch.js
+ * Version: 1.0.0
  *
- * Patch Replacement Service
+ * Normalized Replacement Engine Upgrade
  * =====================================================
  */
 
-export function replaceContent(
-    content,
-    search,
-    replacement,
-    match
-) {
+import { patch } from "../patchEngine.js";
 
-    if (!match?.found) {
-
-        throw new Error(
-            "No valid match found."
-        );
-
-    }
+const file =
+    "tools/patchAssistant/core/replacementService.js";
 
 
-    switch (match.strategy) {
+async function run() {
 
-        case "exact":
+    console.log(
+        "========================================="
+    );
 
-            return content.replace(
-                search,
-                replacement
-            );
+    console.log(
+        "ABUFAUZAN TECH CMP"
+    );
+
+    console.log(
+        "RC005 - NORMALIZED REPLACEMENT UPGRADE"
+    );
+
+    console.log(
+        "========================================="
+    );
 
 
-        case "normalized": {
+    try {
+
+        await patch({
+
+            path: file,
+
+            search:
+`        case "normalized":
+
+            throw new Error(
+                "Whitespace-tolerant replacement is not yet implemented."
+            );`,
+
+            replace:
+`        case "normalized": {
 
             const normalize = text =>
                 text.replace(
-                    /\\s+/g,
+                    /\\\\s+/g,
                     " "
                 ).trim();
 
@@ -72,7 +85,7 @@ export function replaceContent(
             const originalStart =
                 content.indexOf(
                     search.trim().split(
-                        /\\s+/
+                        /\\\\s+/
                     )[0]
                 );
 
@@ -95,15 +108,28 @@ export function replaceContent(
                 replacement
             );
 
-        }
+        }`
+        });
 
 
-        default:
+        console.log(
+            "PATCH: PASS"
+        );
+    }
 
-            throw new Error(
-                `Unsupported matching strategy: ${match.strategy}`
-            );
+    catch (error) {
+
+        console.log(
+            "PATCH FAIL"
+        );
+
+        console.log(
+            error.message
+        );
 
     }
 
 }
+
+
+run();

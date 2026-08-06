@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>RC014B - Sandbox Session Manager Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    startSandbox,
+    getCurrentSandbox,
+    isSandboxActive,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+const output =
+    document.getElementById("output");
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "RC014B - SANDBOX SESSION MANAGER TEST\n";
+    report += "=========================================\n\n";
+
+    const sandbox =
+        startSandbox();
+
+    if (!isSandboxActive()) {
+
+        throw new Error(
+            "Sandbox failed to start."
+        );
+
+    }
+
+    report +=
+        "START SANDBOX(): PASS\n\n";
+
+    report += JSON.stringify(
+        getCurrentSandbox(),
+        null,
+        4
+    );
+
+    endSandbox();
+    report += "\n\n";
+    report += "END SANDBOX(): PASS\n\n";
+
+    report += JSON.stringify(
+        getCurrentSandbox(),
+        null,
+        4
+    );
+
+}
+catch (error) {
+
+    report += "SANDBOX MANAGER TEST: FAIL\n\n";
+    report += error.message;
+
+}
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>

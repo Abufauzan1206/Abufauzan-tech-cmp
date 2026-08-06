@@ -11,7 +11,7 @@
 
 import {
     generateBalanceSheet
-} from "./js/business/balanceSheetEngine.js";
+} from "./js/business/balanceSheetEngine.js?v=rc013";
 
 const output = document.getElementById("output");
 
@@ -26,6 +26,53 @@ try {
 
     const result =
         await generateBalanceSheet();
+
+    console.log(
+        "BALANCE SHEET RESULT:",
+        result
+    );
+
+    if (result.totalAssets < 0) {
+
+        throw new Error(
+            "Invalid total assets."
+        );
+
+    }
+
+    if (result.totalLiabilities < 0) {
+
+        throw new Error(
+            "Invalid total liabilities."
+        );
+
+    }
+
+    if (result.totalEquity < 0) {
+
+        throw new Error(
+            "Invalid total equity."
+        );
+
+    }
+
+    report +=
+        JSON.stringify(
+            result,
+            null,
+            4
+        );
+
+    report +=
+        "\n\n";
+
+    if (!result.balanced) {
+
+        throw new Error(
+            "Balance sheet is not balanced."
+        );
+
+    }
 
     report += "GENERATE BALANCE SHEET(): PASS\n\n";
 
