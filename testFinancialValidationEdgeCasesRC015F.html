@@ -1,0 +1,342 @@
+/**
+ * =====================================================
+ * ABUFAUZAN TECH Cooperative Management Platform
+ *
+ * RC015F - Financial Validation Edge Cases Test
+ *
+ * File: testFinancialValidationEdgeCasesRC015F.html
+ *
+ * Validation Hardening
+ * =====================================================
+ */
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+ABUFAUZAN TECH CMP - RC015F Validation Edge Cases
+</title>
+
+<style>
+
+body {
+    font-family: monospace;
+    padding: 20px;
+}
+
+pre {
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<h2>
+ABUFAUZAN TECH CMP
+</h2>
+
+<h3>
+RC015F - Financial Validation Edge Cases Test
+</h3>
+
+<pre id="output">
+Running...
+</pre>
+
+
+<script type="module">
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+
+const output =
+    document.getElementById("output");
+
+
+function print(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+
+async function runTest() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC015F - VALIDATION EDGE CASES TEST\n" +
+        "=========================================\n";
+
+
+    try {
+
+        startSandbox();
+
+        print(
+            "\nSandbox Started: PASS"
+        );
+        // TEST 1: INVALID ACCOUNT
+
+        try {
+
+            await postJournal({
+
+                title:
+                    "RC015F Invalid Account Test",
+
+                date:
+                    new Date().toISOString(),
+
+                entries: [
+
+                    {
+                        account:
+                            "INVALID ACCOUNT",
+
+                        debit:
+                            1000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            0,
+
+                        credit:
+                            1000
+                    }
+
+                ],
+
+                createdBy:
+                    "RC015F-TEST"
+
+            });
+
+
+            print(
+                "\nTEST 1 INVALID ACCOUNT: FAIL"
+            );
+
+
+        }
+
+        catch (error) {
+
+            print(
+                "\nTEST 1 INVALID ACCOUNT: PASS"
+            );
+
+            print(
+                error.message
+            );
+
+        }
+
+
+
+        // TEST 2: UNBALANCED JOURNAL
+
+        try {
+
+            await postJournal({
+
+                title:
+                    "RC015F Unbalanced Test",
+
+                date:
+                    new Date().toISOString(),
+
+                entries: [
+
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            2000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Contribution Income",
+
+                        debit:
+                            0,
+
+                        credit:
+                            1000
+                    }
+
+                ],
+
+                createdBy:
+                    "RC015F-TEST"
+
+            });
+
+
+            print(
+                "\nTEST 2 UNBALANCED: FAIL"
+            );
+
+
+        }
+
+        catch (error) {
+
+            print(
+                "\nTEST 2 UNBALANCED: PASS"
+            );
+
+            print(
+                error.message
+            );
+
+        }
+        // TEST 3: SANDBOX REGRESSION
+
+        try {
+
+            const result =
+                await postJournal({
+
+                    title:
+                        "RC015F Sandbox Regression Test",
+
+                    date:
+                        new Date().toISOString(),
+
+                    entries: [
+
+                        {
+                            account:
+                                "Cash Account",
+
+                            debit:
+                                3000,
+
+                            credit:
+                                0
+                        },
+
+
+                        {
+                            account:
+                                "Contribution Income",
+
+                            debit:
+                                0,
+
+                            credit:
+                                3000
+                        }
+
+                    ],
+
+                    createdBy:
+                        "RC015F-TEST"
+
+                });
+
+
+            if (
+                result.journalDocumentId &&
+                result.ledgerDocumentId
+            ) {
+
+                print(
+                    "\nTEST 3 SANDBOX REGRESSION: PASS"
+                );
+
+            }
+
+            else {
+
+                throw new Error(
+                    "Document identity missing."
+                );
+
+            }
+
+
+        }
+
+        catch (error) {
+
+            print(
+                "\nTEST 3 SANDBOX REGRESSION: FAIL"
+            );
+
+            print(
+                error.message
+            );
+
+        }
+
+
+        endSandbox();
+
+
+        print(
+            "\nEND SANDBOX(): PASS"
+        );
+
+
+        print(
+            "\nRC015F VALIDATION EDGE CASE TEST COMPLETE"
+        );
+
+
+    }
+
+    catch (error) {
+
+        print(
+            "\nTEST SUITE FAIL"
+        );
+
+        print(
+            error.message
+        );
+
+    }
+
+}
+
+
+runTest();
+
+
+</script>
+
+
+</body>
+
+</html>
