@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+ABUFAUZAN TECH CMP - RC016A Duplicate Journal Test
+</title>
+
+<style>
+
+body {
+    font-family: monospace;
+    padding: 20px;
+}
+
+pre {
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>
+ABUFAUZAN TECH CMP
+</h2>
+
+<h3>
+RC016A - Duplicate Journal Protection Test
+</h3>
+
+<pre id="output">
+Running...
+</pre>
+
+<script type="module">
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+const output =
+    document.getElementById("output");
+
+function print(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+async function run() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC016A - DUPLICATE JOURNAL TEST\n" +
+        "=========================================\n";
+
+    startSandbox();
+
+    print(
+        "\nSandbox Started: PASS"
+    );
+
+    const request = {
+
+        reference:
+            "RC016A-REF-001",
+
+        title:
+            "Duplicate Protection Test",
+
+        date:
+            new Date().toISOString(),
+
+        entries: [
+            {
+                account:
+                    "Cash Account",
+
+                debit:
+                    1000,
+
+                credit:
+                    0
+            },
+
+            {
+                account:
+                    "Contribution Income",
+
+                debit:
+                    0,
+
+                credit:
+                    1000
+            }
+
+        ],
+
+        createdBy:
+            "RC016A-TEST"
+
+    };
+
+
+    try {
+
+        await postJournal(
+            request
+        );
+
+        print(
+            "\nFIRST JOURNAL: PASS"
+        );
+
+    }
+
+    catch (error) {
+
+        print(
+            "\nFIRST JOURNAL: FAIL"
+        );
+
+        print(
+            error.name
+        );
+
+        print(
+            error.message
+        );
+
+        print(
+            error.stack || "No stack available"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        await postJournal(
+            request
+        );
+
+        print(
+            "\nDUPLICATE CHECK: FAIL"
+        );
+
+    }
+
+    catch (error) {
+
+        print(
+            "\nDUPLICATE CHECK: PASS"
+        );
+
+        print(
+            error.message
+        );
+
+    }
+    endSandbox();
+
+    print(
+        "\nEND SANDBOX(): PASS"
+    );
+
+    print(
+        "\nRC016A DUPLICATE JOURNAL TEST COMPLETE"
+    );
+
+}
+
+run();
+
+</script>
+
+</body>
+
+</html>
