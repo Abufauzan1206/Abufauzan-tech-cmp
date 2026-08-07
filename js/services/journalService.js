@@ -58,3 +58,17 @@ export async function deleteJournal(id) {
     return await journalRepository.delete(id);
 
 }
+
+export async function findJournalByReference(reference) {
+
+    const journals =
+        await journalRepository.findAll();
+
+    return journals.find(
+
+        journal =>
+            journal.reference === reference
+
+    ) || null;
+
+}

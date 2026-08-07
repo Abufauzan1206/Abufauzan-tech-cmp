@@ -5,9 +5,9 @@
  * Developer Tools
  *
  * File: patchService.js
- * Version: 2.0.0
+ * Version: 3.0.0
  *
- * Patch Service
+ * Transactional Patch Service
  * =====================================================
  */
 
@@ -37,6 +37,13 @@ const repository =
 
 export async function applyPatch(data) {
 
+    return await applySinglePatch(data);
+
+}
+
+
+async function applySinglePatch(data) {
+
     validatePatchRequest(
         data
     );
@@ -46,6 +53,7 @@ export async function applyPatch(data) {
         await repository.exists(
             data.path
         );
+
 
     if (!exists) {
 
@@ -104,17 +112,9 @@ export async function applyPatch(data) {
 
 
     return {
-
         success: true,
-
         backup,
-
-        strategy:
-            match.strategy,
-
-        message:
-            "Patch applied successfully."
-
+        strategy: match.strategy
     };
 
 }

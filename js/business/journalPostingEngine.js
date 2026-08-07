@@ -13,7 +13,8 @@
  */
 
 import {
-    createJournal
+    createJournal,
+    findJournalByReference
 } from "../services/journalService.js";
 
 import {
@@ -101,6 +102,23 @@ export async function postJournal(data) {
     await validateEntries(
         entries
     );
+
+    if (data.reference) {
+
+        const existing =
+            await findJournalByReference(
+                data.reference
+            );
+
+        if (existing) {
+
+            throw new Error(
+                "Duplicate journal reference detected."
+            );
+
+        }
+
+    }
 
     if (
         !entries ||

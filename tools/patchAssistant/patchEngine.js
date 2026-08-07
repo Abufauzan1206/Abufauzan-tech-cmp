@@ -5,21 +5,91 @@
  * Developer Tools
  *
  * File: patchEngine.js
- * Version: 1.0.0
+ * Version: 2.0.0
  *
- * Patch Engine
+ * Transaction Patch Engine
  * =====================================================
  */
+
 
 import {
     applyPatch
 } from "./patchService.js";
 
+
 export async function patch(data) {
 
-    const result =
-        await applyPatch(data);
+    return await applyPatch(
+        data
+    );
 
-    return result;
+}
+
+
+
+export async function transaction(
+    patches = []
+) {
+
+    if (
+        !Array.isArray(patches) ||
+        patches.length === 0
+    ) {
+
+        throw new Error(
+            "Transaction patches required."
+        );
+
+    }
+
+
+    const results = [];
+
+
+    try {
+
+        for (
+            const item of patches
+        ) {
+
+            const result =
+                await applyPatch(
+                    item
+                );
+
+
+            results.push(
+                result
+            );
+
+        }
+
+
+        return {
+
+            success: true,
+
+            count:
+                results.length,
+
+            results
+
+        };
+
+    }
+    catch(error) {
+
+        return {
+
+            success: false,
+
+            error:
+                error.message,
+
+            results
+
+        };
+
+    }
 
 }
