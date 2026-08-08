@@ -14,7 +14,8 @@
 
 import {
     createJournal,
-    findJournalByReference
+    findJournalByReference,
+    deleteJournal
 } from "../services/journalService.js";
 
 import {
@@ -250,7 +251,11 @@ export async function postJournal(data) {
         await createJournal(journal);
 
 
-    const ledgerResult =
+    let ledgerResult;
+
+try {
+
+    ledgerResult =
         await postLedgerBatch(
             entries,
 
@@ -259,10 +264,31 @@ export async function postJournal(data) {
 
             {
                 sandboxId:
-                    sandbox?.sandboxId
+                    sandbox?.sandboxId,
+
+                journalReference:
+                    data.reference,
+
+                journalNumber
+
             }
         );
 
+}
+catch (error) {
+
+    if (journalResult) {
+
+        await deleteJournal(
+            journalResult.id ??
+            journalResult
+        );
+
+    }
+
+    throw error;
+
+}
 
     return {
 

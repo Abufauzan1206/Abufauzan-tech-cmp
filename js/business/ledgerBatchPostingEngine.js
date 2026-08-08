@@ -12,7 +12,8 @@
  */
 
 import {
-    createLedgerBatch
+    createLedgerBatch,
+    findLedgerBatchByJournalReference
 } from "../services/ledgerBatchService.js";
 
 import {
@@ -54,6 +55,25 @@ export async function postLedgerBatch(
         );
     }
 
+    if (options.journalReference) {
+
+        const existing =
+            await findLedgerBatchByJournalReference(
+                options.journalReference
+            );
+
+
+        if (existing) {
+
+            throw new Error(
+                "Duplicate ledger batch detected."
+            );
+
+        }
+
+    }
+
+
     const sequence =
         await getNextSequence("LED");
 
@@ -63,6 +83,13 @@ export async function postLedgerBatch(
     const batch = {
         batchNumber,
         entries,
+
+        ...(options.journalReference
+            ? {
+                journalReference:
+                    options.journalReference
+            }
+            : {}),
 
         ...(options.sandboxId
             ? {

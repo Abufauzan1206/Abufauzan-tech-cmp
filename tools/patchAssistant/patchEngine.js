@@ -16,6 +16,9 @@ import {
     applyPatch
 } from "./patchService.js";
 
+import {
+    rollback
+} from "./rollbackService.js";
 
 export async function patch(data) {
 
@@ -45,6 +48,7 @@ export async function transaction(
 
     const results = [];
 
+const applied = [];
 
     try {
 
@@ -62,6 +66,10 @@ export async function transaction(
                 result
             );
 
+applied.push(
+    item
+);
+
         }
 
 
@@ -77,19 +85,23 @@ export async function transaction(
         };
 
     }
-    catch(error) {
 
-        return {
+catch(error) {
 
-            success: false,
+    await rollback(
+        applied
+    );
 
-            error:
-                error.message,
+    return {
 
-            results
+        success: false,
 
-        };
+        error:
+            error.message,
 
-    }
+        results
 
+    };
+
+}
 }

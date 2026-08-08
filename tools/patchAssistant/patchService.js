@@ -71,14 +71,18 @@ async function applySinglePatch(data) {
 
 
     const match =
-        findMatch(
-            content,
-            data.search,
-            {
-                ignoreWhitespace:
-                    data.ignoreWhitespace ?? false
-            }
-        );
+    findMatch(
+        content,
+        data.search,
+        {
+            ignoreWhitespace:
+                data.ignoreWhitespace ?? false,
+
+            mode:
+                data.mode ?? "exact"
+        }
+
+    );
 
 
     if (!match.found) {

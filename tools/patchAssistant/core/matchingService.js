@@ -18,10 +18,28 @@ export function findMatch(
 ) {
 
     const {
-        ignoreWhitespace = false
-    } = options;
+    ignoreWhitespace = false,
+    mode = "exact"
+} = options;
 
+if (mode === "regex") {
 
+    const regex =
+        new RegExp(search, "m");
+
+    return {
+
+        found:
+            regex.test(content),
+
+        strategy:
+            "regex",
+
+        search
+
+    };
+
+}
     if (content.includes(search)) {
 
         return {

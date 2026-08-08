@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RC017A Ledger Duplicate Protection Test</title>
+</head>
+
+<body>
+
+<pre id="output"></pre>
+
+<script type="module">
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+import {
+    postLedgerBatch
+} from "./js/business/ledgerBatchPostingEngine.js";
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+
+const output =
+    document.getElementById(
+        "output"
+    );
+
+
+function log(message) {
+
+    output.textContent +=
+        message + "\n";
+
+}
+
+
+async function run() {
+
+    log(
+        "========================================="
+    );
+
+    log(
+        "ABUFAUZAN TECH CMP"
+    );
+
+    log(
+        "RC017A - LEDGER DUPLICATE TEST"
+    );
+
+    log(
+        "========================================="
+    );
+
+
+    try {
+
+        const testReference =
+            "RC017A-LEDGER-" + Date.now();
+
+        startSandbox();
+
+        log(
+            "Sandbox Started: PASS"
+        );
+        const journal =
+            await postJournal({
+
+                title:
+                    "RC017A Ledger Test",
+
+                reference:
+                    testReference,
+
+                date:
+                    "2026-08-07",
+
+                entries: [
+
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            1000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Members Capital",
+
+                        debit:
+                            0,
+
+                        credit:
+                            1000
+                    }
+
+                ],
+
+                createdBy:
+                    "RC017A"
+
+            });
+
+
+        log(
+            "FIRST JOURNAL: PASS"
+        );
+
+
+        log(
+            "Ledger Batch: " +
+            journal.ledgerBatchNumber
+        );
+
+
+        try {
+
+            await postLedgerBatch(
+
+                [
+
+                    {
+                        account:
+                            "Cash",
+
+                        debit:
+                            1000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Members Capital",
+
+                        debit:
+                            0,
+
+                        credit:
+                            1000
+                    }
+
+                ],
+
+                "RC017A",
+
+                {
+
+                    journalReference:
+                        testReference
+
+                }
+
+            );
+
+
+            log(
+                "DUPLICATE CHECK: FAIL"
+            );
+
+
+        }
+        catch(error) {
+
+            log(
+                "DUPLICATE CHECK: PASS"
+            );
+
+
+            log(
+                error.message
+            );
+
+        }
+        endSandbox();
+
+
+        log(
+            "END SANDBOX(): PASS"
+        );
+
+
+        log(
+            "========================================="
+        );
+
+
+        log(
+            "RC017A LEDGER DUPLICATE TEST COMPLETE"
+        );
+
+
+        log(
+            "========================================="
+        );
+
+
+    }
+    catch(error) {
+
+        log(
+            "TEST FAIL"
+        );
+
+        log(
+            error.message
+        );
+
+    }
+
+}
+
+
+run().catch(error => {
+
+    output.textContent =
+        "FATAL ERROR\n\n" +
+        error.stack;
+
+});
+
+</script>
+
+</body>
+</html>

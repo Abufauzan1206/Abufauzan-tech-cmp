@@ -36,3 +36,19 @@ export async function updateLedgerBatch(id, data) {
 export async function deleteLedgerBatch(id) {
     return await ledgerBatchRepository.delete(id);
 }
+
+
+export async function findLedgerBatchByJournalReference(reference) {
+
+    const batches =
+        await ledgerBatchRepository.findAll();
+
+
+    return batches.find(
+
+        batch =>
+            batch.journalReference === reference
+
+    ) || null;
+
+}

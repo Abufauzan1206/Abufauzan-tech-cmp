@@ -45,7 +45,6 @@ export function replaceContent(
                     " "
                 ).trim();
 
-
             const normalizedSearch =
                 normalize(search);
 
@@ -97,13 +96,18 @@ export function replaceContent(
 
         }
 
+        case "regex":
+
+            return content.replace(
+                new RegExp(search, "m"),
+                replacement
+            );
 
         default:
 
             throw new Error(
                 `Unsupported matching strategy: ${match.strategy}`
             );
-
     }
 
 }

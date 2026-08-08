@@ -53,6 +53,33 @@ export class CMPPatchRepository {
 
     }
 
+async restoreBackup(path) {
+
+    const backupPath =
+        `${path}.bak`;
+
+    if (!(await this.exists(backupPath))) {
+
+        throw new Error(
+            "Backup file does not exist."
+        );
+
+    }
+
+    const content =
+        await this.readFile(
+            backupPath
+        );
+
+    await this.writeFile(
+        path,
+        content
+    );
+
+    return true;
+
+}
+
     async exists(path) {
 
         try {

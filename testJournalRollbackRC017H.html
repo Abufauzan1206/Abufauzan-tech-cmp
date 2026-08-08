@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>RC017H Journal Rollback Test</title>
+</head>
+
+<body>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    startSandbox,
+    endSandbox
+} from "./js/utils/sandboxManager.js";
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+import {
+    postLedgerBatch
+} from "./js/business/ledgerBatchPostingEngine.js";
+
+import {
+    findJournalByReference
+} from "./js/services/journalService.js";
+
+const output =
+    document.getElementById("output");
+
+function log(message) {
+
+    output.textContent +=
+        "\n" + message;
+
+}
+
+async function runTest() {
+
+    output.textContent =
+        "=========================================\n" +
+        "ABUFAUZAN TECH CMP\n" +
+        "RC017H - JOURNAL ROLLBACK TEST\n" +
+        "=========================================\n";
+
+    const reference =
+        "RC017H-" + Date.now();
+
+    try {
+
+        startSandbox();
+
+        log("\nSandbox Started: PASS");
+
+        /*
+         * Create a ledger batch first using the
+         * same journal reference.
+         *
+         * This guarantees that postJournal()
+         * will create its journal first and then
+         * fail when posting the duplicate ledger.
+         */
+
+        await postLedgerBatch(
+
+            [
+                {
+                    account: "Cash Account",
+                    debit: 1000,
+                    credit: 0
+                },
+                {
+                    account: "Members Capital",
+                    debit: 0,
+                    credit: 1000
+                }
+            ],
+
+            "RC017H",
+
+            {
+                journalReference:
+                    reference
+            }
+
+        );
+
+        log(
+            "PREPARED DUPLICATE LEDGER: PASS"
+        );
+
+        try {
+
+            await postJournal({
+
+                title:
+                    "RC017H Rollback Test",
+
+                reference,
+
+                date:
+                    "2026-08-07",
+
+                entries: [
+
+                    {
+                        account:
+                            "Cash Account",
+
+                        debit:
+                            1000,
+
+                        credit:
+                            0
+                    },
+
+                    {
+                        account:
+                            "Members Capital",
+
+                        debit:
+                            0,
+
+                        credit:
+                            1000
+                    }
+
+                ],
+
+                createdBy:
+                    "RC017H"
+
+            });
+
+            log(
+                "ROLLBACK TRIGGER: FAIL"
+            );
+
+        }
+        catch (error) {
+
+            log(
+                "EXPECTED LEDGER FAILURE: PASS"
+            );
+
+            log(
+                error.message
+            );
+
+        }
+
+        const remaining =
+            await findJournalByReference(
+                reference
+            );
+
+        if (remaining === null) {
+
+            log(
+                "JOURNAL ROLLBACK: PASS"
+            );
+
+        }
+        else {
+
+            log(
+                "JOURNAL ROLLBACK: FAIL"
+            );
+
+        }
+
+        endSandbox();
+
+        log(
+            "END SANDBOX(): PASS"
+        );
+
+        log(
+            "\n=========================================\n" +
+            "RC017H JOURNAL ROLLBACK TEST COMPLETE\n" +
+            "========================================="
+        );
+
+    }
+    catch (error) {
+
+        log(
+            "\nTEST FAIL"
+        );
+
+        log(
+            error.message
+        );
+
+        try {
+            endSandbox();
+        }
+        catch {}
+
+    }
+
+}
+
+runTest();
+
+</script>
+
+</body>
+</html>
