@@ -11,7 +11,7 @@ const report = CMPReportExportEngine.build({
     data: [
 
         {
-            account: "Cash",
+            account: "Cash Account",
             debit: 10000,
             credit: 0
         },

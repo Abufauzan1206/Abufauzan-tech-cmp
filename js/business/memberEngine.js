@@ -22,38 +22,31 @@ export class CMPMemberEngine {
     /**
  * Register a new member
  */
-static register(member) {
-  
-  CMPMemberValidationService.validate(member);
+static async register(member) {
+    CMPMemberValidationService.validate(member);
 
     const newMember = {
-
+        ...member,
         memberId: CMPIdService.generate("MEM"),
-
         createdAt: new Date(),
-
-        status: "active",
-
-        ...member
-
+        status: "active"
     };
 
-    CMPRepositoryManager
-    .member
-    .create(newMember);
+    await CMPRepositoryManager
+        .member
+        .create(newMember);
 
     CMPAuditService.log(
-    "MEMBER_REGISTERED",
-    newMember
-);
+        "MEMBER_REGISTERED",
+        newMember
+    );
 
-CMPEventBus.emit(
-    "member:registered",
-    newMember
-);
+    CMPEventBus.emit(
+        "member:registered",
+        newMember
+    );
 
     return newMember;
-
 }
 
     /**

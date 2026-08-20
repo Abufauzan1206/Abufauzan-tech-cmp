@@ -1,17 +1,16 @@
 import { auth, db } from "./firebase-config.js";
 import { rolesMatch } from "./components/roleAuthorization.js";
 
-import { buildSidebar } from "./navigation/sidebar.js";
-
 import {
-    signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 import {
     doc,
     getDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 
 function handleDashboardHistoryReentry() {
     const currentUser = auth.currentUser;
@@ -61,36 +60,65 @@ onAuthStateChanged(auth, async (user) => {
 
         const userData = userDoc.data();
 
-        if (!rolesMatch(userData.role, "super_admin")) {
+        const allowed =
+            rolesMatch(
+                userData.role,
+                "cooperative_admin"
+            );
 
+        if (!allowed) {
             window.location.href =
-                rolesMatch(userData.role, "cooperative_admin")
-                    ? "cooperative-admin.html"
+                rolesMatch(
+                    userData.role,
+                    "super_admin"
+                )
+                    ? "super-admin.html"
                     : "login.html";
 
             return;
         }
 
-        buildSidebar("sidebarMenu");
+        const name =
+            userData.name ||
+            userData.displayName ||
+            user.email ||
+            "Cooperative Administrator";
+
+        const nameElement =
+            document.getElementById("adminName");
+
+        if (nameElement) {
+            nameElement.textContent = name;
+        }
 
     } catch (error) {
 
         console.error(
-            "Super Admin authorization error:",
+            "Cooperative Admin authentication error:",
             error
         );
 
-        await signOut(auth);
         window.location.href = "login.html";
     }
-});
-
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-
-  await signOut(auth);
-
-  alert("Logged out successfully.");
-
-  window.location.href = "login.html";
 
 });
+
+
+const logoutBtn =
+    document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+
+    logoutBtn.addEventListener(
+        "click",
+        async () => {
+
+            await signOut(auth);
+
+            window.location.href =
+                "login.html";
+
+        }
+    );
+
+}

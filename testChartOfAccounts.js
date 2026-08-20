@@ -4,7 +4,7 @@ from "./js/business/chartOfAccountsEngine.js";
 CMPChartOfAccountsEngine.createAccount({
 
     code: "1000",
-    name: "Cash",
+    name: "Cash Account",
     category: "ASSET"
 
 });

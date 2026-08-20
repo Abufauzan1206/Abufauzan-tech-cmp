@@ -28,6 +28,14 @@ import {
     findJournalByReference
 } from "./js/services/journalService.js";
 
+import {
+    createYear
+} from "./js/business/financialYearEngine.js";
+
+import {
+    createPeriod
+} from "./js/business/accountingPeriodEngine.js";
+
 const output =
     document.getElementById("output");
 
@@ -54,6 +62,31 @@ async function runTest() {
         startSandbox();
 
         log("\nSandbox Started: PASS");
+
+        const testSuffix = Date.now();
+
+        const financialYear = await createYear({
+            name:
+                "FY 2026 RC017H Rollback Test " + testSuffix,
+            startDate:
+                "2026-01-01",
+            endDate:
+                "2026-12-31"
+        });
+
+        const accountingPeriod = await createPeriod({
+            name:
+                "August 2026 RC017H Rollback Test " + testSuffix,
+            financialYearId:
+                financialYear.id,
+            startDate:
+                "2026-08-01",
+            endDate:
+                "2026-08-31"
+        });
+
+        log("FINANCIAL YEAR: PASS");
+        log("ACCOUNTING PERIOD: PASS");
 
         /*
          * Create a ledger batch first using the

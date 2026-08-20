@@ -1,9 +1,8 @@
 console.log("Contribution script loaded");
 
 import {
-    recordContribution
-}
-from "../../js/services/contributionService.js";
+    postContribution
+} from "../../js/business/contributionPostingEngine.js";
 
 import {
     getMembers
@@ -53,7 +52,7 @@ contributionForm.addEventListener(
 
         try {
 
-            await recordContribution({
+            await postContribution({
 
                 memberId:
                 document.getElementById(

@@ -74,12 +74,11 @@ export class CMPMemoryAdapter {
     ) {
 
         const item = {
-
             id:
+                record?.id ??
+                record?.memberId ??
                 crypto.randomUUID(),
-
             ...record
-
         };
 
 
@@ -93,13 +92,41 @@ export class CMPMemoryAdapter {
     }
 
 
+    matchesIdentity(
+        item,
+        id
+    ) {
+        if (!item) {
+            return false;
+        }
+
+        if (item.id === id) {
+            return true;
+        }
+
+        const businessIdKey =
+            Object.keys(item).find(
+                key =>
+                    key.endsWith("Id") &&
+                    key !== "id"
+            );
+
+        return businessIdKey
+            ? item[businessIdKey] === id
+            : false;
+    }
+
+
     async findById(
         id
     ) {
 
         return this.data.find(
             item =>
-                item.id === id
+                this.matchesIdentity(
+                    item,
+                    id
+                )
         );
 
     }
@@ -120,9 +147,11 @@ export class CMPMemoryAdapter {
         const index =
             this.data.findIndex(
                 item =>
-                    item.id === id
+                    this.matchesIdentity(
+                        item,
+                        id
+                    )
             );
-
 
         if (index === -1) {
 
@@ -154,9 +183,11 @@ export class CMPMemoryAdapter {
         const index =
             this.data.findIndex(
                 item =>
-                    item.id === id
+                    this.matchesIdentity(
+                        item,
+                        id
+                    )
             );
-
 
         if (index === -1) {
 

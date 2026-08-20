@@ -8,11 +8,13 @@
  * =====================================================
  */
 
-import { CMPIncomeExpenditureEngine } from "./incomeExpenditureEngine.js";
+import {
+    generateIncomeExpenditure
+} from "./incomeExpenditureEngine.js";
 
 export class CMPStatementOfChangesInEquityEngine {
 
-    static generate({
+    static async generate({
 
         openingEquity = 0,
 
@@ -23,10 +25,10 @@ export class CMPStatementOfChangesInEquityEngine {
     } = {}) {
 
         const incomeStatement =
-            CMPIncomeExpenditureEngine.generate();
+            await generateIncomeExpenditure();
 
         const surplus =
-            incomeStatement.surplus;
+            incomeStatement.netSurplus;
 
         const closingEquity =
 

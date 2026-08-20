@@ -32,8 +32,13 @@ import {
 } from "./auditTrailEngine.js";
 
 import {
-    createPeriod
+    createPeriod,
+    lockPeriod
 } from "./accountingPeriodEngine.js";
+
+import {
+    getAllAccountingPeriods
+} from "../services/accountingPeriodService.js";
 
 import {
     createYear
@@ -155,9 +160,28 @@ export class CMPFinancialClosingCoordinator {
 
 
 
+        const accountingPeriods =
+            await getAllAccountingPeriods();
+
+        const currentAccountingPeriod =
+            accountingPeriods.find(
+                period =>
+                    period.financialYearId === financialYearId &&
+                    period.status === "OPEN" &&
+                    period.locked !== true
+            );
+
+        if (!currentAccountingPeriod) {
+            throw new Error(
+                "No open accounting period found for financial year."
+            );
+        }
+
         const periodLock =
-            CMPPeriodLockEngine.lock(
-                String(year)
+            await lockPeriod(
+                currentAccountingPeriod.id,
+                "SYSTEM",
+                "Financial year closing"
             );
 
 

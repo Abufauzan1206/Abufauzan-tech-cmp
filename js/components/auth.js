@@ -8,6 +8,10 @@
  */
 
 import { auth } from "../firebase-config.js";
+import {
+    normalizeRole,
+    rolesMatch
+} from "./roleAuthorization.js";
 
 import {
   onAuthStateChanged,
@@ -39,10 +43,8 @@ export class CMPAuth {
 }
 
 static setRole(role) {
-
-  this.role = role;
-
-}
+        this.role = normalizeRole(role);
+    }
 
 static setPermissions(permissions) {
 
@@ -83,27 +85,19 @@ static requireLogin(loginPage = "../login.html") {
 }
 
 static hasRole(role) {
-
-  return this.role === role;
-
-}
+        return rolesMatch(this.role, role);
+    }
 
 static isSuperAdmin() {
-
-  return this.hasRole("super_admin");
-
-}
+        return this.hasRole("super_admin");
+    }
 
 static isCooperativeAdmin() {
-
-  return this.hasRole("cooperative_admin");
-
-}
+        return this.hasRole("cooperative_admin");
+    }
 
 static isMember() {
-
-  return this.hasRole("member");
-
-}
+        return this.hasRole("member");
+    }
 
 }

@@ -1,4 +1,4 @@
-import { buildSidebar } from "./sidebar.js";
+import { buildSidebar } from "./navigation/sidebar.js";
 
 // Build the sidebar
 buildSidebar("sidebarMenu");

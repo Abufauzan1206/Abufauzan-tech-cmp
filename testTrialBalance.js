@@ -25,30 +25,85 @@ await CMPTransactionEngine.create({
     description: "Monthly Contribution"
 });
 
-// Generate Trial Balance
-const report =
-    await generateTrialBalance();
+const report = await generateTrialBalance();
+
+if (!report.success) {
+    throw new Error("Trial Balance generation failed.");
+}
 
 if (!report.balanced) {
+    throw new Error("Trial Balance is not balanced.");
+}
+
+if (report.totalDebit !== 10000) {
     throw new Error(
-        "Trial Balance is not balanced."
+        `Expected total debit of 10000, got ${report.totalDebit}.`
     );
 }
 
-console.log("========== TRIAL BALANCE ==========");
+if (report.totalCredit !== 10000) {
+    throw new Error(
+        `Expected total credit of 10000, got ${report.totalCredit}.`
+    );
+}
 
-console.log(report.accounts);
+if (!Array.isArray(report.accounts)) {
+    throw new Error("Trial Balance accounts must be an array.");
+}
+
+const cash = report.accounts.find(
+    account => account.account === "Cash Account"
+);
+
+const contributionIncome = report.accounts.find(
+    account => account.account === "Contribution Income"
+);
+
+if (!cash) {
+    throw new Error("Cash Account missing from Trial Balance.");
+}
+
+if (!contributionIncome) {
+    throw new Error(
+        "Contribution Income missing from Trial Balance."
+    );
+}
+
+if (
+    cash.debit !== 10000 ||
+    cash.credit !== 0 ||
+    cash.balance !== 10000
+) {
+    throw new Error("Cash Account Trial Balance values are incorrect.");
+}
+
+if (
+    contributionIncome.debit !== 0 ||
+    contributionIncome.credit !== 10000 ||
+    contributionIncome.balance !== -10000
+) {
+    throw new Error(
+        "Contribution Income Trial Balance values are incorrect."
+    );
+}
+
+console.log("=========================================");
+console.log("ABUFAUZAN TECH CMP");
+console.log("TRIAL BALANCE VERIFICATION");
+console.log("=========================================");
 
 console.log("");
+console.log("Accounts:");
+console.table(report.accounts);
 
+console.log("");
 console.log("Total Debit :", report.totalDebit);
-
 console.log("Total Credit:", report.totalCredit);
 
 console.log("");
+console.log("Balanced Verification: PASS");
+console.log("Cash Account Verification: PASS");
+console.log("Contribution Income Verification: PASS");
+console.log("Trial Balance Verification: PASS");
 
-console.log(
-    report.balanced
-        ? "✓ Trial Balance Balanced"
-        : "✗ Trial Balance NOT Balanced"
-);
+console.log("=========================================");

@@ -28,9 +28,7 @@ export async function generateTrialBalance() {
         for (const entry of batch.entries || []) {
 
             const accountName =
-                entry.account === "Cash"
-                    ? "Cash Account"
-                    : entry.account;
+                entry.account;
 
             if (!accounts[accountName]) {
 

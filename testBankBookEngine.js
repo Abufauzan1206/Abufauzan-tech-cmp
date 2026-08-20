@@ -13,9 +13,9 @@ async function runTest() {
             throw new Error("Bank Book generation failed.");
         }
 
-        if (result.account !== "Bank") {
+        if (result.account !== "Bank Account") {
             throw new Error(
-                `Expected canonical account "Bank", received "${result.account}".`
+                `Expected canonical account "Bank Account", received "${result.account}".`
             );
         }
 

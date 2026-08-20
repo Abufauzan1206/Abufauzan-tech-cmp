@@ -1,4 +1,5 @@
 import { auth, db } from "./firebase-config.js";
+import { rolesMatch } from "./components/roleAuthorization.js";
 
 import {
   signInWithEmailAndPassword
@@ -37,11 +38,15 @@ if (loginForm) {
 
       alert("Login successful!");
 
-      if (userData.role === "superAdmin") {
-
-        window.location.href = "super-admin.html";
-
-      } else {
+      if (
+            rolesMatch(userData.role, "super_admin")
+        ) {
+            window.location.href = "super-admin.html";
+        } else if (
+            rolesMatch(userData.role, "cooperative_admin")
+        ) {
+            window.location.href = "cooperative-admin.html";
+        } else {
 
         alert("Dashboard for " + userData.role + " is not yet available.");
 

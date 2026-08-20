@@ -150,7 +150,106 @@ async function runTest() {
         console.log("Receipt Integration: PASS");
         console.log("Payment Integration: PASS");
         console.log("Closing Balance Integration: PASS");
-        console.log("Transaction Integration: PASS");
+
+        if (!result.success) {
+    throw new Error(
+        "Cash Book generation verification failed."
+    );
+}
+
+if (result.account !== "Cash Account") {
+    throw new Error(
+        "Cash Book canonical account verification failed."
+    );
+}
+
+if (result.receipts.length !== 1) {
+    throw new Error(
+        "Cash Book receipt count verification failed."
+    );
+}
+
+if (result.payments.length !== 0) {
+    throw new Error(
+        "Cash Book payment count verification failed."
+    );
+}
+
+if (result.totalReceipts !== 10000) {
+    throw new Error(
+        "Cash Book total receipts verification failed."
+    );
+}
+
+if (result.totalPayments !== 0) {
+    throw new Error(
+        "Cash Book total payments verification failed."
+    );
+}
+
+if (result.closingBalance !== 10000) {
+    throw new Error(
+        "Cash Book closing balance verification failed."
+    );
+}
+
+if (result.totalTransactions !== 1) {
+    throw new Error(
+        "Cash Book transaction count verification failed."
+    );
+}
+
+const receiptTotal =
+    result.receipts.reduce(
+        (sum, item) =>
+            sum + Number(item.receipt || 0),
+        0
+    );
+
+const paymentTotal =
+    result.payments.reduce(
+        (sum, item) =>
+            sum + Number(item.payment || 0),
+        0
+    );
+
+if (receiptTotal !== result.totalReceipts) {
+    throw new Error(
+        "Cash Book receipt reconciliation failed."
+    );
+}
+
+if (paymentTotal !== result.totalPayments) {
+    throw new Error(
+        "Cash Book payment reconciliation failed."
+    );
+}
+
+if (
+    result.closingBalance !==
+    result.totalReceipts -
+    result.totalPayments
+) {
+    throw new Error(
+        "Cash Book closing balance calculation failed."
+    );
+}
+
+console.log("");
+console.log("Cash Book Generation Verification: PASS");
+console.log("Canonical Account Verification: PASS");
+console.log("Receipt Count Verification: PASS");
+console.log("Payment Count Verification: PASS");
+console.log("Total Receipts Verification: PASS");
+console.log("Total Payments Verification: PASS");
+console.log("Closing Balance Verification: PASS");
+console.log("Transaction Count Verification: PASS");
+console.log("Receipt Reconciliation Verification: PASS");
+console.log("Payment Reconciliation Verification: PASS");
+console.log("Closing Balance Calculation Verification: PASS");
+console.log("Cash Book Transaction Integration Verification: PASS");
+
+console.log("Transaction Integration: PASS");
         console.log("");
         console.log("CASH BOOK RESULT:");
         console.log(JSON.stringify(result, null, 4));

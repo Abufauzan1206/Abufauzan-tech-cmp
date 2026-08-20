@@ -19,13 +19,13 @@ export class CMPChartOfAccounts {
     // ==========================
     CASH: {
         code: "1001",
-        name: "Cash",
+        name: "Cash Account",
         type: CMPAccountTypes.TYPES.ASSET
     },
 
     BANK: {
         code: "1002",
-        name: "Bank",
+        name: "Bank Account",
         type: CMPAccountTypes.TYPES.ASSET
     },
 

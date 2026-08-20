@@ -34,7 +34,7 @@ export class CMPJournalBuilderEngine {
                         transaction.transactionDate,
 
                     reference:
-                        transaction.transactionId,
+            transaction.reference ?? transaction.transactionId,
 
                     entries: [
 
@@ -80,7 +80,7 @@ export class CMPJournalBuilderEngine {
                     date:
                         transaction.transactionDate,
                     reference:
-                        transaction.transactionId,
+                transaction.reference ?? transaction.transactionId,
                     entries: [
                         {
                             account:

@@ -200,14 +200,12 @@ export async function lockPeriod(
     });
 
     return {
-
         success: true,
-
         locked: true,
-
+        status: "LOCKED",
+        periodId: id,
         message:
             "Accounting period locked successfully."
-
     };
 
 }

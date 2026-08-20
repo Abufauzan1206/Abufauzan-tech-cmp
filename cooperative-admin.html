@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CMP Cooperative Admin Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        ABUFAUZAN TECH CMP
+    </div>
+
+    <div class="profile">
+        <span id="adminName">
+            Cooperative Administrator
+        </span>
+
+        <button id="logoutBtn">
+            Logout
+        </button>
+    </div>
+</header>
+
+<div class="main-container">
+
+    <nav id="sidebarMenu" class="sidebar"></nav>
+
+    <main id="content">
+
+        <div class="dashboard-header">
+
+            <h1>
+                👋 Welcome, Cooperative Administrator
+            </h1>
+
+            <p>
+                Manage your cooperative's members,
+                contributions, loans, welfare and
+                cooperative operations from your
+                dedicated dashboard.
+            </p>
+
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <h2>👥</h2>
+                <h3 id="memberCount">0</h3>
+                <p>Members</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>💰</h2>
+                <h3 id="contributionTotal">₦0.00</h3>
+                <p>Contributions</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>🏦</h2>
+                <h3 id="loanCount">0</h3>
+                <p>Loans</p>
+            </div>
+
+        </div>
+
+        <div class="dashboard-section">
+
+            <h2>⚡ Cooperative Services</h2>
+
+            <div class="service-grid">
+
+                <a
+                    href="modules/members/index.html"
+                    class="service-card"
+                >
+                    <div class="service-icon">👥</div>
+                    <h3>Members</h3>
+                    <p>
+                        Manage cooperative members.
+                    </p>
+                </a>
+
+                <a
+                    href="modules/contributions/index.html"
+                    class="service-card"
+                >
+                    <div class="service-icon">💰</div>
+                    <h3>Contributions</h3>
+                    <p>
+                        Manage member contributions.
+                    </p>
+                </a>
+
+                <a
+                    href="modules/loans/loan-directory/index.html"
+                    class="service-card"
+                >
+                    <div class="service-icon">🏦</div>
+                    <h3>Loans</h3>
+                    <p>
+                        Manage cooperative lending.
+                    </p>
+                </a>
+
+                <a
+                    href="modules/welfare/index.html"
+                    class="service-card"
+                >
+                    <div class="service-icon">❤️</div>
+                    <h3>Welfare</h3>
+                    <p>
+                        Manage welfare operations.
+                    </p>
+                </a>
+
+                <div class="service-card disabled">
+                    <div class="service-icon">📊</div>
+                    <h3>Reports</h3>
+                    <p>
+                        Coming Soon
+                    </p>
+                </div>
+
+                <div class="service-card disabled">
+                    <div class="service-icon">⚙️</div>
+                    <h3>Cooperative Settings</h3>
+                    <p>
+                        Coming Soon
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-section">
+
+            <h2>📢 Recent Activities</h2>
+
+            <div class="card">
+                <p>
+                    No recent activities yet.
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<footer>
+    © 2026 ABUFAUZAN TECH
+</footer>
+
+<script type="module"
+    src="js/cooperative-admin.js">
+</script>
+
+</body>
+</html>

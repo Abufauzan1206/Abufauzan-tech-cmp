@@ -96,8 +96,10 @@ export class CMPTransactionEngine {
         const builtJournal =
             CMPJournalBuilderEngine
                 .build(newTransaction);
-        await CMPJournalPostingEngine
-            .post(builtJournal);
+
+        const postingResult =
+            await CMPJournalPostingEngine
+                .post(builtJournal);
 
         newTransaction.status = "POSTED";
         newTransaction.postedAt = new Date();
@@ -107,7 +109,23 @@ export class CMPTransactionEngine {
                 .transaction
                 .create(newTransaction);
 
-return transactionRecord;
+        return {
+            ...transactionRecord,
+            journalDocumentId:
+                postingResult.journalDocumentId,
+            ledgerDocumentId:
+                postingResult.ledgerDocumentId,
+            journalNumber:
+                postingResult.journalNumber,
+            ledgerBatchNumber:
+                postingResult.ledgerBatchNumber,
+            accountingPeriod:
+                postingResult.accountingPeriod,
+            financialYearId:
+                postingResult.financialYearId,
+            accountingPeriodId:
+                postingResult.accountingPeriodId
+        };
 
     }
 

@@ -80,17 +80,55 @@ console.log(
     `NET SURPLUS : NGN ${report.netSurplus}`
 );
 
-if (
-    report.netSurplus !==
-    report.totalIncome -
-    report.totalExpenses
-) {
+const contributionIncome = report.incomeAccounts.find(
+    account => account.account === "Contribution Income"
+);
 
+if (!contributionIncome) {
     throw new Error(
-        "Net surplus calculation is incorrect."
+        "Contribution Income missing from Income & Expenditure Statement."
+    );
+}
+
+if (
+    contributionIncome.credit !== 10000 ||
+    contributionIncome.debit !== 0
+) {
+    throw new Error(
+        "Contribution Income values are incorrect."
+    );
+}
+
+if (report.totalIncome !== 10000) {
+    throw new Error(
+        "Total income is incorrect."
+    );
+}
+
+if (report.totalExpenses !== 0) {
+    throw new Error(
+        "Total expenditure is incorrect."
+    );
+}
+
+if (report.netSurplus !== 10000) {
+    throw new Error(
+        "Net surplus is incorrect."
+    );
+}
+
+if (report.netDeficit !== 0) {
+    throw new Error(
+        "Net deficit is incorrect."
     );
 }
 
 console.log("");
-console.log("INCOME & EXPENDITURE TEST: PASS");
+console.log("Income Classification Verification: PASS");
+console.log("Contribution Income Verification: PASS");
+console.log("Total Income Verification: PASS");
+console.log("Total Expenditure Verification: PASS");
+console.log("Net Surplus Verification: PASS");
+console.log("Net Deficit Verification: PASS");
+console.log("Income & Expenditure Verification: PASS");
 console.log("=========================================");

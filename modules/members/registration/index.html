@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Registration</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <main id="registrationApp">
+        <h1>Member Registration</h1>
+
+        <form id="registrationForm">
+            <label>
+                Full Name
+                <input id="fullName" name="fullName" type="text" required>
+            </label>
+
+            <label>
+                Phone Number
+                <input id="phoneNumber" name="phoneNumber" type="tel" required>
+            </label>
+
+            <label>
+                Email
+                <input id="email" name="email" type="email">
+            </label>
+
+            <button type="submit">Register Member</button>
+        </form>
+
+        <p id="registrationMessage"></p>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+</body>
+</html>

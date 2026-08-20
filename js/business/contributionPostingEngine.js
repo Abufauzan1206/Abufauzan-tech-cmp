@@ -16,12 +16,10 @@ import {
 } from "../services/contributionService.js";
 
 import {
-    createTransaction
-} from "../services/transactionService.js";
+    CMPTransactionEngine
+} from "./transactionEngine.js";
 
-import {
-    postJournal
-} from "./journalPostingEngine.js";
+
 
 import {
     getNextSequence
@@ -60,31 +58,37 @@ export async function postContribution(data) {
         await createContribution(contribution);
 
     const transactionResult =
-        await createTransaction({
+        await CMPTransactionEngine.create({
             type: "CONTRIBUTION",
             amount: data.amount,
             memberId: data.memberId,
             reference: contributionNumber,
-            status: "SUCCESS"
-        });
-
-    const journalResult =
-        await postJournal({
-            title: "Contribution Received",
-            debit: data.amount,
-            credit: data.amount,
-            debitAccount: "Cash Account",
-            creditAccount: "Contribution Income",
+            description: "Member Contribution",
+            account: "Cash Account",
             createdBy: data.createdBy ?? "CMP"
         });
+
+    
 
     return {
         success: true,
         contributionNumber,
         contributionId: contributionResult.id ?? contributionResult,
         transactionId: transactionResult.id ?? transactionResult,
-        journalNumber: journalResult.journalNumber,
-        ledgerBatchNumber: journalResult.ledgerBatchNumber
+        journalNumber:
+            transactionResult.journalNumber,
+        ledgerBatchNumber:
+            transactionResult.ledgerBatchNumber,
+        journalDocumentId:
+            transactionResult.journalDocumentId,
+        ledgerDocumentId:
+            transactionResult.ledgerDocumentId,
+        accountingPeriod:
+            transactionResult.accountingPeriod,
+        financialYearId:
+            transactionResult.financialYearId,
+        accountingPeriodId:
+            transactionResult.accountingPeriodId
     };
 
 }

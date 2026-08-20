@@ -41,14 +41,201 @@ async function runTest() {
         const transaction = await CMPTransactionEngine.create({
             type: "CONTRIBUTION",
             amount: 10000,
-            description: "RC069 General Ledger Integration Contribution"
+            memberId: "MEMBER001",
+            reference: "CON-REFERENCE-001",
+            description: "Contribution Reference Verification",
+            account: "Cash Account",
+            createdBy: "CMP"
         });
 
         if (!transaction || transaction.status !== "POSTED") {
             throw new Error("Expected transaction to be POSTED.");
         }
 
+        if (transaction.reference !== "CON-REFERENCE-001") {
+            throw new Error(
+                `Expected transaction reference CON-REFERENCE-001, received ${transaction.reference}.`
+            );
+        }
+
+        console.log("Transaction Reference: PASS");
+
         const cashLedger = await generateGeneralLedger("Cash Account");
+
+        const { findJournalByReference } =
+            await import("./js/services/journalService.js");
+
+        const { findLedgerBatchByJournalReference } =
+            await import("./js/services/ledgerBatchService.js");
+
+        const journal =
+            await findJournalByReference("CON-REFERENCE-001");
+
+        if (!journal) {
+            throw new Error(
+                "Contribution journal was not persisted with the expected reference."
+            );
+        }
+
+        if (journal.reference !== "CON-REFERENCE-001") {
+            throw new Error(
+                `Expected persisted journal reference CON-REFERENCE-001, received ${journal.reference}.`
+            );
+        }
+
+        if (!journal.journalNumber) {
+            throw new Error(
+                "Persisted contribution journal has no journal number."
+            );
+        }
+
+        const ledgerBatch =
+            await findLedgerBatchByJournalReference("CON-REFERENCE-001");
+
+        if (!ledgerBatch) {
+            throw new Error(
+                "Contribution ledger batch was not persisted with the expected journal reference."
+            );
+        }
+
+        if (ledgerBatch.journalReference !== "CON-REFERENCE-001") {
+            throw new Error(
+                `Expected ledger batch journalReference CON-REFERENCE-001, received ${ledgerBatch.journalReference}.`
+            );
+        }
+
+        if (!ledgerBatch.batchNumber) {
+            throw new Error(
+                "Persisted contribution ledger batch has no batch number."
+            );
+        }
+
+        if (ledgerBatch.journalReference !== journal.reference) {
+            throw new Error(
+                "Journal reference and ledger batch journalReference do not match."
+            );
+        }
+
+        console.log("Journal Reference Persistence: PASS");
+        console.log("Ledger Batch Reference Persistence: PASS");
+        console.log("Journal/Ledger Reference Reconciliation: PASS");
+
+        if (journal.status !== "POSTED") {
+            throw new Error(
+                `Expected persisted contribution journal status POSTED, received ${journal.status}.`
+            );
+        }
+
+        if (journal.financialYearId !== financialYear.id) {
+            throw new Error(
+                "Persisted contribution journal financial year context does not match."
+            );
+        }
+
+        if (journal.accountingPeriodId !== period.id) {
+            throw new Error(
+                "Persisted contribution journal accounting period context does not match."
+            );
+        }
+
+        if (journal.accountingPeriod !== period.period.name) {
+            throw new Error(
+                "Persisted contribution journal accounting period name does not match."
+            );
+        }
+
+        if (ledgerBatch.status !== "POSTED") {
+            throw new Error(
+                `Expected persisted contribution ledger batch status POSTED, received ${ledgerBatch.status}.`
+            );
+        }
+
+        if (ledgerBatch.financialYearId !== financialYear.id) {
+            throw new Error(
+                "Persisted contribution ledger batch financial year context does not match."
+            );
+        }
+
+        if (ledgerBatch.accountingPeriodId !== period.id) {
+            throw new Error(
+                "Persisted contribution ledger batch accounting period context does not match."
+            );
+        }
+
+        if (ledgerBatch.accountingPeriod !== period.period.name) {
+            throw new Error(
+                "Persisted contribution ledger batch accounting period name does not match."
+            );
+        }
+
+        if (Number(ledgerBatch.totalDebit || 0) !== 10000) {
+            throw new Error(
+                `Expected ledger batch total debit 10000, received ${ledgerBatch.totalDebit}.`
+            );
+        }
+
+        if (Number(ledgerBatch.totalCredit || 0) !== 10000) {
+            throw new Error(
+                `Expected ledger batch total credit 10000, received ${ledgerBatch.totalCredit}.`
+            );
+        }
+
+        if (!Array.isArray(ledgerBatch.entries)) {
+            throw new Error(
+                "Persisted contribution ledger batch entries must be an array."
+            );
+        }
+
+        if (ledgerBatch.entries.length !== 2) {
+            throw new Error(
+                `Expected 2 persisted ledger batch entries, received ${ledgerBatch.entries.length}.`
+            );
+        }
+
+        const persistedCashEntry = ledgerBatch.entries.find(
+            entry => entry.account === "Cash Account"
+        );
+
+        const persistedIncomeEntry = ledgerBatch.entries.find(
+            entry => entry.account === "Contribution Income"
+        );
+
+        if (!persistedCashEntry) {
+            throw new Error(
+                "Persisted ledger batch is missing Cash Account entry."
+            );
+        }
+
+        if (!persistedIncomeEntry) {
+            throw new Error(
+                "Persisted ledger batch is missing Contribution Income entry."
+            );
+        }
+
+        if (Number(persistedCashEntry.debit || 0) !== 10000) {
+            throw new Error(
+                "Persisted Cash Account ledger batch debit should be 10000."
+            );
+        }
+
+        if (Number(persistedIncomeEntry.credit || 0) !== 10000) {
+            throw new Error(
+                "Persisted Contribution Income ledger batch credit should be 10000."
+            );
+        }
+
+        console.log("Journal POSTED Status: PASS");
+        console.log("Journal Financial Year Persistence: PASS");
+        console.log("Journal Accounting Period Persistence: PASS");
+        console.log("Ledger Batch POSTED Status: PASS");
+        console.log("Ledger Batch Financial Year Persistence: PASS");
+        console.log("Ledger Batch Accounting Period Persistence: PASS");
+        console.log("Ledger Batch Debit Total: PASS");
+        console.log("Ledger Batch Credit Total: PASS");
+        console.log("Ledger Batch Entry Count: PASS");
+        console.log("Persisted Cash Account Entry: PASS");
+        console.log("Persisted Contribution Income Entry: PASS");
+        console.log("Persisted Double-Entry Content: PASS");
 
         if (!cashLedger || cashLedger.success !== true) {
             throw new Error("Cash Account General Ledger generation failed.");

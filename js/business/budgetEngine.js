@@ -12,45 +12,80 @@
  */
 
 import {
-
     createBudget,
     getBudgetById,
     getAllBudgets,
     updateBudget,
     deleteBudget
-
 } from "../services/budgetService.js";
+
+import {
+    getFinancialYearById
+} from "../services/financialYearService.js";
 
 
 
 export async function createNewBudget(data) {
 
     if (!data?.name) {
-
         throw new Error(
             "Budget name is required."
         );
-
     }
 
-
     if (!data?.financialYearId) {
-
         throw new Error(
             "Financial year is required."
         );
-
     }
 
-
-    if (!data?.amount) {
-
+    if (
+        typeof data.amount !== "number" ||
+        !Number.isFinite(data.amount) ||
+        data.amount <= 0
+    ) {
         throw new Error(
-            "Budget amount is required."
+            "Budget amount must be a positive number."
+        );
+    }
+
+    const financialYear =
+        await getFinancialYearById(
+            data.financialYearId
         );
 
+    if (!financialYear) {
+        throw new Error(
+            "Financial year not found."
+        );
     }
 
+    if (
+        financialYear.status === "CLOSED" ||
+        financialYear.locked === true
+    ) {
+        throw new Error(
+            "Budget cannot be created for a closed or locked financial year."
+        );
+    }
+
+    const existingBudgets =
+        await getAllBudgets();
+
+    const duplicate =
+        existingBudgets.find(
+            budget =>
+                budget.financialYearId ===
+                    data.financialYearId &&
+                String(budget.name).toLowerCase() ===
+                    String(data.name).toLowerCase()
+        );
+
+    if (duplicate) {
+        throw new Error(
+            "Budget already exists for this financial year."
+        );
+    }
 
     const budget = {
 
@@ -121,21 +156,137 @@ export async function modifyBudget(
     data
 ) {
 
+    const budget =
+        await getBudgetById(id);
+
+    if (!budget) {
+        throw new Error(
+            "Budget not found."
+        );
+    }
+
+    if (budget.locked === true) {
+        throw new Error(
+            "Locked budget cannot be modified."
+        );
+    }
+
+    if (budget.status === "CLOSED") {
+        throw new Error(
+            "Closed budget cannot be modified."
+        );
+    }
+
+    const financialYear =
+        await getFinancialYearById(
+            budget.financialYearId
+        );
+
+    if (!financialYear) {
+        throw new Error(
+            "Financial year not found."
+        );
+    }
+
+    if (
+        financialYear.status === "CLOSED" ||
+        financialYear.locked === true
+    ) {
+        throw new Error(
+            "Budget cannot be modified because the financial year is closed or locked."
+        );
+    }
+
+    if (
+        data?.amount !== undefined &&
+        (
+            typeof data.amount !== "number" ||
+            !Number.isFinite(data.amount) ||
+            data.amount <= 0
+        )
+    ) {
+        throw new Error(
+            "Budget amount must be a positive number."
+        );
+    }
+
+    if (
+        data?.financialYearId !== undefined &&
+        data.financialYearId !== budget.financialYearId
+    ) {
+        throw new Error(
+            "Budget financial year cannot be changed after creation."
+        );
+    }
+    if (
+        data?.financialYearId !== undefined &&
+        data.financialYearId !== budget.financialYearId
+    ) {
+        throw new Error(
+            "Budget financial year cannot be changed after creation."
+        );
+    }
+
     return await updateBudget(
         id,
         data
     );
-
 }
 
 
 
 export async function removeBudget(id) {
 
-    return await deleteBudget(
-        id
-    );
+    const budget =
+        await getBudgetById(id);
 
+    if (!budget) {
+        throw new Error(
+            "Budget not found."
+        );
+    }
+
+    if (budget.locked === true) {
+        throw new Error(
+            "Locked budget cannot be deleted."
+        );
+    }
+
+    if (data?.financialYearId !== undefined &&
+        data.financialYearId !== budget.financialYearId
+    ) {
+        throw new Error(
+            "Budget financial year cannot be changed after creation."
+        );
+    }
+
+    if (budget.status === "CLOSED") {
+        throw new Error(
+            "Closed budget cannot be deleted."
+        );
+    }
+
+    const financialYear =
+        await getFinancialYearById(
+            budget.financialYearId
+        );
+
+    if (!financialYear) {
+        throw new Error(
+            "Financial year not found."
+        );
+    }
+
+    if (
+        financialYear.status === "CLOSED" ||
+        financialYear.locked === true
+    ) {
+        throw new Error(
+            "Budget cannot be deleted because the financial year is closed or locked."
+        );
+    }
+
+    return await deleteBudget(id);
 }
 /**
  * =====================================================

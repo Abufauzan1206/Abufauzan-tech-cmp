@@ -17,6 +17,7 @@ import { db } from "../firebase-config.js";
 import {
     collection,
     addDoc,
+    setDoc,
     getDoc,
     getDocs,
     updateDoc,
@@ -38,13 +39,26 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
 
     async create(data) {
 
+        if (data?.memberId) {
+
+            await setDoc(
+                doc(
+                    db,
+                    this.collectionName,
+                    data.memberId
+                ),
+                data
+            );
+
+            return data.memberId;
+        }
+
         const document = await addDoc(
             collection(db, this.collectionName),
             data
         );
 
         return document.id;
-
     }
 
 

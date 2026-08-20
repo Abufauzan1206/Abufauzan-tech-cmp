@@ -13,6 +13,8 @@
 
 import { CMPRepositoryManager }
 from "../repositories/repositoryManager.js";
+import { CMPMemberEngine }
+from "../business/memberEngine.js";
 
 
 const memberRepository =
@@ -48,7 +50,9 @@ export async function updateMember(id, data) {
 
 
 export async function deleteMember(id) {
-
     return await memberRepository.delete(id);
+}
 
+export async function registerMember(data) {
+    return await CMPMemberEngine.register(data);
 }
