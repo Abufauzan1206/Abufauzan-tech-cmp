@@ -45,9 +45,7 @@ async function run() {
                 path: file,
 
                 search:
-`static firebase(collectionName) {
-        return new CMPFirebaseAdapter(collectionName);
-    }`,
+`static firebase(collectionName) {`,
 
                 replace:
 `static firebase(collectionName) {

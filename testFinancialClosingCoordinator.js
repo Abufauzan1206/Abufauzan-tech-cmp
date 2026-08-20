@@ -1,19 +1,36 @@
 import { CMPTransactionEngine } from "./js/business/transactionEngine.js";
+import { createPeriod } from "./js/business/accountingPeriodEngine.js";
+import { seedChartOfAccounts } from "./js/seeders/chartOfAccountsSeeder.js";
+import { createYear } from "./js/business/financialYearEngine.js";
 import { CMPFinancialClosingCoordinator } from "./js/business/financialClosingCoordinator.js";
 
-CMPTransactionEngine.create({
+await seedChartOfAccounts();
 
-    type: "CONTRIBUTION",
-
-    amount: 10000,
-
-    description: "Monthly Contribution"
-
+const financialYear =
+    await createYear({
+        name: "FY 2026 RC",
+        startDate: "2026-01-01",
+        endDate: "2026-12-31"
 });
 
+const accountingPeriod = await createPeriod({
+    name: "August 2026",
+    financialYearId: financialYear.id,
+    startDate: "2026-01-01",
+    endDate: "2026-12-31"
+});
+
+await CMPTransactionEngine.create({
+    type: "CONTRIBUTION",
+    amount: 10000,
+    description: "Monthly Contribution"
+});
 
 const report =
-    CMPFinancialClosingCoordinator.close(2026);
+    await CMPFinancialClosingCoordinator.close(
+        financialYear.id,
+        2026
+    );
 
 
 console.log("");

@@ -40,10 +40,8 @@ static register(member) {
 
     CMPRepositoryManager
     .member
-    .save(newMember);
+    .create(newMember);
 
-return newMember;
-    
     CMPAuditService.log(
     "MEMBER_REGISTERED",
     newMember
@@ -65,7 +63,7 @@ CMPEventBus.emit(
 
     return CMPRepositoryManager
         .member
-        .getAll();
+        .findAll();
 
 }
 

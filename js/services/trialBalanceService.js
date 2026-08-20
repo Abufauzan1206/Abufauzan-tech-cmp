@@ -17,7 +17,7 @@ import {
 
 
 const trialBalanceRepository =
-    CMPRepositoryManager.get("trialBalance");
+    CMPRepositoryManager.get("ledgerBatch");
 
 
 export async function getAllLedgerBatches() {

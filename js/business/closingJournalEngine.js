@@ -28,7 +28,7 @@ export class CMPClosingJournalEngine {
 
             entries.push({
 
-                account: "Current Surplus",
+                account: "Contribution Income",
 
                 debit: surplus,
 
@@ -38,7 +38,7 @@ export class CMPClosingJournalEngine {
 
             entries.push({
 
-                account: "Retained Earnings",
+                account: "Members Capital",
 
                 debit: 0,
 
@@ -60,7 +60,7 @@ export class CMPClosingJournalEngine {
 
             entries.push({
 
-                account: "Current Deficit",
+                account: "Office Expense",
 
                 debit: 0,
 

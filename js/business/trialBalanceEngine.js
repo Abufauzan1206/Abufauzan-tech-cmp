@@ -27,10 +27,15 @@ export async function generateTrialBalance() {
 
         for (const entry of batch.entries || []) {
 
-            if (!accounts[entry.account]) {
+            const accountName =
+                entry.account === "Cash"
+                    ? "Cash Account"
+                    : entry.account;
 
-                accounts[entry.account] = {
-                    account: entry.account,
+            if (!accounts[accountName]) {
+
+                accounts[accountName] = {
+                    account: accountName,
                     debit: 0,
                     credit: 0,
                     balance: 0
@@ -38,10 +43,10 @@ export async function generateTrialBalance() {
 
             }
 
-            accounts[entry.account].debit +=
+            accounts[accountName].debit +=
                 Number(entry.debit || 0);
 
-            accounts[entry.account].credit +=
+            accounts[accountName].credit +=
                 Number(entry.credit || 0);
 
         }

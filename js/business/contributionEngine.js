@@ -36,7 +36,7 @@ static create(contribution) {
 
     CMPRepositoryManager
     .contribution
-    .save(contribution);
+    .create(newContribution);
 
     return newContribution;
 
@@ -49,7 +49,7 @@ static create(contribution) {
 
         return CMPRepositoryManager
     .contribution
-    .getAll();
+    .findAll();
 
     }
 

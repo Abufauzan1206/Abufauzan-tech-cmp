@@ -51,6 +51,10 @@ export async function generateGeneralLedger(accountName) {
                 account: entry.account,
                 debit: Number(entry.debit || 0),
                 credit: Number(entry.credit || 0),
+                transactionId: entry.transactionId,
+                financialYearId: batch.financialYearId,
+                accountingPeriodId: batch.accountingPeriodId,
+                accountingPeriod: batch.accountingPeriod,
                 balance: runningBalance
             });
 

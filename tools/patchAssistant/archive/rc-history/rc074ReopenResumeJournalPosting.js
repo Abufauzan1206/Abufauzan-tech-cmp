@@ -1,0 +1,325 @@
+import fs from "fs/promises";
+
+async function run() {
+
+    console.log("=========================================");
+    console.log("ABUFAUZAN TECH CMP");
+    console.log("RC074 - REOPEN JOURNAL POSTING");
+    console.log("=========================================");
+
+    const path =
+        "testAccountingPeriodReopenJournalPosting.html";
+
+    const content = `<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>Accounting Period Reopen Journal Posting Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    postJournal
+} from "./js/business/journalPostingEngine.js";
+
+import {
+    createPeriod,
+    lockPeriod,
+    reopenPeriod
+} from "./js/business/accountingPeriodEngine.js";
+
+import {
+    createYear
+} from "./js/business/financialYearEngine.js";
+
+import {
+    CMPMemoryAdapter
+} from "./js/adapters/memoryAdapter.js";
+
+CMPMemoryAdapter.clear();
+
+const output =
+    document.getElementById("output");
+
+const testSuffix =
+    Date.now();
+
+let report = "";
+
+try {
+
+    const financialYear =
+        await createYear({
+
+            name:
+                \`FY 2026 Reopen Posting Test \${testSuffix}\`,
+
+            startDate:
+                "2026-01-01",
+
+            endDate:
+                "2026-12-31"
+
+        });
+
+    report +=
+        "=========================================\\n";
+
+    report +=
+        "ABUFAUZAN TECH CMP\\n";
+
+    report +=
+        "ACCOUNTING PERIOD REOPEN JOURNAL POSTING TEST\\n";
+
+    report +=
+        "=========================================\\n\\n";
+
+
+    const period =
+        await createPeriod({
+
+            name:
+                \`October 2026 Reopen Posting Test \${testSuffix}\`,
+
+            financialYearId:
+                financialYear.id,
+
+            startDate:
+                "2026-10-01",
+
+            endDate:
+                "2026-10-31"
+
+        });
+
+    report +=
+        "CREATE OPEN PERIOD(): PASS\\n";
+
+
+    await postJournal({
+
+        title:
+            "Pre-Lock Contribution",
+
+        date:
+            "2026-10-15",
+
+        debit:
+            10000,
+
+        credit:
+            10000,
+
+        debitAccount:
+            "Cash Account",
+
+        creditAccount:
+            "Contribution Income",
+
+        createdBy:
+            "CMP"
+
+    });
+
+    report +=
+        "POST WHILE OPEN: PASS\\n";
+
+
+    await lockPeriod(
+        period.id,
+        "CMP",
+        "Period control test"
+    );
+
+    report +=
+        "LOCK PERIOD(): PASS\\n";
+
+
+    try {
+
+        await postJournal({
+
+            title:
+                "Blocked Contribution",
+
+            date:
+                "2026-10-20",
+
+            debit:
+                5000,
+
+            credit:
+                5000,
+
+            debitAccount:
+                "Cash Account",
+
+            creditAccount:
+                "Contribution Income",
+
+            createdBy:
+                "CMP"
+
+        });
+
+        report +=
+            "POST WHILE LOCKED: FAIL\\n";
+
+    }
+    catch (error) {
+
+        if (
+            error.message ===
+            "Accounting period is closed or locked. Posting is blocked."
+        ) {
+
+            report +=
+                "POST WHILE LOCKED: PASS\\n";
+
+        }
+        else {
+
+            throw error;
+
+        }
+
+    }
+
+
+    const reopened =
+        await reopenPeriod(
+            period.id
+        );
+
+    if (
+        !reopened ||
+        reopened.reopened !== true
+    ) {
+
+        throw new Error(
+            "Accounting period did not reopen successfully."
+        );
+
+    }
+
+    report +=
+        "REOPEN PERIOD(): PASS\\n";
+
+
+    const resumedJournal =
+        await postJournal({
+
+            title:
+                "Post-Reopen Contribution",
+
+            date:
+                "2026-10-25",
+
+            debit:
+                7500,
+
+            credit:
+                7500,
+
+            debitAccount:
+                "Cash Account",
+
+            creditAccount:
+                "Contribution Income",
+
+            createdBy:
+                "CMP"
+
+        });
+
+    report +=
+        "POST AFTER REOPEN: PASS\\n";
+
+
+    if (
+        resumedJournal.financialYearId !==
+        financialYear.id
+    ) {
+
+        throw new Error(
+            "Post-reopen journal financial year mismatch."
+        );
+
+    }
+
+    report +=
+        "FINANCIAL YEAR CONTEXT: PASS\\n";
+
+
+    if (
+        resumedJournal.accountingPeriodId !==
+        period.id
+    ) {
+
+        throw new Error(
+            "Post-reopen journal accounting period mismatch."
+        );
+
+    }
+
+    report +=
+        "ACCOUNTING PERIOD CONTEXT: PASS\\n";
+
+
+    report +=
+        "\\n=========================================\\n";
+
+    report +=
+        "RC074 TEST COMPLETE: PASS\\n";
+
+    report +=
+        "=========================================";
+
+
+}
+catch (error) {
+
+    report +=
+        "\\nRC074 TEST COMPLETE: FAIL\\n\\n";
+
+    report +=
+        error.message;
+
+}
+
+
+output.textContent =
+    report;
+
+</script>
+
+</body>
+</html>
+`;
+
+    await fs.writeFile(
+        path,
+        content,
+        "utf8"
+    );
+
+    await fs.access(path);
+
+    console.log("CREATE TEST FILE: PASS");
+    console.log(`Test: ${path}`);
+    console.log("=========================================");
+    console.log("RC074 PATCH COMPLETE");
+    console.log("=========================================");
+}
+
+run().catch(error => {
+
+    console.error("RC074 PATCH FAIL");
+    console.error(error.message);
+
+    process.exit(1);
+
+});

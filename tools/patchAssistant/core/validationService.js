@@ -31,12 +31,14 @@ export function validatePatchRequest(data) {
     }
 
 
-    if (!data.search) {
-
+    if (
+        data.mode !== "create" &&
+        data.mode !== "empty" &&
+        !data.search
+    ) {
         throw new Error(
             "Search text is required."
         );
-
     }
 
 

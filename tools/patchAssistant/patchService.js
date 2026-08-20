@@ -55,14 +55,65 @@ async function applySinglePatch(data) {
         );
 
 
+    if (data.mode === "create") {
+
+        if (exists) {
+
+            throw new Error(
+                "Target file already exists."
+            );
+
+        }
+
+        await repository.writeFile(
+            data.path,
+            data.replace
+        );
+
+        return {
+            success: true,
+            backup: null,
+            strategy: "create"
+        };
+
+    }
+
     if (!exists) {
 
         throw new Error(
             "Target file does not exist."
         );
-
     }
 
+    if (data.mode === "empty") {
+
+        const content =
+            await repository.readFile(
+                data.path
+            );
+
+        if (content !== "") {
+            throw new Error(
+                "Target file is not empty."
+            );
+        }
+
+        const backup =
+            await createBackup(
+                data.path
+            );
+
+        await repository.writeFile(
+            data.path,
+            data.replace
+        );
+
+        return {
+            success: true,
+            backup,
+            strategy: "empty"
+        };
+    }
 
     const content =
         await repository.readFile(

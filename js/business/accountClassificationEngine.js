@@ -37,15 +37,17 @@ export class CMPAccountClassificationEngine {
         },
 
         CONTRIBUTION: {
-
-            category: "EQUITY",
-
+            category: "INCOME",
             statement: "INCOME_EXPENDITURE",
-
             cashFlow: "OPERATING",
-
             normalBalance: "CREDIT"
+        },
 
+        MEMBERS: {
+            category: "EQUITY",
+            statement: "BALANCE_SHEET",
+            cashFlow: "FINANCING",
+            normalBalance: "CREDIT"
         },
 
         EXPENSE: {

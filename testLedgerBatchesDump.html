@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CMP Ledger Batches Dump</title>
+</head>
+<body>
+<pre id="output">Loading...</pre>
+
+<script type="module">
+import {
+    getAllLedgerBatches
+} from "./js/services/ledgerBatchService.js";
+
+const output = document.getElementById("output");
+
+try {
+
+    const batches =
+        await getAllLedgerBatches();
+
+    output.textContent =
+        JSON.stringify(
+            batches,
+            null,
+            2
+        );
+
+}
+catch (error) {
+
+    output.textContent =
+        "ERROR:\n\n" +
+        error.stack;
+
+}
+</script>
+
+</body>
+</html>

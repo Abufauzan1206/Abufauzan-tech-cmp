@@ -18,9 +18,12 @@ import {
     getAccountingPeriodById
 } from "../services/accountingPeriodService.js";
 
+import {
+    getFinancialYearById
+} from "../services/financialYearService.js";
+
 
 export async function createPeriod(data) {
-
     if (!data?.name) {
         throw new Error(
             "Accounting period name is required."
@@ -42,6 +45,34 @@ export async function createPeriod(data) {
         );
     }
 
+    if (!data?.financialYearId) {
+        throw new Error(
+            "Financial year is required."
+        );
+    }
+
+    const financialYear =
+        await getFinancialYearById(
+            data.financialYearId
+        );
+
+    if (!financialYear) {
+        throw new Error(
+            "Financial year not found."
+        );
+    }
+
+    if (
+        new Date(data.startDate) <
+        new Date(financialYear.startDate) ||
+        new Date(data.endDate) >
+        new Date(financialYear.endDate)
+    ) {
+        throw new Error(
+            "Accounting period must fall within the financial year."
+        );
+    }
+
     const periods =
         await getAllAccountingPeriods();
 
@@ -60,6 +91,8 @@ export async function createPeriod(data) {
     const period = {
 
         name: data.name,
+        financialYearId:
+            data.financialYearId,
         startDate: data.startDate,
         endDate: data.endDate,
 

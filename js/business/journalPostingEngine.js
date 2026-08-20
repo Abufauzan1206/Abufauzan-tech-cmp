@@ -233,6 +233,12 @@ export async function postJournal(data) {
             }
             : {}),
 
+        financialYearId:
+            period.financialYearId,
+
+        accountingPeriodId:
+            period.id,
+
         accountingPeriod:
             period.name,
 
@@ -269,7 +275,13 @@ try {
                 journalReference:
                     data.reference,
 
-                journalNumber
+                journalNumber,
+                financialYearId:
+                    period.financialYearId,
+                accountingPeriodId:
+                    period.id,
+                accountingPeriod:
+                    period.name
 
             }
         );
@@ -310,9 +322,30 @@ catch (error) {
         accountingPeriod:
             period.name,
 
+        financialYearId:
+            period.financialYearId,
+
+        accountingPeriodId:
+            period.id,
+
         message:
             "Journal posted successfully."
 
     };
+
+}
+
+/**
+ * Compatibility facade for transactionEngine.
+ * Keeps the existing postJournal() API intact while exposing
+ * the class-based interface expected by CMPTransactionEngine.
+ */
+export class CMPJournalPostingEngine {
+
+    static async post(data) {
+
+        return await postJournal(data);
+
+    }
 
 }

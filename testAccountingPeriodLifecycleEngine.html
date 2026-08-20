@@ -17,13 +17,25 @@ import {
     reopenPeriod
 } from "./js/business/accountingPeriodEngine.js";
 
+import { createYear } from "./js/business/financialYearEngine.js";
+import { CMPMemoryAdapter } from "./js/adapters/memoryAdapter.js";
+
+CMPMemoryAdapter.clear();
+
 const output = document.getElementById("output");
+
+const testSuffix = Date.now();
 
 let report = "";
 
 try {
+        const financialYear = await createYear({
+            name: `FY 2026 Accounting Period Lifecycle Test ${testSuffix}`,
+            startDate: "2026-01-01",
+            endDate: "2026-12-31"
+        });
 
-    report += "=========================================\n";
+        report += "=========================================\n";
     report += "ABUFAUZAN TECH CMP\n";
     report += "ACCOUNTING PERIOD LIFECYCLE ENGINE TEST\n";
     report += "=========================================\n\n";
@@ -32,10 +44,9 @@ try {
     const created =
         await createPeriod({
 
-            name: "September 2026",
-
+            name: `September 2026 Lifecycle Test ${testSuffix}`,
+            financialYearId: financialYear.id,
             startDate: "2026-09-01",
-
             endDate: "2026-09-30"
 
         });

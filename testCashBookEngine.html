@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>ABUFAUZAN TECH CMP</h2>
+<h3>RC026 Cash Book Engine Test</h3>
+
+<pre id="output">Running...</pre>
+
+<script type="module">
+
+import {
+    generateCashBook
+} from "./js/business/cashBookEngine.js";
+
+const output =
+    document.getElementById("output");
+
+let report = "";
+
+try {
+
+    report += "=========================================\n";
+    report += "ABUFAUZAN TECH CMP\n";
+    report += "RC026 - CASH BOOK ENGINE TEST\n";
+    report += "=========================================\n\n";
+
+    const result =
+        await generateCashBook();
+
+    if (!result.success) {
+
+        throw new Error(
+            "Cash Book generation failed."
+        );
+
+    }
+
+    report += "GENERATE CASH BOOK(): PASS\n\n";
+
+    report += JSON.stringify(
+        result,
+        null,
+        4
+    );
+
+    report += "\n\n=========================================\n";
+    report += "TEST COMPLETE\n";
+    report += "=========================================";
+
+}
+catch (error) {
+
+    report += "GENERATE CASH BOOK(): FAIL\n\n";
+    report += error.message;
+
+}
+
+output.textContent = report;
+
+</script>
+
+</body>
+</html>

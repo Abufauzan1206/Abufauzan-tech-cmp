@@ -41,7 +41,7 @@ export function replaceContent(
 
             const normalize = text =>
                 text.replace(
-                    /\\s+/g,
+                    /\s+/g,
                     " "
                 ).trim();
 

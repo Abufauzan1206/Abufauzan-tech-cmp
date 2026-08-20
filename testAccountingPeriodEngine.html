@@ -9,17 +9,21 @@
 
 <script type="module">
 
-import {
-    createPeriod
-} from "./js/business/accountingPeriodEngine.js";
+import { createPeriod } from "./js/business/accountingPeriodEngine.js";
+import { createYear } from "./js/business/financialYearEngine.js";
 
 const output = document.getElementById("output");
 
 let report = "";
 
 try {
+        const financialYear = await createYear({
+            name: "FY 2026 Accounting Period Engine Test",
+            startDate: "2026-01-01",
+            endDate: "2026-12-31"
+        });
 
-    report += "=========================================\n";
+        report += "=========================================\n";
     report += "ABUFAUZAN TECH CMP\n";
     report += "ACCOUNTING PERIOD ENGINE TEST\n";
     report += "=========================================\n\n";
@@ -27,8 +31,9 @@ try {
     const result = await createPeriod({
 
         name: "August 2026",
-        startDate: "2026-08-01",
-        endDate: "2026-08-31"
+            financialYearId: financialYear.id,
+            startDate: "2026-08-01",
+            endDate: "2026-08-31"
 
     });
 

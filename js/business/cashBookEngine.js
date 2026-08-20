@@ -1,0 +1,96 @@
+/**
+ * =====================================================
+ * ABUFAUZAN TECH Cooperative Management Platform
+ *
+ * Business Engine Layer
+ *
+ * File: cashBookEngine.js
+ * Version: 1.0.0
+ *
+ * Cash Book Engine
+ * =====================================================
+ */
+
+import {
+    generateGeneralLedger
+} from "./generalLedgerEngine.js";
+
+
+export async function generateCashBook() {
+
+    const generalLedger =
+        await generateGeneralLedger("Cash Account");
+
+
+    const receipts = [];
+    const payments = [];
+
+    let totalReceipts = 0;
+    let totalPayments = 0;
+
+
+    for (const transaction of
+        generalLedger.transactions || []) {
+
+        const debit =
+            Number(transaction.debit || 0);
+
+        const credit =
+            Number(transaction.credit || 0);
+
+
+        if (debit > 0) {
+
+            receipts.push({
+                ...transaction,
+                receipt: debit,
+                payment: 0
+            });
+
+            totalReceipts += debit;
+
+        }
+
+
+        if (credit > 0) {
+
+            payments.push({
+                ...transaction,
+                receipt: 0,
+                payment: credit
+            });
+
+            totalPayments += credit;
+
+        }
+
+    }
+
+
+    return {
+
+        success: true,
+
+        account:
+            "Cash Account",
+
+        receipts,
+
+        payments,
+
+        totalReceipts,
+
+        totalPayments,
+
+        closingBalance:
+            generalLedger.closingBalance,
+
+        totalTransactions:
+            generalLedger.totalTransactions,
+
+        transactions:
+            generalLedger.transactions
+
+    };
+
+}

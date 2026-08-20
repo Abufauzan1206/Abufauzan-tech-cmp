@@ -8,15 +8,17 @@
  * =====================================================
  */
 
-import { CMPTrialBalanceEngine } from "./trialBalanceEngine.js";
+import {
+    generateTrialBalance
+} from "./trialBalanceEngine.js";
 import { CMPAccountClassificationEngine } from "./accountClassificationEngine.js";
 
 export class CMPCashFlowEngine {
 
-    static generate() {
+    static async generate() {
 
         const trialBalance =
-            CMPTrialBalanceEngine.generate();
+            await generateTrialBalance();
 
         const operating = [];
         const investing = [];

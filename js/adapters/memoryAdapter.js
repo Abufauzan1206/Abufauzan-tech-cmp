@@ -14,6 +14,9 @@
 
 export class CMPMemoryAdapter {
 
+    static stores = new Map();
+
+
     constructor(
         collectionName
     ) {
@@ -21,11 +24,49 @@ export class CMPMemoryAdapter {
         this.collectionName =
             collectionName;
 
+        if (
+            !CMPMemoryAdapter.stores.has(
+                collectionName
+            )
+        ) {
+
+            CMPMemoryAdapter.stores.set(
+                collectionName,
+                []
+            );
+
+        }
+
         this.data =
-            [];
+            CMPMemoryAdapter.stores.get(
+                collectionName
+            );
 
     }
 
+
+    static clear(
+        collectionName
+    ) {
+
+        if (
+            collectionName
+        ) {
+
+            CMPMemoryAdapter.stores.set(
+                collectionName,
+                []
+            );
+
+            return true;
+
+        }
+
+        CMPMemoryAdapter.stores.clear();
+
+        return true;
+
+    }
 
 
     async create(
@@ -52,7 +93,6 @@ export class CMPMemoryAdapter {
     }
 
 
-
     async findById(
         id
     ) {
@@ -65,13 +105,11 @@ export class CMPMemoryAdapter {
     }
 
 
-
     async findAll() {
 
         return this.data;
 
     }
-
 
 
     async update(
@@ -107,7 +145,6 @@ export class CMPMemoryAdapter {
         return this.data[index];
 
     }
-
 
 
     async delete(

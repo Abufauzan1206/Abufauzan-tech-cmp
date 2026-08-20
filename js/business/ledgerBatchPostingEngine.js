@@ -98,6 +98,27 @@ export async function postLedgerBatch(
             }
             : {}),
 
+        ...(options.financialYearId
+            ? {
+                financialYearId:
+                    options.financialYearId
+            }
+            : {}),
+
+        ...(options.accountingPeriodId
+            ? {
+                accountingPeriodId:
+                    options.accountingPeriodId
+            }
+            : {}),
+
+        ...(options.accountingPeriod
+            ? {
+                accountingPeriod:
+                    options.accountingPeriod
+            }
+            : {}),
+
         totalDebit,
         totalCredit,
         createdBy,

@@ -42,19 +42,15 @@ export async function postClosingJournal(
 
     const result =
         await postJournal({
-
+        date:
             journalDate,
-
-            description:
-                "Year End Closing Journal",
-
-            reference:
-                "CLOSING-JOURNAL",
-
-            entries:
-                closingJournal.entries
-
-        });
+        title:
+            "Year End Closing Journal",
+        reference:
+            "CLOSING-JOURNAL",
+        entries:
+            closingJournal.entries
+    });
 
     return {
 

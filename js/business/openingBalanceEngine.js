@@ -8,15 +8,15 @@
  * =====================================================
  */
 
-import { CMPTrialBalanceEngine } from "./trialBalanceEngine.js";
+import { generateTrialBalance } from "./trialBalanceEngine.js";
 import { CMPAccountClassificationEngine } from "./accountClassificationEngine.js";
 
 export class CMPOpeningBalanceEngine {
 
-    static generate() {
+    static async generate() {
 
         const trialBalance =
-            CMPTrialBalanceEngine.generate();
+            await generateTrialBalance();
 
         const openingBalances = [];
 

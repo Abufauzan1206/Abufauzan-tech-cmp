@@ -44,13 +44,21 @@ export async function generateIncomeExpenditure() {
             case "INCOME":
 
                 incomeAccounts.push(account);
-                totalIncome += Number(account.credit || 0);
+
+                totalIncome +=
+                    Number(account.credit || 0) -
+                    Number(account.debit || 0);
+
                 break;
 
             case "EXPENSE":
 
                 expenseAccounts.push(account);
-                totalExpenses += Number(account.debit || 0);
+
+                totalExpenses +=
+                    Number(account.debit || 0) -
+                    Number(account.credit || 0);
+
                 break;
 
             default:
