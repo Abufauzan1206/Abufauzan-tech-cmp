@@ -32,8 +32,9 @@ try {
     console.log("----- STEP 1: REGISTER MEMBER -----");
 
     member = await registerMember({
-        fullName: "RC199 Test Member",
-        phoneNumber: "08000000199",
+        firstName: "RC199",
+        lastName: "TestMember",
+        phone: "08000000199",
         email: "rc199@test.local"
     });
 
