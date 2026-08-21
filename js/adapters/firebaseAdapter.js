@@ -85,6 +85,56 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
     }
 
 
+    async findOne(criteria) {
+        if (
+            !criteria ||
+            typeof criteria !== "object" ||
+            Array.isArray(criteria)
+        ) {
+            throw new TypeError(
+                "findOne() criteria must be an object."
+            );
+        }
+
+        const entries = Object.entries(criteria);
+
+        if (entries.length === 0) {
+            const snapshot = await getDocs(
+                collection(db, this.collectionName)
+            );
+
+            return snapshot.empty
+                ? null
+                : {
+                    id: snapshot.docs[0].id,
+                    ...snapshot.docs[0].data()
+                };
+        }
+
+        const constraints = entries.map(
+            ([field, value]) =>
+                where(field, "==", value)
+        );
+
+        const snapshot = await getDocs(
+            query(
+                collection(db, this.collectionName),
+                ...constraints
+            )
+        );
+
+        if (snapshot.empty) {
+            return null;
+        }
+
+        const first = snapshot.docs[0];
+
+        return {
+            id: first.id,
+            ...first.data()
+        };
+    }
+
     async findAll() {
 
         const snapshot = await getDocs(

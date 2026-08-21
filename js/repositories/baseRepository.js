@@ -33,6 +33,10 @@ export class CMPBaseRepository {
 
     }
 
+    async findOne(criteria) {
+        return await this.adapter.findOne(criteria);
+    }
+
 
     async findAll() {
 

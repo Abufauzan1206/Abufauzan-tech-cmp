@@ -117,7 +117,34 @@ export class CMPMemoryAdapter {
     }
 
 
-    async findById(
+
+    async findOne(criteria) {
+        if (
+            !criteria ||
+            typeof criteria !== "object" ||
+            Array.isArray(criteria)
+        ) {
+            throw new TypeError(
+                "findOne() criteria must be an object."
+            );
+        }
+
+        const entries = this.data;
+
+        const keys = Object.keys(criteria);
+
+        return (
+            entries.find(record =>
+                keys.every(
+                    key =>
+                        record?.[key] === criteria[key]
+                )
+            ) ?? null
+        );
+    }
+
+
+async findById(
         id
     ) {
 

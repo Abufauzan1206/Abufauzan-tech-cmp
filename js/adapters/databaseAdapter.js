@@ -21,6 +21,10 @@ export class CMPDatabaseAdapter {
         throw new Error("findById() not implemented");
     }
 
+    async findOne(criteria) {
+        throw new Error("findOne() not implemented");
+    }
+
     async findAll() {
         throw new Error("findAll() not implemented");
     }
