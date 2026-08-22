@@ -27,6 +27,11 @@ const approveCooperative = httpsCallable(
     "approveCooperative"
 );
 
+const rejectCooperative = httpsCallable(
+    functions,
+    "rejectCooperative"
+);
+
 function handleDashboardHistoryReentry() {
     const currentUser = auth.currentUser;
 
