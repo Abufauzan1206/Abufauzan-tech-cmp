@@ -234,3 +234,105 @@ exports.approveCooperative = onCall(async (request) => {
       "Cooperative approved and administrator account created.",
   };
 });
+
+exports.rejectCooperative = onCall(async (request) => {
+  /*
+   * 1. The caller must be authenticated.
+   */
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in to reject a cooperative."
+    );
+  }
+
+  const rejectorUid = request.auth.uid;
+
+  /*
+   * 2. Verify the caller is actually a Super Admin.
+   */
+  const rejectorRef = db.collection("users").doc(rejectorUid);
+  const rejectorSnap = await rejectorRef.get();
+
+  if (!rejectorSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "Administrator profile not found."
+    );
+  }
+
+  const rejectorData = rejectorSnap.data();
+
+  if (rejectorData.role !== "super_admin") {
+    throw new HttpsError(
+      "permission-denied",
+      "Only a Super Admin can reject cooperative applications."
+    );
+  }
+
+  /*
+   * 3. Validate the cooperative ID.
+   */
+  const cooperativeId = request.data?.cooperativeId;
+
+  if (
+    typeof cooperativeId !== "string" ||
+    cooperativeId.trim() === ""
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "A valid cooperativeId is required."
+    );
+  }
+
+  /*
+   * 4. Read the cooperative application.
+   */
+  const cooperativeRef = db
+    .collection("cooperatives")
+    .doc(cooperativeId);
+
+  const cooperativeSnap = await cooperativeRef.get();
+
+  if (!cooperativeSnap.exists) {
+    throw new HttpsError(
+      "not-found",
+      "Cooperative application not found."
+    );
+  }
+
+  const cooperative = cooperativeSnap.data();
+
+  /*
+   * 5. Only pending applications may be rejected.
+   */
+  if (cooperative.status !== "pending") {
+    throw new HttpsError(
+      "failed-precondition",
+      "This cooperative application is already " +
+        cooperative.status +
+        "."
+    );
+  }
+
+  /*
+   * 6. Reject the cooperative application.
+   */
+  await cooperativeRef.update({
+    status: "rejected",
+    rejectedBy: rejectorUid,
+    rejectedAt: FieldValue.serverTimestamp(),
+  });
+
+  logger.info("Cooperative rejected successfully", {
+    cooperativeId,
+    rejectedBy: rejectorUid,
+  });
+
+  return {
+    success: true,
+    cooperativeId,
+    rejectedBy: rejectorUid,
+    message: "Cooperative application rejected.",
+  };
+});
