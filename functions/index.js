@@ -16,6 +16,83 @@ setGlobalOptions({
   maxInstances: 10,
 });
 
+exports.submitCooperativeApplication = onCall(async (request) => {
+  /*
+   * Public cooperative application boundary.
+   *
+   * This function replaces the former unrestricted client-side
+   * Firestore create path. The client may submit an application,
+   * but cannot directly write to cooperatives/{cooperativeId}.
+   */
+
+  const data = request.data || {};
+
+  const requiredStrings = {
+    coopName: data.coopName,
+    registrationNumber: data.registrationNumber,
+    coopType: data.coopType,
+    country: data.country,
+    state: data.state,
+    city: data.city,
+    officeAddress: data.officeAddress,
+    coopEmail: data.coopEmail,
+    coopPhone: data.coopPhone,
+    adminName: data.adminName,
+    adminEmail: data.adminEmail,
+    subscriptionPlan: data.subscriptionPlan,
+  };
+
+  for (const [field, value] of Object.entries(requiredStrings)) {
+    if (typeof value !== "string" || value.trim() === "") {
+      throw new HttpsError(
+        "invalid-argument",
+        `A valid ${field} is required.`
+      );
+    }
+  }
+
+  const crypto = require("crypto");
+
+  const cooperativeId =
+    `CMP-${data.country.trim().toUpperCase()}-${crypto
+      .randomUUID()
+      .replace(/-/g, "")
+      .slice(0, 12)
+      .toUpperCase()}`;
+
+  const cooperativeRef = db
+    .collection("cooperatives")
+    .doc(cooperativeId);
+
+  await cooperativeRef.create({
+    cooperativeId,
+    cooperativeName: data.coopName.trim(),
+    registrationNumber: data.registrationNumber.trim(),
+    cooperativeType: data.coopType.trim(),
+    country: data.country.trim(),
+    state: data.state.trim(),
+    city: data.city.trim(),
+    officeAddress: data.officeAddress.trim(),
+    officialEmail: data.coopEmail.trim().toLowerCase(),
+    officialPhone: data.coopPhone.trim(),
+    administratorName: data.adminName.trim(),
+    administratorEmail: data.adminEmail.trim().toLowerCase(),
+    subscriptionPlan: data.subscriptionPlan.trim(),
+    status: "pending",
+    createdAt: FieldValue.serverTimestamp(),
+  });
+
+  logger.info("Cooperative application submitted", {
+    cooperativeId,
+  });
+
+  return {
+    success: true,
+    cooperativeId,
+    message: "Cooperative application submitted successfully.",
+  };
+});
+
 exports.approveCooperative = onCall(async (request) => {
   /*
    * 1. The caller must be authenticated.

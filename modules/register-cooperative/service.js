@@ -8,45 +8,30 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+
+import { getFunctions, httpsCallable } from
+  "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js";
+
+const functions = getFunctions();
+
+const submitCooperativeApplication = httpsCallable(
+  functions,
+  "submitCooperativeApplication"
+);
+
 export async function createCooperative(data) {
+  const result =
+    await submitCooperativeApplication(data);
 
-  const cooperativeId = generateCMPId(data.country);
+  if (
+    !result?.data?.success ||
+    !result?.data?.cooperativeId
+  ) {
+    throw new Error(
+      result?.data?.message ||
+      "Unable to submit cooperative application."
+    );
+  }
 
-  await setDoc(
-    doc(db, "cooperatives", cooperativeId),
-{
-  cooperativeId: cooperativeId,
-
-  cooperativeName: data.coopName,
-
-  registrationNumber: data.registrationNumber,
-
-  cooperativeType: data.coopType,
-
-  country: data.country,
-
-  state: data.state,
-
-  city: data.city,
-
-  officeAddress: data.officeAddress,
-
-  officialEmail: data.coopEmail,
-
-  officialPhone: data.coopPhone,
-
-  administratorName: data.adminName,
-
-  administratorEmail: data.adminEmail,
-
-  subscriptionPlan: data.subscriptionPlan,
-
-  status: "Active",
-
-  createdAt: serverTimestamp()
-}
-  );
-
-  return cooperativeId;
-
+  return result.data.cooperativeId;
 }

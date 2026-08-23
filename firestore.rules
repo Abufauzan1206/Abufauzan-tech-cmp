@@ -1,0 +1,119 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userProfile() {
+      return signedIn()
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid))
+        : null;
+    }
+
+    function isSuperAdmin() {
+      return signedIn()
+        && userProfile().data.role == "super_admin";
+    }
+
+    function isCooperativeAdmin() {
+      return signedIn()
+        && userProfile().data.role == "cooperative_admin";
+    }
+
+    function isMember() {
+      return signedIn()
+        && userProfile().data.role == "member";
+    }
+
+    function isOwnUserProfile(userId) {
+      return signedIn()
+        && request.auth.uid == userId;
+    }
+
+    function belongsToCooperative(cooperativeId) {
+      return signedIn()
+        && userProfile().data.cooperativeId == cooperativeId;
+    }
+
+    function isMemberOfCooperative(cooperativeId) {
+      return isMember()
+        && userProfile().data.cooperativeId == cooperativeId;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwnUserProfile(userId) || isSuperAdmin();
+
+      allow create: if isSuperAdmin();
+
+      allow update: if isSuperAdmin()
+        || isOwnUserProfile(userId);
+
+      allow delete: if isSuperAdmin();
+    }
+
+    match /cooperatives/{cooperativeId} {
+      allow read: if isSuperAdmin()
+        || belongsToCooperative(cooperativeId);
+
+      allow create: if false;
+
+      allow update: if isSuperAdmin();
+
+      allow delete: if isSuperAdmin();
+    }
+
+    match /loans/{loanId} {
+      allow read: if isSuperAdmin()
+        || isCooperativeAdmin()
+        || (
+          isMember()
+          && resource.data.memberId == userProfile().data.memberId
+        );
+
+      allow create: if isMember()
+        && request.resource.data.memberId == userProfile().data.memberId;
+
+      allow update: if isSuperAdmin()
+        || isCooperativeAdmin()
+        || (
+          isMember()
+          && resource.data.memberId == userProfile().data.memberId
+          && request.resource.data.memberId == resource.data.memberId
+        );
+
+      allow delete: if isSuperAdmin()
+        || isCooperativeAdmin();
+    }
+
+    match /welfare/{welfareId} {
+      allow read: if isSuperAdmin()
+        || isCooperativeAdmin()
+        || (
+          isMember()
+          && resource.data.memberId == userProfile().data.memberId
+        );
+
+      allow create: if isMember()
+        && request.resource.data.memberId == userProfile().data.memberId;
+
+      allow update: if isSuperAdmin()
+        || isCooperativeAdmin()
+        || (
+          isMember()
+          && resource.data.memberId == userProfile().data.memberId
+          && request.resource.data.memberId == resource.data.memberId
+        );
+
+      allow delete: if isSuperAdmin()
+        || isCooperativeAdmin();
+    }
+
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
