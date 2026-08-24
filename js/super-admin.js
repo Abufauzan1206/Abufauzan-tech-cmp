@@ -33,25 +33,12 @@ const rejectCooperative = httpsCallable(
 );
 
 function handleDashboardHistoryReentry() {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-        window.location.href = "login.html";
-        return;
-    }
-
     window.addEventListener("popstate", () => {
         window.location.reload();
     });
 
     window.addEventListener("pageshow", (event) => {
         if (event.persisted) {
-            window.location.reload();
-        }
-    });
-
-    window.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") {
             window.location.reload();
         }
     });
