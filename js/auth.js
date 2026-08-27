@@ -1,5 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { rolesMatch } from "./components/roleAuthorization.js";
+import { resolveAccess } from "./controllers/accessController.js";
 
 import {
   signInWithEmailAndPassword
@@ -38,19 +39,33 @@ if (loginForm) {
 
       alert("Login successful!");
 
-      if (
-            rolesMatch(userData.role, "super_admin")
-        ) {
-            window.location.href = "super-admin.html";
-        } else if (
-            rolesMatch(userData.role, "cooperative_admin")
-        ) {
-            window.location.href = "cooperative-admin.html";
-        } else {
+      /*
+       * Super Admin is automatic and is never selectable
+       * through the Login-as control.
+       */
+      if (rolesMatch(userData.role, "super_admin")) {
+          const access = await resolveAccess();
 
-        alert("Dashboard for " + userData.role + " is not yet available.");
+          if (!access.allowed) {
+              alert(access.reason);
+              return;
+          }
 
+          window.location.href = access.destination;
+          return;
       }
+
+      const loginAsRole =
+          document.getElementById("loginAsRole")?.value || null;
+
+      const access = await resolveAccess(loginAsRole);
+
+      if (!access.allowed) {
+          alert(access.reason);
+          return;
+      }
+
+      window.location.href = access.destination;
 
     } catch (error) {
 

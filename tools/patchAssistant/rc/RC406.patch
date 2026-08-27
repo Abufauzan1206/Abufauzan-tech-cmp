@@ -1,0 +1,121 @@
+*** Begin Patch
+*** Update File: js/services/drawGroupService.js
+@@
+ import { db } from "../firebase-config.js";
++import { auth } from "../firebase-config.js";
+ import {
+     collection,
+     addDoc,
+     getDocs,
+     doc,
+     updateDoc,
++    getDoc,
+     serverTimestamp
+ } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+ 
++async function getCurrentUserProfile() {
++    const user = auth.currentUser;
++
++    if (!user) {
++        throw new Error("You must be signed in.");
++    }
++
++    const profileSnap = await getDoc(
++        doc(db, "users", user.uid)
++    );
++
++    if (!profileSnap.exists()) {
++        throw new Error("User profile not found.");
++    }
++
++    return profileSnap.data();
++}
++
+ export async function createDrawGroup(
+     groupData
+ ) {
++    const profile = await getCurrentUserProfile();
++
++    if (
++        profile.role !== "super_admin" &&
++        profile.role !== "cooperative_admin"
++    ) {
++        throw new Error(
++            "Only authorized administrators can create draw groups."
++        );
++    }
++
++    if (
++        profile.role === "cooperative_admin" &&
++        !profile.cooperativeId
++    ) {
++        throw new Error(
++            "Cooperative administrator has no cooperative ownership."
++        );
++    }
++
+     groupData.status =
+         "Draft";
+ 
++    groupData.cooperativeId =
++        profile.role === "cooperative_admin"
++            ? profile.cooperativeId
++            : groupData.cooperativeId ?? null;
++
+     groupData.createdAt =
+         serverTimestamp();
+@@
+ export async function getDrawGroups() {
++    const profile = await getCurrentUserProfile();
++
+     const snapshot =
+         await getDocs(
+             collection(
+@@
+ 
+     snapshot.forEach(doc => {
++        const data = doc.data();
++
++        if (
++            profile.role === "cooperative_admin" &&
++            data.cooperativeId !== profile.cooperativeId
++        ) {
++            return;
++        }
++
+         groups.push({
+             id: doc.id,
+-            ...doc.data()
++            ...data
+         });
+     });
+@@
+ export async function getDrawGroupById(
+     groupId
+ ) {
++    const profile = await getCurrentUserProfile();
++
+     const snapshot =
+         await getDocs(
+             collection(
+@@
+ 
+         if (
+             doc.id === groupId
+         ) {
++            const data = doc.data();
++
++            if (
++                profile.role === "cooperative_admin" &&
++                data.cooperativeId !== profile.cooperativeId
++            ) {
++                return;
++            }
+ 
+             group = {
+                 id: doc.id,
+-                ...doc.data()
++                ...data
+             };
+         }
+*** End Patch

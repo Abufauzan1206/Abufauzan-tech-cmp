@@ -39,8 +39,8 @@ check(
 );
 
 check(
-    superAdminSource.includes('doc(db, "users", user.uid)') &&
-    cooperativeAdminSource.includes('doc(db, "users", user.uid)'),
+    superAdminSource.includes('doc(db, "users", currentUser.uid)') &&
+    cooperativeAdminSource.includes('doc(db, "users", currentUser.uid)'),
     "Both protected dashboards resolve the current Firestore profile"
 );
 

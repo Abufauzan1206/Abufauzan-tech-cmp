@@ -20,6 +20,8 @@ import {
     setDoc,
     getDoc,
     getDocs,
+    query,
+    where,
     updateDoc,
     deleteDoc,
     doc

@@ -1,0 +1,1107 @@
+
+===============================================
+RC390 CREATE-GROUP OWNERSHIP CONTRACT TRACE
+===============================================
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+
+--- context around line 2 ---
+1: import { auth, db } from "./firebase-config.js";
+2: import { rolesMatch } from "./components/roleAuthorization.js";
+3: import { buildSidebar } from "./navigation/sidebar.js";
+4: 
+5: import {
+6:     onAuthStateChanged,
+7:     signOut
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+--- context around line 6 ---
+1: import { auth, db } from "./firebase-config.js";
+2: import { rolesMatch } from "./components/roleAuthorization.js";
+3: import { buildSidebar } from "./navigation/sidebar.js";
+4: 
+5: import {
+6:     onAuthStateChanged,
+7:     signOut
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+
+--- context around line 36 ---
+30:         }
+31:     });
+32: }
+33: 
+34: handleDashboardHistoryReentry();
+35: 
+36: const dashboardRole = "cooperative_admin";
+37: 
+38: onAuthStateChanged(auth, async (user) => {
+39: 
+40:     if (!user) {
+41:         window.location.href = "login.html";
+42:         return;
+
+--- context around line 38 ---
+32: }
+33: 
+34: handleDashboardHistoryReentry();
+35: 
+36: const dashboardRole = "cooperative_admin";
+37: 
+38: onAuthStateChanged(auth, async (user) => {
+39: 
+40:     if (!user) {
+41:         window.location.href = "login.html";
+42:         return;
+43:     }
+44: 
+
+--- context around line 47 ---
+41:         window.location.href = "login.html";
+42:         return;
+43:     }
+44: 
+45:     try {
+46: 
+47:         const currentUser = auth.currentUser;
+48: 
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+
+--- context around line 54 ---
+48: 
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+
+--- context around line 55 ---
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+
+--- context around line 58 ---
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+
+--- context around line 64 ---
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+
+--- context around line 67 ---
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+
+--- context around line 68 ---
+62:         }
+63: 
+64:         const userData = userDoc.data();
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+74:                 rolesMatch(
+
+--- context around line 74 ---
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+74:                 rolesMatch(
+75:                     userData.role,
+76:                     "super_admin"
+77:                 )
+78:                     ? "super-admin.html"
+79:                     : "login.html";
+80: 
+
+--- context around line 75 ---
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+74:                 rolesMatch(
+75:                     userData.role,
+76:                     "super_admin"
+77:                 )
+78:                     ? "super-admin.html"
+79:                     : "login.html";
+80: 
+81:             return;
+
+--- context around line 85 ---
+79:                     : "login.html";
+80: 
+81:             return;
+82:         }
+83: 
+84:         const name =
+85:             userData.name ||
+86:             userData.displayName ||
+87:             user.email ||
+88:             "Cooperative Administrator";
+89: 
+90:         const nameElement =
+91:             document.getElementById("adminName");
+
+--- context around line 86 ---
+80: 
+81:             return;
+82:         }
+83: 
+84:         const name =
+85:             userData.name ||
+86:             userData.displayName ||
+87:             user.email ||
+88:             "Cooperative Administrator";
+89: 
+90:         const nameElement =
+91:             document.getElementById("adminName");
+92: 
+
+--- context around line 99 ---
+93:         if (nameElement) {
+94:             nameElement.textContent = name;
+95:         }
+96: 
+97:         const sidebar = document.getElementById("sidebarMenu");
+98:         if (sidebar) {
+99:             buildSidebar("sidebarMenu", userData.role);
+100:         }
+101: 
+102:     } catch (error) {
+103: 
+104:         console.error(
+105:             "Cooperative Admin authentication error:",
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+
+--- context around line 13 ---
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+14:     const user = auth.currentUser;
+15: 
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+
+--- context around line 14 ---
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+14:     const user = auth.currentUser;
+15: 
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+
+--- context around line 20 ---
+14:     const user = auth.currentUser;
+15: 
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+
+--- context around line 21 ---
+15: 
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+
+--- context around line 24 ---
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+
+--- context around line 25 ---
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+
+--- context around line 28 ---
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+
+--- context around line 32 ---
+26:     }
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+
+--- context around line 33 ---
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+
+--- context around line 36 ---
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+40:         profile.role !== "super_admin" &&
+41:         profile.role !== "cooperative_admin"
+42:     ) {
+
+--- context around line 37 ---
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+40:         profile.role !== "super_admin" &&
+41:         profile.role !== "cooperative_admin"
+42:     ) {
+43:         throw new Error(
+
+--- context around line 40 ---
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+40:         profile.role !== "super_admin" &&
+41:         profile.role !== "cooperative_admin"
+42:     ) {
+43:         throw new Error(
+44:             "Only authorized administrators can create draw groups."
+45:         );
+46:     }
+
+--- context around line 41 ---
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+40:         profile.role !== "super_admin" &&
+41:         profile.role !== "cooperative_admin"
+42:     ) {
+43:         throw new Error(
+44:             "Only authorized administrators can create draw groups."
+45:         );
+46:     }
+47: 
+
+--- context around line 49 ---
+43:         throw new Error(
+44:             "Only authorized administrators can create draw groups."
+45:         );
+46:     }
+47: 
+48:     if (
+49:         profile.role === "cooperative_admin" &&
+50:         !profile.cooperativeId
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+
+--- context around line 50 ---
+44:             "Only authorized administrators can create draw groups."
+45:         );
+46:     }
+47: 
+48:     if (
+49:         profile.role === "cooperative_admin" &&
+50:         !profile.cooperativeId
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+
+--- context around line 57 ---
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+
+--- context around line 60 ---
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+
+--- context around line 61 ---
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+
+--- context around line 62 ---
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+
+--- context around line 63 ---
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+
+--- context around line 65 ---
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+
+--- context around line 69 ---
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+
+--- context around line 72 ---
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+
+--- context around line 74 ---
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+80: export async function getDrawGroups() {
+
+--- context around line 80 ---
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+80: export async function getDrawGroups() {
+81:     if (typeof status !== "string") {
+82:         throw new Error(
+83:             "Invalid draw group status."
+84:         );
+85:     }
+86: 
+
+--- context around line 93 ---
+87:     if (status.trim().length === 0) {
+88:         throw new Error(
+89:             "Invalid draw group status."
+90:         );
+91:     }
+92: 
+93:     const validDrawGroupStatuses = [
+94:         "Draft"
+95:     ];
+96: 
+97:     if (
+98:         !validDrawGroupStatuses.includes(
+99:             status.trim()
+
+--- context around line 98 ---
+92: 
+93:     const validDrawGroupStatuses = [
+94:         "Draft"
+95:     ];
+96: 
+97:     if (
+98:         !validDrawGroupStatuses.includes(
+99:             status.trim()
+100:         )
+101:     ) {
+102:         throw new Error(
+103:             "Invalid draw group status."
+104:         );
+
+--- context around line 109 ---
+103:             "Invalid draw group status."
+104:         );
+105:     }
+106: 
+107:     status = status.trim();
+108: 
+109:     const profile =
+110:         await getCurrentUserProfile();
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+
+--- context around line 110 ---
+104:         );
+105:     }
+106: 
+107:     status = status.trim();
+108: 
+109:     const profile =
+110:         await getCurrentUserProfile();
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+116:                 "drawGroups"
+
+--- context around line 116 ---
+110:         await getCurrentUserProfile();
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+116:                 "drawGroups"
+117:             )
+118:         );
+119: 
+120:     const groups = [];
+121: 
+122:     snapshot.forEach(doc => {
+
+--- context around line 126 ---
+120:     const groups = [];
+121: 
+122:     snapshot.forEach(doc => {
+123:         const data = doc.data();
+124: 
+125:         if (
+126:             profile.role === "cooperative_admin" &&
+127:             data.cooperativeId !== profile.cooperativeId
+128:         ) {
+129:             return;
+130:         }
+131: 
+132:         groups.push({
+
+--- context around line 127 ---
+121: 
+122:     snapshot.forEach(doc => {
+123:         const data = doc.data();
+124: 
+125:         if (
+126:             profile.role === "cooperative_admin" &&
+127:             data.cooperativeId !== profile.cooperativeId
+128:         ) {
+129:             return;
+130:         }
+131: 
+132:         groups.push({
+133:             id: doc.id,
+
+--- context around line 141 ---
+135:         });
+136:     });
+137: 
+138:     return groups;
+139: }
+140: 
+141: export async function getDrawGroupById(
+142:     groupId
+143: ) {
+144:     const profile =
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+
+--- context around line 144 ---
+138:     return groups;
+139: }
+140: 
+141: export async function getDrawGroupById(
+142:     groupId
+143: ) {
+144:     const profile =
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+
+--- context around line 145 ---
+139: }
+140: 
+141: export async function getDrawGroupById(
+142:     groupId
+143: ) {
+144:     const profile =
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+151:                 "drawGroups"
+
+--- context around line 151 ---
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+151:                 "drawGroups"
+152:             )
+153:         );
+154: 
+155:     let group = null;
+156: 
+157:     snapshot.forEach(doc => {
+
+--- context around line 164 ---
+158:         if (
+159:             doc.id === groupId
+160:         ) {
+161:             const data = doc.data();
+162: 
+163:             if (
+164:                 profile.role === "cooperative_admin" &&
+165:                 data.cooperativeId !== profile.cooperativeId
+166:             ) {
+167:                 return;
+168:             }
+169: 
+170:             group = {
+
+--- context around line 165 ---
+159:             doc.id === groupId
+160:         ) {
+161:             const data = doc.data();
+162: 
+163:             if (
+164:                 profile.role === "cooperative_admin" &&
+165:                 data.cooperativeId !== profile.cooperativeId
+166:             ) {
+167:                 return;
+168:             }
+169: 
+170:             group = {
+171:                 id: doc.id,
+
+--- context around line 203 ---
+197:     if (status.trim().length === 0) {
+198:         throw new Error(
+199:             "Invalid draw group status."
+200:         );
+201:     }
+202: 
+203:     const validDrawGroupStatuses = [
+204:         "Draft"
+205:     ];
+206: 
+207:     if (
+208:         !validDrawGroupStatuses.includes(
+209:             status.trim()
+
+--- context around line 208 ---
+202: 
+203:     const validDrawGroupStatuses = [
+204:         "Draft"
+205:     ];
+206: 
+207:     if (
+208:         !validDrawGroupStatuses.includes(
+209:             status.trim()
+210:         )
+211:     ) {
+212:         throw new Error(
+213:             "Invalid draw group status."
+214:         );
+
+--- context around line 221 ---
+215:     }
+216: 
+217:     status = status.trim();
+218: 
+219: 
+220: 
+221:     const profile =
+222:         await getCurrentUserProfile();
+223: 
+224:     if (
+225:         profile.role !== "super_admin" &&
+226:         profile.role !== "cooperative_admin"
+227:     ) {
+
+--- context around line 222 ---
+216: 
+217:     status = status.trim();
+218: 
+219: 
+220: 
+221:     const profile =
+222:         await getCurrentUserProfile();
+223: 
+224:     if (
+225:         profile.role !== "super_admin" &&
+226:         profile.role !== "cooperative_admin"
+227:     ) {
+228:         throw new Error(
+
+--- context around line 225 ---
+219: 
+220: 
+221:     const profile =
+222:         await getCurrentUserProfile();
+223: 
+224:     if (
+225:         profile.role !== "super_admin" &&
+226:         profile.role !== "cooperative_admin"
+227:     ) {
+228:         throw new Error(
+229:             "Unauthorized: only authorized administrators can update draw group status."
+230:         );
+231:     }
+
+--- context around line 226 ---
+220: 
+221:     const profile =
+222:         await getCurrentUserProfile();
+223: 
+224:     if (
+225:         profile.role !== "super_admin" &&
+226:         profile.role !== "cooperative_admin"
+227:     ) {
+228:         throw new Error(
+229:             "Unauthorized: only authorized administrators can update draw group status."
+230:         );
+231:     }
+232: 
+
+--- context around line 233 ---
+227:     ) {
+228:         throw new Error(
+229:             "Unauthorized: only authorized administrators can update draw group status."
+230:         );
+231:     }
+232: 
+233:     const groupRef = doc(
+234:         db,
+235:         "drawGroups",
+236:         groupId
+237:     );
+238: 
+239:     const groupSnap =
+
+--- context around line 235 ---
+229:             "Unauthorized: only authorized administrators can update draw group status."
+230:         );
+231:     }
+232: 
+233:     const groupRef = doc(
+234:         db,
+235:         "drawGroups",
+236:         groupId
+237:     );
+238: 
+239:     const groupSnap =
+240:         await getDoc(groupRef);
+241: 
+
+--- context around line 240 ---
+234:         db,
+235:         "drawGroups",
+236:         groupId
+237:     );
+238: 
+239:     const groupSnap =
+240:         await getDoc(groupRef);
+241: 
+242:     if (!groupSnap.exists()) {
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+246:     }
+
+--- context around line 248 ---
+242:     if (!groupSnap.exists()) {
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+246:     }
+247: 
+248:     const groupData =
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+
+--- context around line 252 ---
+246:     }
+247: 
+248:     const groupData =
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+
+--- context around line 253 ---
+247: 
+248:     const groupData =
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+
+--- context around line 260 ---
+254:     ) {
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+260:     await updateDoc(
+261: 
+262:         doc(
+263: 
+264:             db,
+265: 
+266:             "drawGroups",
+
+--- context around line 262 ---
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+260:     await updateDoc(
+261: 
+262:         doc(
+263: 
+264:             db,
+265: 
+266:             "drawGroups",
+267: 
+268:             groupId
+
+--- context around line 266 ---
+260:     await updateDoc(
+261: 
+262:         doc(
+263: 
+264:             db,
+265: 
+266:             "drawGroups",
+267: 
+268:             groupId
+269: 
+270:         ),
+271: 
+272:         {
+
+===============================================
+FILE: cooperative-admin.html
+===============================================
+
+--- context around line 20 ---
+14: 
+15: <header>
+16:     <div class="logo">
+17:         ABUFAUZAN TECH CMP
+18:     </div>
+19: 
+20:     <div class="profile">
+21:         <span id="adminName">
+22:             Cooperative Administrator
+23:         </span>
+24: 
+25:         <button id="logoutBtn">
+26:             Logout
+
+===============================================
+FILE: modules/register-cooperative/service.js
+===============================================
+
+--- context around line 28 ---
+22: export async function createCooperative(data) {
+23:   const result =
+24:     await submitCooperativeApplication(data);
+25: 
+26:   if (
+27:     !result?.data?.success ||
+28:     !result?.data?.cooperativeId
+29:   ) {
+30:     throw new Error(
+31:       result?.data?.message ||
+32:       "Unable to submit cooperative application."
+33:     );
+34:   }
+
+--- context around line 36 ---
+30:     throw new Error(
+31:       result?.data?.message ||
+32:       "Unable to submit cooperative application."
+33:     );
+34:   }
+35: 
+36:   return result.data.cooperativeId;
+37: }
+
+===============================================
+RC390 OWNERSHIP CONTRACT QUESTIONS
+===============================================
+1. IDENTIFY THE EXACT PROFILE OBJECT USED BY THE COOPERATIVE ADMIN DASHBOARD.
+2. IDENTIFY WHETHER THAT PROFILE OBJECT CONTAINS cooperativeId.
+3. IDENTIFY THE EXACT CREATE-GROUP ENTRY POINT.
+4. IDENTIFY THE EXACT PAYLOAD PASSED TO createDrawGroup().
+5. DETERMINE WHETHER cooperativeId IS ALREADY PRESENT IN THAT PAYLOAD.
+6. IF ABSENT, TRACE THE EXISTING AUTHORITATIVE PROFILE/COOPERATIVE SOURCE.
+7. DO NOT DERIVE cooperativeId FROM uid, groupId, memberId, adminId, OR CLIENT-GENERATED IDENTIFIERS.
+8. DO NOT CREATE ownerId, createdByUserId, OR ANY DUPLICATE OWNERSHIP FIELD.
+9. DO NOT MODIFY createDrawGroup(), cooperative-admin.js, OR FIRESTORE RULES IN RC390.
+RC390 STATUS: AUDIT ONLY — NO APPLICATION FILES MODIFIED.
+
+===============================================
+RC390 AUDIT COMPLETE
+===============================================

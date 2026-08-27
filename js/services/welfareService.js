@@ -1,4 +1,4 @@
-import { db } from "../firebase-config.js";
+import { db, auth } from "../firebase-config.js";
 
 import {
     collection,
@@ -15,20 +15,51 @@ from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 export async function applyWelfare(
     welfareData
 ) {
+    const user = auth.currentUser;
 
-    welfareData.status =
-        "Pending";
+    if (!user) {
+        throw new Error(
+            "Authenticated member required."
+        );
+    }
 
-    welfareData.createdAt =
-    serverTimestamp();
+    const profileSnapshot = await getDocs(
+        query(
+            collection(db, "users"),
+            where("__name__", "==", user.uid)
+        )
+    );
+
+    if (profileSnapshot.empty) {
+        throw new Error(
+            "Authenticated member profile not found."
+        );
+    }
+
+    const profile =
+        profileSnapshot.docs[0].data();
+
+    if (!profile.memberId) {
+        throw new Error(
+            "Authenticated member profile has no memberId."
+        );
+    }
+
+    const ownedWelfareData = {
+        ...welfareData,
+        memberId: profile.memberId,
+        cooperativeId:
+            profile.cooperativeId ?? null,
+        status: "Pending",
+        createdAt: serverTimestamp()
+    };
 
     const docRef = await addDoc(
         collection(db, "welfare"),
-        welfareData
+        ownedWelfareData
     );
 
     return docRef.id;
-
 }
 
 export async function getMemberWelfare(

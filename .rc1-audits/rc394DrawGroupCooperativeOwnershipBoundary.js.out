@@ -1,0 +1,1237 @@
+===============================================
+RC394 DRAW GROUP COOPERATIVE OWNERSHIP BOUNDARY
+===============================================
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+
+--- context around line 12 ---
+7:     signOut
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+13: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+14: 
+15: 
+16: function handleDashboardHistoryReentry() {
+17:     window.addEventListener("popstate", () => {
+18:         window.location.reload();
+19:     });
+
+--- context around line 47 ---
+42:         return;
+43:     }
+44: 
+45:     try {
+46: 
+47:         const currentUser = auth.currentUser;
+48: 
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+
+--- context around line 54 ---
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+
+--- context around line 55 ---
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+
+MISSING: modules/contribution-draw/group-create/script.js
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+
+--- context around line 4 ---
+1: import { db, auth } from "../firebase-config.js";
+2: 
+3: import {
+4:     collection,
+5:     addDoc,
+6:     getDocs,
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+--- context around line 5 ---
+1: import { db, auth } from "../firebase-config.js";
+2: 
+3: import {
+4:     collection,
+5:     addDoc,
+6:     getDocs,
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+
+--- context around line 6 ---
+1: import { db, auth } from "../firebase-config.js";
+2: 
+3: import {
+4:     collection,
+5:     addDoc,
+6:     getDocs,
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+
+--- context around line 8 ---
+3: import {
+4:     collection,
+5:     addDoc,
+6:     getDocs,
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+14:     const user = auth.currentUser;
+15: 
+
+--- context around line 9 ---
+4:     collection,
+5:     addDoc,
+6:     getDocs,
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+14:     const user = auth.currentUser;
+15: 
+16:     if (!user) {
+
+--- context around line 14 ---
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+14:     const user = auth.currentUser;
+15: 
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+
+--- context around line 20 ---
+15: 
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+
+--- context around line 21 ---
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+28:     return profileSnap.data();
+
+--- context around line 32 ---
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+
+--- context around line 33 ---
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+40:         profile.role !== "super_admin" &&
+
+--- context around line 50 ---
+45:         );
+46:     }
+47: 
+48:     if (
+49:         profile.role === "cooperative_admin" &&
+50:         !profile.cooperativeId
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+
+--- context around line 57 ---
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+
+--- context around line 60 ---
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+
+--- context around line 62 ---
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+
+--- context around line 63 ---
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+
+--- context around line 65 ---
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+
+--- context around line 69 ---
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+
+--- context around line 70 ---
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+
+--- context around line 72 ---
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+
+--- context around line 74 ---
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+80: export async function getDrawGroups() {
+81:     if (typeof status !== "string") {
+
+--- context around line 80 ---
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+80: export async function getDrawGroups() {
+81:     if (typeof status !== "string") {
+82:         throw new Error(
+83:             "Invalid draw group status."
+84:         );
+85:     }
+86: 
+87:     if (status.trim().length === 0) {
+
+--- context around line 93 ---
+88:         throw new Error(
+89:             "Invalid draw group status."
+90:         );
+91:     }
+92: 
+93:     const validDrawGroupStatuses = [
+94:         "Draft"
+95:     ];
+96: 
+97:     if (
+98:         !validDrawGroupStatuses.includes(
+99:             status.trim()
+100:         )
+
+--- context around line 98 ---
+93:     const validDrawGroupStatuses = [
+94:         "Draft"
+95:     ];
+96: 
+97:     if (
+98:         !validDrawGroupStatuses.includes(
+99:             status.trim()
+100:         )
+101:     ) {
+102:         throw new Error(
+103:             "Invalid draw group status."
+104:         );
+105:     }
+
+--- context around line 113 ---
+108: 
+109:     const profile =
+110:         await getCurrentUserProfile();
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+116:                 "drawGroups"
+117:             )
+118:         );
+119: 
+120:     const groups = [];
+
+--- context around line 114 ---
+109:     const profile =
+110:         await getCurrentUserProfile();
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+116:                 "drawGroups"
+117:             )
+118:         );
+119: 
+120:     const groups = [];
+121: 
+
+--- context around line 116 ---
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+116:                 "drawGroups"
+117:             )
+118:         );
+119: 
+120:     const groups = [];
+121: 
+122:     snapshot.forEach(doc => {
+123:         const data = doc.data();
+
+--- context around line 127 ---
+122:     snapshot.forEach(doc => {
+123:         const data = doc.data();
+124: 
+125:         if (
+126:             profile.role === "cooperative_admin" &&
+127:             data.cooperativeId !== profile.cooperativeId
+128:         ) {
+129:             return;
+130:         }
+131: 
+132:         groups.push({
+133:             id: doc.id,
+134:             ...data
+
+--- context around line 148 ---
+143: ) {
+144:     const profile =
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+151:                 "drawGroups"
+152:             )
+153:         );
+154: 
+155:     let group = null;
+
+--- context around line 149 ---
+144:     const profile =
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+151:                 "drawGroups"
+152:             )
+153:         );
+154: 
+155:     let group = null;
+156: 
+
+--- context around line 151 ---
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+151:                 "drawGroups"
+152:             )
+153:         );
+154: 
+155:     let group = null;
+156: 
+157:     snapshot.forEach(doc => {
+158:         if (
+
+--- context around line 165 ---
+160:         ) {
+161:             const data = doc.data();
+162: 
+163:             if (
+164:                 profile.role === "cooperative_admin" &&
+165:                 data.cooperativeId !== profile.cooperativeId
+166:             ) {
+167:                 return;
+168:             }
+169: 
+170:             group = {
+171:                 id: doc.id,
+172:                 ...data
+
+--- context around line 203 ---
+198:         throw new Error(
+199:             "Invalid draw group status."
+200:         );
+201:     }
+202: 
+203:     const validDrawGroupStatuses = [
+204:         "Draft"
+205:     ];
+206: 
+207:     if (
+208:         !validDrawGroupStatuses.includes(
+209:             status.trim()
+210:         )
+
+--- context around line 208 ---
+203:     const validDrawGroupStatuses = [
+204:         "Draft"
+205:     ];
+206: 
+207:     if (
+208:         !validDrawGroupStatuses.includes(
+209:             status.trim()
+210:         )
+211:     ) {
+212:         throw new Error(
+213:             "Invalid draw group status."
+214:         );
+215:     }
+
+--- context around line 235 ---
+230:         );
+231:     }
+232: 
+233:     const groupRef = doc(
+234:         db,
+235:         "drawGroups",
+236:         groupId
+237:     );
+238: 
+239:     const groupSnap =
+240:         await getDoc(groupRef);
+241: 
+242:     if (!groupSnap.exists()) {
+
+--- context around line 240 ---
+235:         "drawGroups",
+236:         groupId
+237:     );
+238: 
+239:     const groupSnap =
+240:         await getDoc(groupRef);
+241: 
+242:     if (!groupSnap.exists()) {
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+246:     }
+247: 
+
+--- context around line 248 ---
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+246:     }
+247: 
+248:     const groupData =
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+255:         throw new Error(
+
+--- context around line 253 ---
+248:     const groupData =
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+260:     await updateDoc(
+
+--- context around line 260 ---
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+260:     await updateDoc(
+261: 
+262:         doc(
+263: 
+264:             db,
+265: 
+266:             "drawGroups",
+267: 
+
+--- context around line 266 ---
+261: 
+262:         doc(
+263: 
+264:             db,
+265: 
+266:             "drawGroups",
+267: 
+268:             groupId
+269: 
+270:         ),
+271: 
+272:         {
+273: 
+
+===============================================
+FILE: js/services/memberService.js
+===============================================
+
+--- context around line 14 ---
+9:  *
+10:  * Member Business Service
+11:  * =====================================================
+12:  */
+13: 
+14: import { CMPRepositoryManager }
+15: from "../repositories/repositoryManager.js";
+16: import { CMPMemberEngine }
+17: from "../business/memberEngine.js";
+18: 
+19: 
+20: const memberRepository =
+21:     CMPRepositoryManager.get("member");
+
+--- context around line 15 ---
+10:  * Member Business Service
+11:  * =====================================================
+12:  */
+13: 
+14: import { CMPRepositoryManager }
+15: from "../repositories/repositoryManager.js";
+16: import { CMPMemberEngine }
+17: from "../business/memberEngine.js";
+18: 
+19: 
+20: const memberRepository =
+21:     CMPRepositoryManager.get("member");
+22: 
+
+--- context around line 20 ---
+15: from "../repositories/repositoryManager.js";
+16: import { CMPMemberEngine }
+17: from "../business/memberEngine.js";
+18: 
+19: 
+20: const memberRepository =
+21:     CMPRepositoryManager.get("member");
+22: 
+23: 
+24: export async function createMember(data) {
+25: 
+26:     return await memberRepository.create(data);
+27: 
+
+--- context around line 21 ---
+16: import { CMPMemberEngine }
+17: from "../business/memberEngine.js";
+18: 
+19: 
+20: const memberRepository =
+21:     CMPRepositoryManager.get("member");
+22: 
+23: 
+24: export async function createMember(data) {
+25: 
+26:     return await memberRepository.create(data);
+27: 
+28: }
+
+--- context around line 24 ---
+19: 
+20: const memberRepository =
+21:     CMPRepositoryManager.get("member");
+22: 
+23: 
+24: export async function createMember(data) {
+25: 
+26:     return await memberRepository.create(data);
+27: 
+28: }
+29: 
+30: 
+31: export async function getMemberById(id) {
+
+--- context around line 26 ---
+21:     CMPRepositoryManager.get("member");
+22: 
+23: 
+24: export async function createMember(data) {
+25: 
+26:     return await memberRepository.create(data);
+27: 
+28: }
+29: 
+30: 
+31: export async function getMemberById(id) {
+32: 
+33:     return await memberRepository.findById(id);
+
+--- context around line 33 ---
+28: }
+29: 
+30: 
+31: export async function getMemberById(id) {
+32: 
+33:     return await memberRepository.findById(id);
+34: 
+35: }
+36: 
+37: 
+38: export async function getAllMembers() {
+39: 
+40:     return await memberRepository.findAll();
+
+--- context around line 40 ---
+35: }
+36: 
+37: 
+38: export async function getAllMembers() {
+39: 
+40:     return await memberRepository.findAll();
+41: 
+42: }
+43: 
+44: 
+45: export async function updateMember(id, data) {
+46: 
+47:     return await memberRepository.update(id, data);
+
+--- context around line 47 ---
+42: }
+43: 
+44: 
+45: export async function updateMember(id, data) {
+46: 
+47:     return await memberRepository.update(id, data);
+48: 
+49: }
+50: 
+51: 
+52: export async function deleteMember(id) {
+53:     return await memberRepository.delete(id);
+54: }
+
+--- context around line 53 ---
+48: 
+49: }
+50: 
+51: 
+52: export async function deleteMember(id) {
+53:     return await memberRepository.delete(id);
+54: }
+55: 
+56: export async function registerMember(data) {
+57:     return await CMPMemberEngine.register(data);
+58: }
+59: 
+
+===============================================
+FILE: js/services/contributionService.js
+===============================================
+
+--- context around line 14 ---
+9:  *
+10:  * Contribution Business Service
+11:  * =====================================================
+12:  */
+13: 
+14: import { CMPRepositoryManager }
+15: from "../repositories/repositoryManager.js";
+16: 
+17: 
+18: const contributionRepository =
+19:     CMPRepositoryManager.get("contribution");
+20: 
+21: 
+
+--- context around line 15 ---
+10:  * Contribution Business Service
+11:  * =====================================================
+12:  */
+13: 
+14: import { CMPRepositoryManager }
+15: from "../repositories/repositoryManager.js";
+16: 
+17: 
+18: const contributionRepository =
+19:     CMPRepositoryManager.get("contribution");
+20: 
+21: 
+22: export async function createContribution(data) {
+
+--- context around line 18 ---
+13: 
+14: import { CMPRepositoryManager }
+15: from "../repositories/repositoryManager.js";
+16: 
+17: 
+18: const contributionRepository =
+19:     CMPRepositoryManager.get("contribution");
+20: 
+21: 
+22: export async function createContribution(data) {
+23: 
+24:     return await contributionRepository.create(data);
+25: 
+
+--- context around line 19 ---
+14: import { CMPRepositoryManager }
+15: from "../repositories/repositoryManager.js";
+16: 
+17: 
+18: const contributionRepository =
+19:     CMPRepositoryManager.get("contribution");
+20: 
+21: 
+22: export async function createContribution(data) {
+23: 
+24:     return await contributionRepository.create(data);
+25: 
+26: }
+
+--- context around line 22 ---
+17: 
+18: const contributionRepository =
+19:     CMPRepositoryManager.get("contribution");
+20: 
+21: 
+22: export async function createContribution(data) {
+23: 
+24:     return await contributionRepository.create(data);
+25: 
+26: }
+27: 
+28: 
+29: export async function getContributionById(id) {
+
+--- context around line 24 ---
+19:     CMPRepositoryManager.get("contribution");
+20: 
+21: 
+22: export async function createContribution(data) {
+23: 
+24:     return await contributionRepository.create(data);
+25: 
+26: }
+27: 
+28: 
+29: export async function getContributionById(id) {
+30: 
+31:     return await contributionRepository.findById(id);
+
+--- context around line 31 ---
+26: }
+27: 
+28: 
+29: export async function getContributionById(id) {
+30: 
+31:     return await contributionRepository.findById(id);
+32: 
+33: }
+34: 
+35: 
+36: export async function getAllContributions() {
+37: 
+38:     return await contributionRepository.findAll();
+
+--- context around line 38 ---
+33: }
+34: 
+35: 
+36: export async function getAllContributions() {
+37: 
+38:     return await contributionRepository.findAll();
+39: 
+40: }
+41: 
+42: 
+43: export async function updateContribution(id, data) {
+44: 
+45:     return await contributionRepository.update(id, data);
+
+--- context around line 45 ---
+40: }
+41: 
+42: 
+43: export async function updateContribution(id, data) {
+44: 
+45:     return await contributionRepository.update(id, data);
+46: 
+47: }
+48: 
+49: 
+50: export async function deleteContribution(id) {
+51: 
+52:     return await contributionRepository.delete(id);
+
+--- context around line 52 ---
+47: }
+48: 
+49: 
+50: export async function deleteContribution(id) {
+51: 
+52:     return await contributionRepository.delete(id);
+53: 
+54: }
+55: 
+
+===============================================
+FILE: js/repositories/memberRepository.js
+===============================================
+
+--- context around line 4 ---
+1: /**
+2:  * =====================================================
+3:  * ABUFAUZAN TECH Cooperative Management Platform
+4:  * Repository Module: RP-011
+5:  *
+6:  * File: memberRepository.js
+7:  * Version: 2.0.0
+8:  *
+9:  * Adapter Based Member Repository
+10:  * =====================================================
+11:  */
+
+--- context around line 6 ---
+1: /**
+2:  * =====================================================
+3:  * ABUFAUZAN TECH Cooperative Management Platform
+4:  * Repository Module: RP-011
+5:  *
+6:  * File: memberRepository.js
+7:  * Version: 2.0.0
+8:  *
+9:  * Adapter Based Member Repository
+10:  * =====================================================
+11:  */
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+
+--- context around line 9 ---
+4:  * Repository Module: RP-011
+5:  *
+6:  * File: memberRepository.js
+7:  * Version: 2.0.0
+8:  *
+9:  * Adapter Based Member Repository
+10:  * =====================================================
+11:  */
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+
+--- context around line 13 ---
+8:  *
+9:  * Adapter Based Member Repository
+10:  * =====================================================
+11:  */
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+17: export class CMPMemberRepository
+18:     extends CMPBaseRepository {
+19: 
+20: 
+
+--- context around line 17 ---
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+17: export class CMPMemberRepository
+18:     extends CMPBaseRepository {
+19: 
+20: 
+21:     constructor() {
+22: 
+23:         super(
+24:             CMPAdapterFactory.firebase("members")
+
+--- context around line 18 ---
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+17: export class CMPMemberRepository
+18:     extends CMPBaseRepository {
+19: 
+20: 
+21:     constructor() {
+22: 
+23:         super(
+24:             CMPAdapterFactory.firebase("members")
+25:         );
+
+===============================================
+FILE: js/repositories/contributionRepository.js
+===============================================
+
+--- context around line 4 ---
+1: /**
+2:  * =====================================================
+3:  * ABUFAUZAN TECH Cooperative Management Platform
+4:  * Repository Module: RP-003
+5:  *
+6:  * File: contributionRepository.js
+7:  * Version: 2.0.0
+8:  *
+9:  * Adapter Based Contribution Repository
+10:  * =====================================================
+11:  */
+
+--- context around line 6 ---
+1: /**
+2:  * =====================================================
+3:  * ABUFAUZAN TECH Cooperative Management Platform
+4:  * Repository Module: RP-003
+5:  *
+6:  * File: contributionRepository.js
+7:  * Version: 2.0.0
+8:  *
+9:  * Adapter Based Contribution Repository
+10:  * =====================================================
+11:  */
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+
+--- context around line 9 ---
+4:  * Repository Module: RP-003
+5:  *
+6:  * File: contributionRepository.js
+7:  * Version: 2.0.0
+8:  *
+9:  * Adapter Based Contribution Repository
+10:  * =====================================================
+11:  */
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+
+--- context around line 13 ---
+8:  *
+9:  * Adapter Based Contribution Repository
+10:  * =====================================================
+11:  */
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+17: export class CMPContributionRepository
+18:     extends CMPBaseRepository {
+19: 
+20: 
+
+--- context around line 17 ---
+12: 
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+17: export class CMPContributionRepository
+18:     extends CMPBaseRepository {
+19: 
+20: 
+21:     constructor() {
+22: 
+23:         super(
+24:             CMPAdapterFactory.firebase("contributions")
+
+--- context around line 18 ---
+13: import { CMPBaseRepository } from "./baseRepository.js";
+14: import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
+15: 
+16: 
+17: export class CMPContributionRepository
+18:     extends CMPBaseRepository {
+19: 
+20: 
+21:     constructor() {
+22: 
+23:         super(
+24:             CMPAdapterFactory.firebase("contributions")
+25:         );
+
+===============================================
+FILE: js/repositories/baseRepository.js
+===============================================
+
+--- context around line 4 ---
+1: /**
+2:  * =====================================================
+3:  * ABUFAUZAN TECH Cooperative Management Platform
+4:  * Repository Layer
+5:  *
+6:  * File: baseRepository.js
+7:  * Module: RP-001
+8:  * Version: 2.0.0
+9:  *
+10:  * Adapter-Based Base Repository
+11:  * =====================================================
+
+--- context around line 6 ---
+1: /**
+2:  * =====================================================
+3:  * ABUFAUZAN TECH Cooperative Management Platform
+4:  * Repository Layer
+5:  *
+6:  * File: baseRepository.js
+7:  * Module: RP-001
+8:  * Version: 2.0.0
+9:  *
+10:  * Adapter-Based Base Repository
+11:  * =====================================================
+12:  */
+13: 
+
+--- context around line 10 ---
+5:  *
+6:  * File: baseRepository.js
+7:  * Module: RP-001
+8:  * Version: 2.0.0
+9:  *
+10:  * Adapter-Based Base Repository
+11:  * =====================================================
+12:  */
+13: 
+14: export class CMPBaseRepository {
+15: 
+16:     constructor(adapter) {
+17: 
+
+--- context around line 14 ---
+9:  *
+10:  * Adapter-Based Base Repository
+11:  * =====================================================
+12:  */
+13: 
+14: export class CMPBaseRepository {
+15: 
+16:     constructor(adapter) {
+17: 
+18:         this.adapter = adapter;
+19: 
+20:     }
+21: 
+
+===============================================
+RC394 DECISION CHECKS
+===============================================
+
+1. AUTHORITATIVE COOPERATIVE:
+   Is cooperativeId obtained from users/{authenticatedUid}?
+
+2. CREATE DRAW GROUP PAYLOAD:
+   Does groupData contain cooperativeId before createDrawGroup()?
+
+3. DRAW GROUP SERVICE:
+   Does createDrawGroup() write cooperativeId into drawGroups?
+
+4. CLIENT CONTROL:
+   Can Cooperative Admin directly choose or submit cooperativeId?
+
+5. OWNERSHIP SOURCE:
+   Is cooperative ownership derived from the authoritative user profile?
+
+6. CROSS-COOPERATIVE RISK:
+   Could a Cooperative Admin create/read another cooperative's draw group?
+
+7. DUPLICATE OWNERSHIP:
+   Confirm no ownerId, createdByUserId, adminId, or equivalent duplicate ownership field is required.
+
+8. MEMBER / CONTRIBUTION FOLLOW-THROUGH:
+   Identify whether downstream member/contribution records can inherit the same cooperative boundary.
+
+RC394 STATUS: AUDIT ONLY — NO APPLICATION FILES MODIFIED.
+===============================================
+RC394 AUDIT COMPLETE
+===============================================

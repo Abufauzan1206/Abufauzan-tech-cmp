@@ -57,13 +57,23 @@ check(
 );
 
 check(
-    superAdminSource.includes("auth.currentUser"),
-    "Super Admin session resolves the current Firebase user"
+    superAdminSource.includes("onAuthStateChanged(auth"),
+    "Super Admin session resolves the current Firebase user through the Firebase auth-state boundary"
 );
 
 check(
-    cooperativeAdminSource.includes("auth.currentUser"),
-    "Cooperative Admin session resolves the current Firebase user"
+    cooperativeAdminSource.includes("onAuthStateChanged(auth"),
+    "Cooperative Admin session resolves the current Firebase user through the Firebase auth-state boundary"
+);
+
+check(
+    !superAdminSource.includes("if (!currentUser)"),
+    "Super Admin dashboard has no premature auth.currentUser initialization gate"
+);
+
+check(
+    !cooperativeAdminSource.includes("if (!currentUser)"),
+    "Cooperative Admin dashboard has no premature auth.currentUser initialization gate"
 );
 
 /* =========================================

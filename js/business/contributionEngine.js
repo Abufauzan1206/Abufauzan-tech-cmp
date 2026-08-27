@@ -19,28 +19,34 @@ export class CMPContributionEngine {
  */
 static create(contribution) {
 
-    const newContribution = {
+        if (!contribution?.memberId) {
+            throw new Error(
+                "Contribution member ownership is required."
+            );
+        }
 
-        contributionId:
-            CMPIdService.generate("CON"),
+        if (!contribution?.cooperativeId) {
+            throw new Error(
+                "Contribution cooperative ownership is required."
+            );
+        }
 
-        createdAt:
-            new Date(),
+        const newContribution = {
+            contributionId:
+                CMPIdService.generate("CON"),
+            createdAt:
+                new Date(),
+            status:
+                "pending",
+            ...contribution
+        };
 
-        status:
-            "pending",
+        CMPRepositoryManager
+            .contribution
+            .create(newContribution);
 
-        ...contribution
-
-    };
-
-    CMPRepositoryManager
-    .contribution
-    .create(newContribution);
-
-    return newContribution;
-
-}
+        return newContribution;
+    }
 
     /**
      * Get all contributions

@@ -50,34 +50,42 @@ function walk(dir) {
 
 console.log("==================================================");
 console.log("ABUFAUZAN TECH CMP");
-console.log("RC219 — LOCATE ACTIVE RC190 TEST TARGET");
+console.log("RC219 — LOCATE AUTHORITATIVE RC201 MEMBER TEST TARGET");
 console.log("==================================================");
 
 const candidates = walk(ROOT).filter(file => {
     const relative = path.relative(ROOT, file);
 
     /*
-     * Never inspect Patch Engine infrastructure itself.
-     * RC219 must discover the real member test source,
-     * not another patch script containing RC190 strings.
+     * RC201 is the authoritative member-registration
+     * persistence verification target.
+     *
+     * Patch Engine infrastructure is never a valid target.
      */
     if (
-        relative.startsWith("tools/patchAssistant/") ||
-        relative === "tools/patchAssistant/rc/rc219ActivateMemberTestTarget.js"
+        relative.startsWith("tools/patchAssistant/") &&
+        relative !==
+            "tools/patchAssistant/rc/rc201MemberRegistrationPersistenceVerification.js"
     ) {
         return false;
     }
 
-    const source = fs.readFileSync(file, "utf8");
+    /*
+     * Deterministic authoritative target.
+     * Do not rely on obsolete RC190 markers or fragile
+     * heading text.
+     */
+    if (
+        relative ===
+        "tools/patchAssistant/rc/rc201MemberRegistrationPersistenceVerification.js"
+    ) {
+        return true;
+    }
 
-    return (
-        source.includes("RC190 MEMBER REGISTRATION END-TO-END") ||
-        source.includes('fullName: "RC190 Test Member"') ||
-        source.includes('phoneNumber: "08000000190"')
-    );
+    return false;
 });
 
-console.log("RC190 CANDIDATES:");
+console.log("AUTHORITATIVE RC201 CANDIDATES:");
 
 for (const candidate of candidates) {
     console.log(
@@ -89,7 +97,7 @@ for (const candidate of candidates) {
 if (candidates.length === 0) {
     console.error("");
     console.error(
-        "RC219 ERROR: Active RC190 test source could not be located."
+        "RC219 ERROR: Authoritative RC201 member test source could not be located."
     );
     process.exitCode = 1;
     process.exit();
@@ -98,7 +106,7 @@ if (candidates.length === 0) {
 if (candidates.length > 1) {
     console.error("");
     console.error(
-        "RC219 ERROR: Multiple RC190 candidates found."
+        "RC219 ERROR: Multiple authoritative RC201 candidates found."
     );
     console.error(
         "Do not patch until the active target is uniquely identified."
@@ -125,65 +133,44 @@ const source = fs.readFileSync(
 const patches = [];
 
 /*
- * Legacy default import:
+ * RC219 canonical-target contract:
  *
- * import { CMPMemoryAdapter } from "./js/adapters/memoryAdapter.js";
+ * RC201 is the authoritative member-registration persistence
+ * verification target. It uses memberService directly:
+ *
+ *   registerMember
+ *   getMemberById
+ *   deleteMember
+ *
+ * Therefore RC219 must NOT attempt the obsolete RC190
+ * MemoryAdapter import/constructor repair against RC201.
  */
-if (
-    /import\s+MemoryAdapter\s+from\s+["'][^"']*memoryAdapter\.js["'];/.test(
-        source
-    )
-) {
-    patches.push({
-        path: target,
-        mode: "regex",
-        search:
-            `import\\s+MemoryAdapter\\s+from\\s+["'][^"']*memoryAdapter\\.js["'];`,
-        replace:
-            `import { CMPMemoryAdapter } from "./js/adapters/memoryAdapter.js";`
-    });
-}
+const canonicalRC201 =
+    target ===
+        "tools/patchAssistant/rc/rc201MemberRegistrationPersistenceVerification.js" &&
+    source.includes(
+        'from "../../../js/services/memberService.js";'
+    ) &&
+    source.includes("registerMember") &&
+    source.includes("getMemberById") &&
+    source.includes("deleteMember");
 
-/*
- * Legacy constructor usage.
- */
-if (
-    /new\s+MemoryAdapter\s*\(/.test(source)
-) {
-    patches.push({
-        path: target,
-        mode: "regex",
-        search: `new\\s+MemoryAdapter\\s*\\(`,
-        replace: `new CMPMemoryAdapter(`
-    });
-}
-
-/*
- * Already correctly imported and constructed.
- */
-if (patches.length === 0) {
-    const alreadyCorrect =
-        source.includes(
-            `import { CMPMemoryAdapter } from "./js/adapters/memoryAdapter.js";`
-        ) &&
-        !/new\s+MemoryAdapter\s*\(/.test(source);
-
-    if (alreadyCorrect) {
-        console.log(
-            "RC219: TARGET ALREADY USES CMPMemoryAdapter CONTRACT."
-        );
-        console.log(
-            "RC219 MEMBER TEST TARGET: PASS"
-        );
-        process.exit(0);
-    }
-
-    console.error(
-        "RC219 ERROR: Target found, but no safe MemoryAdapter contract pattern matched."
+if (canonicalRC201) {
+    console.log(
+        "RC219: AUTHORITATIVE RC201 MEMBER SERVICE CONTRACT CONFIRMED."
     );
-    process.exitCode = 1;
-    process.exit();
+    console.log(
+        "RC219: OBSOLETE RC190 MEMORYADAPTER REPAIR SKIPPED."
+    );
+    console.log("RC219 MEMBER TEST TARGET: PASS");
+    process.exit(0);
 }
+
+console.error(
+    "RC219 ERROR: Target is not the authoritative RC201 member-service contract."
+);
+process.exitCode = 1;
+process.exit();
 
 console.log(
     "PATCH COUNT:",

@@ -47,12 +47,12 @@ check(
 );
 
 check(
-    superAdminSource.includes('doc(db, "users", user.uid)'),
+    superAdminSource.includes('doc(db, "users", currentUser.uid)'),
     "Super Admin remains bound to the current Firestore profile"
 );
 
 check(
-    cooperativeAdminSource.includes('doc(db, "users", user.uid)'),
+    cooperativeAdminSource.includes('doc(db, "users", currentUser.uid)'),
     "Cooperative Admin remains bound to the current Firestore profile"
 );
 

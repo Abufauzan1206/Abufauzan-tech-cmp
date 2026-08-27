@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Portal — ABUFAUZAN TECH CMP</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">ABUFAUZAN TECH CMP</div>
+
+        <div class="profile">
+            <span id="memberName">Member</span>
+            <button id="logoutBtn">Logout</button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <nav id="sidebarMenu" class="sidebar"></nav>
+        <section id="content">
+
+            <div class="dashboard-header">
+                <h1>👋 Welcome, Member</h1>
+                <p>
+                    View your cooperative membership,
+                    contributions, loans and welfare information.
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h2>👤</h2>
+                    <h3 id="memberId">—</h3>
+                    <p>Member ID</p>
+                </div>
+
+                <div class="stat-card">
+                    <h2>💰</h2>
+                    <h3 id="contributionTotal">₦0.00</h3>
+                    <p>My Contributions</p>
+                </div>
+
+                <div class="stat-card">
+                    <h2>🏦</h2>
+                    <h3 id="loanCount">0</h3>
+                    <p>My Loans</p>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>⚡ My Services</h2>
+
+                <div class="service-grid">
+
+                    <a href="../members/member-profile/index.html" class="service-card">
+                        <div class="service-icon">👤</div>
+                        <h3>My Profile</h3>
+                        <p>View your cooperative membership details.</p>
+                    </a>
+
+                    <a href="../contributions/index.html" class="service-card">
+                        <div class="service-icon">💰</div>
+                        <h3>My Contributions</h3>
+                        <p>View your contribution history and balance.</p>
+                    </a>
+
+                    <a href="../loans/loan-directory/index.html" class="service-card">
+                        <div class="service-icon">🏦</div>
+                        <h3>My Loans</h3>
+                        <p>View your loans and repayment information.</p>
+                    </a>
+
+                    <a href="../welfare/welfare-directory/index.html" class="service-card">
+                        <div class="service-icon">❤️</div>
+                        <h3>Welfare</h3>
+                        <p>View your welfare information and activity.</p>
+                    </a>
+
+                    <div class="service-card disabled">
+                        <div class="service-icon">📄</div>
+                        <h3>Statements</h3>
+                        <p>Coming Soon</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        © 2026 ABUFAUZAN TECH
+    </footer>
+
+    <script type="module" src="./member-portal.js"></script>
+</body>
+</html>

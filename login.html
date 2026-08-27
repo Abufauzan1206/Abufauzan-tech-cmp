@@ -37,6 +37,39 @@ Sign in to continue to your cooperative dashboard.
 
 <form id="loginForm">
 
+<div
+id="loginAsContainer"
+style="margin-bottom:20px;">
+
+<label
+for="loginAsRole"
+style="display:block;margin-bottom:8px;font-weight:600;">
+
+Login as
+
+</label>
+
+<select
+id="loginAsRole"
+required
+style="width:100%;padding:12px;border:1px solid #CBD5E1;border-radius:8px;">
+
+<option value="" selected disabled>
+Select access category
+</option>
+
+<option value="cooperative_admin">
+Cooperative Admin
+</option>
+
+<option value="member">
+Member
+</option>
+
+</select>
+
+</div>
+
 <input
 type="email"
 id="email"

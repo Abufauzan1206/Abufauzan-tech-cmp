@@ -10,16 +10,6 @@ export function validateForm(data) {
     return false;
   }
 
-  if (data.adminPassword === "") {
-    alert("Please enter a Temporary Password.");
-    return false;
-  }
-
-  if (data.adminPassword.length < 6) {
-    alert("Password must be at least 6 characters.");
-    return false;
-  }
-
   return true;
 
 }

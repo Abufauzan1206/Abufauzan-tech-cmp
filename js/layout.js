@@ -1,7 +1,7 @@
-import { buildSidebar } from "./navigation/sidebar.js";
+import { buildAuthenticatedSidebar } from "./navigation/sidebar.js";
 
-// Build the sidebar
-buildSidebar("sidebarMenu");
+// Build the sidebar using the authenticated user's role
+buildAuthenticatedSidebar("sidebarMenu");
 
 // Register button loader (only if the button exists)
 const registerBtn = document.getElementById("registerBtn");

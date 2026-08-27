@@ -29,7 +29,8 @@ try {
     member = await registerMember({
         firstName: "RC201",
         lastName: "TestMember",
-        phone: "08000000201"
+        phone: "08000000201",
+        cooperativeId: "RC201-TEST-COOPERATIVE"
     });
 
     console.log("Registered Member:");

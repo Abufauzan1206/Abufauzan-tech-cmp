@@ -57,13 +57,13 @@ check(
 );
 
 check(
-    superAdminSource.includes("auth.currentUser"),
-    "Super Admin continuously resolves the current Firebase user"
+    superAdminSource.includes("onAuthStateChanged(auth"),
+    "Super Admin continuously resolves the current Firebase user through the Firebase auth-state boundary"
 );
 
 check(
-    cooperativeAdminSource.includes("auth.currentUser"),
-    "Cooperative Admin continuously resolves the current Firebase user"
+    cooperativeAdminSource.includes("onAuthStateChanged(auth"),
+    "Cooperative Admin continuously resolves the current Firebase user through the Firebase auth-state boundary"
 );
 
 /* =========================================

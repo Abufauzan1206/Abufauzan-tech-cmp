@@ -51,13 +51,13 @@ check(
 );
 
 check(
-    superAdminSource.includes("auth.currentUser"),
-    "Super Admin dashboard consistently resolves the current authenticated user"
+    superAdminSource.includes("onAuthStateChanged(auth"),
+    "Super Admin dashboard consistently resolves the current authenticated user through the Firebase auth-state boundary"
 );
 
 check(
-    cooperativeAdminSource.includes("auth.currentUser"),
-    "Cooperative Admin dashboard consistently resolves the current authenticated user"
+    cooperativeAdminSource.includes("onAuthStateChanged(auth"),
+    "Cooperative Admin dashboard consistently resolves the current authenticated user through the Firebase auth-state boundary"
 );
 
 /* =========================================

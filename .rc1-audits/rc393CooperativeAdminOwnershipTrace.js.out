@@ -1,0 +1,471 @@
+===============================================
+RC393 COOPERATIVE ADMIN OWNERSHIP TRACE
+===============================================
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+
+--- context around line 6 ---
+2: import { rolesMatch } from "./components/roleAuthorization.js";
+3: import { buildSidebar } from "./navigation/sidebar.js";
+4: 
+5: import {
+6:     onAuthStateChanged,
+7:     signOut
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+
+--- context around line 12 ---
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+13: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+14: 
+15: 
+16: function handleDashboardHistoryReentry() {
+17:     window.addEventListener("popstate", () => {
+18:         window.location.reload();
+
+--- context around line 38 ---
+34: handleDashboardHistoryReentry();
+35: 
+36: const dashboardRole = "cooperative_admin";
+37: 
+38: onAuthStateChanged(auth, async (user) => {
+39: 
+40:     if (!user) {
+41:         window.location.href = "login.html";
+42:         return;
+43:     }
+44: 
+
+--- context around line 47 ---
+43:     }
+44: 
+45:     try {
+46: 
+47:         const currentUser = auth.currentUser;
+48: 
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+
+--- context around line 54 ---
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+
+--- context around line 55 ---
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+
+===============================================
+FILE: js/navigation/sidebar.js
+===============================================
+
+--- context around line 4 ---
+1: import { auth, db } from "../firebase-config.js";
+2: import { rolesMatch } from "../components/roleAuthorization.js";
+3: import {
+4:     onAuthStateChanged
+5: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+6: import {
+7:     doc,
+8:     getDoc
+9: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+10: 
+
+--- context around line 8 ---
+4:     onAuthStateChanged
+5: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+6: import {
+7:     doc,
+8:     getDoc
+9: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+10: 
+11: function getDashboardUrl(role) {
+12:     if (rolesMatch(role, "super_admin")) {
+13:         return "super-admin.html";
+14:     }
+
+--- context around line 205 ---
+201:     });
+202: }
+203: 
+204: export function buildAuthenticatedSidebar(containerId) {
+205:     onAuthStateChanged(auth, async user => {
+206:         if (!user) {
+207:             window.location.href = new URL("../../login.html", import.meta.url).href;
+208:             return;
+209:         }
+210: 
+211:         try {
+
+--- context around line 212 ---
+208:             return;
+209:         }
+210: 
+211:         try {
+212:             const userDoc = await getDoc(
+213:                 doc(db, "users", user.uid)
+214:             );
+215: 
+216:             if (!userDoc.exists()) {
+217:                 window.location.href = new URL("../../login.html", import.meta.url).href;
+218:                 return;
+
+--- context around line 213 ---
+209:         }
+210: 
+211:         try {
+212:             const userDoc = await getDoc(
+213:                 doc(db, "users", user.uid)
+214:             );
+215: 
+216:             if (!userDoc.exists()) {
+217:                 window.location.href = new URL("../../login.html", import.meta.url).href;
+218:                 return;
+219:             }
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+
+--- context around line 6 ---
+2: 
+3: import {
+4:     collection,
+5:     addDoc,
+6:     getDocs,
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+
+--- context around line 9 ---
+5:     addDoc,
+6:     getDocs,
+7:     doc,
+8:     updateDoc,
+9:     getDoc,
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+14:     const user = auth.currentUser;
+15: 
+
+--- context around line 14 ---
+10:     serverTimestamp
+11: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+12: 
+13: async function getCurrentUserProfile() {
+14:     const user = auth.currentUser;
+15: 
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+
+--- context around line 20 ---
+16:     if (!user) {
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+
+--- context around line 21 ---
+17:         throw new Error("You must be signed in.");
+18:     }
+19: 
+20:     const profileSnap = await getDoc(
+21:         doc(db, "users", user.uid)
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+
+--- context around line 32 ---
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+
+--- context around line 50 ---
+46:     }
+47: 
+48:     if (
+49:         profile.role === "cooperative_admin" &&
+50:         !profile.cooperativeId
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+
+--- context around line 60 ---
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+
+--- context around line 62 ---
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+
+--- context around line 63 ---
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+
+--- context around line 113 ---
+109:     const profile =
+110:         await getCurrentUserProfile();
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+116:                 "drawGroups"
+117:             )
+118:         );
+119: 
+
+--- context around line 127 ---
+123:         const data = doc.data();
+124: 
+125:         if (
+126:             profile.role === "cooperative_admin" &&
+127:             data.cooperativeId !== profile.cooperativeId
+128:         ) {
+129:             return;
+130:         }
+131: 
+132:         groups.push({
+133:             id: doc.id,
+
+--- context around line 148 ---
+144:     const profile =
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+151:                 "drawGroups"
+152:             )
+153:         );
+154: 
+
+--- context around line 165 ---
+161:             const data = doc.data();
+162: 
+163:             if (
+164:                 profile.role === "cooperative_admin" &&
+165:                 data.cooperativeId !== profile.cooperativeId
+166:             ) {
+167:                 return;
+168:             }
+169: 
+170:             group = {
+171:                 id: doc.id,
+
+--- context around line 240 ---
+236:         groupId
+237:     );
+238: 
+239:     const groupSnap =
+240:         await getDoc(groupRef);
+241: 
+242:     if (!groupSnap.exists()) {
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+246:     }
+
+--- context around line 253 ---
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+
+MISSING: modules/contribution-draw/group-create/script.js
+
+===============================================
+FILE: js/services/memberService.js
+===============================================
+
+--- context around line 24 ---
+20: const memberRepository =
+21:     CMPRepositoryManager.get("member");
+22: 
+23: 
+24: export async function createMember(data) {
+25: 
+26:     return await memberRepository.create(data);
+27: 
+28: }
+29: 
+30: 
+
+--- context around line 26 ---
+22: 
+23: 
+24: export async function createMember(data) {
+25: 
+26:     return await memberRepository.create(data);
+27: 
+28: }
+29: 
+30: 
+31: export async function getMemberById(id) {
+32: 
+
+===============================================
+FILE: js/services/contributionService.js
+===============================================
+
+--- context around line 22 ---
+18: const contributionRepository =
+19:     CMPRepositoryManager.get("contribution");
+20: 
+21: 
+22: export async function createContribution(data) {
+23: 
+24:     return await contributionRepository.create(data);
+25: 
+26: }
+27: 
+28: 
+
+--- context around line 24 ---
+20: 
+21: 
+22: export async function createContribution(data) {
+23: 
+24:     return await contributionRepository.create(data);
+25: 
+26: }
+27: 
+28: 
+29: export async function getContributionById(id) {
+30: 
+
+===============================================
+FILE: js/repositories/memberRepository.js
+===============================================
+
+===============================================
+FILE: js/repositories/contributionRepository.js
+===============================================
+
+===============================================
+FILE: js/repositories/baseRepository.js
+===============================================
+
+===============================================
+RC393 DECISION CHECKS
+===============================================
+1. AUTHORITATIVE SOURCE:
+   Does Cooperative Admin obtain cooperativeId from users/{uid}?
+
+2. DRAW GROUP:
+   Does the actual createDrawGroup() payload contain cooperativeId?
+
+3. DRAW GROUP SERVICE:
+   Does createDrawGroup() preserve cooperativeId when writing drawGroups?
+
+4. MEMBER:
+   Does member creation obtain cooperativeId from an authoritative profile/context?
+
+5. CONTRIBUTION:
+   Does contribution creation preserve cooperativeId?
+
+6. REPOSITORY:
+   Does the repository layer enforce or merely accept cooperativeId?
+
+7. ISOLATION:
+   Is there any path where a Cooperative Admin can supply another cooperativeId directly?
+
+8. DUPLICATE OWNERSHIP:
+   Confirm no ownerId, createdByUserId, or similar duplicate ownership field is introduced.
+
+RC393 STATUS: AUDIT ONLY — NO APPLICATION FILES MODIFIED.
+===============================================
+RC393 AUDIT COMPLETE
+===============================================

@@ -23,5 +23,9 @@
   "homepage": "https://github.com/Abufauzan1206/Abufauzan-tech-cmp#readme",
   "devDependencies": {
     "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "firebase-admin": "^14.3.0"
   }
 }

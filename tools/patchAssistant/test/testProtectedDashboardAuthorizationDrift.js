@@ -52,13 +52,13 @@ check(
    ========================================= */
 
 check(
-    superAdminSource.includes("auth.currentUser"),
-    "Super Admin dashboard resolves the current Firebase user"
+    superAdminSource.includes("onAuthStateChanged(auth"),
+    "Super Admin dashboard resolves the current Firebase user through the Firebase auth-state boundary"
 );
 
 check(
-    cooperativeAdminSource.includes("auth.currentUser"),
-    "Cooperative Admin dashboard resolves the current Firebase user"
+    cooperativeAdminSource.includes("onAuthStateChanged(auth"),
+    "Cooperative Admin dashboard resolves the current Firebase user through the Firebase auth-state boundary"
 );
 
 /* =========================================

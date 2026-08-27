@@ -39,6 +39,18 @@ export class CMPMemberValidationService {
 
         }
 
+        /*
+         * RC1 OWNERSHIP CONTRACT
+         *
+         * Every cooperative member must belong to a
+         * cooperative before reaching the repository boundary.
+         */
+        if (!member.cooperativeId?.trim()) {
+            throw new Error(
+                "Member cooperative ownership is required."
+            );
+        }
+
         return true;
 
     }

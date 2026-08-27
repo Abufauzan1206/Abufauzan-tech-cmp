@@ -1,5 +1,6 @@
 import { auth, db } from "./firebase-config.js";
-import { rolesMatch } from "./components/roleAuthorization.js";
+import { enforceDashboardAccess } from "./controllers/accessController.js";
+import { buildSidebar } from "./navigation/sidebar.js";
 
 import {
     onAuthStateChanged,
@@ -13,13 +14,6 @@ import {
 
 
 function handleDashboardHistoryReentry() {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-        window.location.href = "login.html";
-        return;
-    }
-
     window.addEventListener("popstate", () => {
         window.location.reload();
     });
@@ -39,6 +33,8 @@ function handleDashboardHistoryReentry() {
 
 handleDashboardHistoryReentry();
 
+
+
 onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
@@ -48,8 +44,22 @@ onAuthStateChanged(auth, async (user) => {
 
     try {
 
+        const access =
+            await enforceDashboardAccess("cooperative_admin");
+
+        if (!access.allowed) {
+            return;
+        }
+
+        const currentUser = auth.currentUser;
+
+        if (!currentUser) {
+            window.location.href = "login.html";
+            return;
+        }
+
         const userDoc = await getDoc(
-            doc(db, "users", user.uid)
+            doc(db, "users", currentUser.uid)
         );
 
         if (!userDoc.exists()) {
@@ -59,24 +69,6 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         const userData = userDoc.data();
-
-        const allowed =
-            rolesMatch(
-                userData.role,
-                "cooperative_admin"
-            );
-
-        if (!allowed) {
-            window.location.href =
-                rolesMatch(
-                    userData.role,
-                    "super_admin"
-                )
-                    ? "super-admin.html"
-                    : "login.html";
-
-            return;
-        }
 
         const name =
             userData.name ||
@@ -89,6 +81,16 @@ onAuthStateChanged(auth, async (user) => {
 
         if (nameElement) {
             nameElement.textContent = name;
+        }
+
+        const sidebar =
+            document.getElementById("sidebarMenu");
+
+        if (sidebar) {
+            buildSidebar(
+                "sidebarMenu",
+                userData.role
+            );
         }
 
     } catch (error) {

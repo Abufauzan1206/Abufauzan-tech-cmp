@@ -31,19 +31,22 @@ try {
             firstName: "RC212-A",
             lastName: "RegressionMember",
             phone: "08000000212",
-            email: "rc212a@test.local"
+            email: "rc212a@test.local",
+            cooperativeId: "RC212-TEST-COOPERATIVE"
         },
         {
             firstName: "RC212-B",
             lastName: "RegressionMember",
             phone: "08000000213",
-            email: "rc212b@test.local"
+            email: "rc212b@test.local",
+            cooperativeId: "RC212-TEST-COOPERATIVE"
         },
         {
             firstName: "RC212-C",
             lastName: "RegressionMember",
             phone: "08000000214",
-            email: "rc212c@test.local"
+            email: "rc212c@test.local",
+            cooperativeId: "RC212-TEST-COOPERATIVE"
         }
     ];
 

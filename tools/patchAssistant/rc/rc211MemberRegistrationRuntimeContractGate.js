@@ -43,7 +43,8 @@ try {
         firstName: "RC211",
         lastName: "RuntimeMember",
         phone: "08000000211",
-        email: "rc211@test.local"
+        email: "rc211@test.local",
+        cooperativeId: "RC211-TEST-COOPERATIVE"
     });
 
     console.log("Registered Member:");
@@ -139,6 +140,7 @@ try {
         lastName: "RuntimeMember",
         phone: "08000000211",
         email: "rc211@test.local",
+        cooperativeId: "RC211-TEST-COOPERATIVE",
         status: "active"
     };
 

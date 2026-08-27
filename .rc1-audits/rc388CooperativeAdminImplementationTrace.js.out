@@ -1,0 +1,179 @@
+
+===============================================
+RC388 COOPERATIVE ADMIN IMPLEMENTATION TRACE
+===============================================
+
+===============================================
+FULL js/cooperative-admin.js
+===============================================
+1: import { auth, db } from "./firebase-config.js";
+2: import { rolesMatch } from "./components/roleAuthorization.js";
+3: import { buildSidebar } from "./navigation/sidebar.js";
+4: 
+5: import {
+6:     onAuthStateChanged,
+7:     signOut
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+13: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+14: 
+15: 
+16: function handleDashboardHistoryReentry() {
+17:     window.addEventListener("popstate", () => {
+18:         window.location.reload();
+19:     });
+20: 
+21:     window.addEventListener("pageshow", (event) => {
+22:         if (event.persisted) {
+23:             window.location.reload();
+24:         }
+25:     });
+26: 
+27:     window.addEventListener("visibilitychange", () => {
+28:         if (document.visibilityState === "visible") {
+29:             window.location.reload();
+30:         }
+31:     });
+32: }
+33: 
+34: handleDashboardHistoryReentry();
+35: 
+36: const dashboardRole = "cooperative_admin";
+37: 
+38: onAuthStateChanged(auth, async (user) => {
+39: 
+40:     if (!user) {
+41:         window.location.href = "login.html";
+42:         return;
+43:     }
+44: 
+45:     try {
+46: 
+47:         const currentUser = auth.currentUser;
+48: 
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+74:                 rolesMatch(
+75:                     userData.role,
+76:                     "super_admin"
+77:                 )
+78:                     ? "super-admin.html"
+79:                     : "login.html";
+80: 
+81:             return;
+82:         }
+83: 
+84:         const name =
+85:             userData.name ||
+86:             userData.displayName ||
+87:             user.email ||
+88:             "Cooperative Administrator";
+89: 
+90:         const nameElement =
+91:             document.getElementById("adminName");
+92: 
+93:         if (nameElement) {
+94:             nameElement.textContent = name;
+95:         }
+96: 
+97:         const sidebar = document.getElementById("sidebarMenu");
+98:         if (sidebar) {
+99:             buildSidebar("sidebarMenu", userData.role);
+100:         }
+101: 
+102:     } catch (error) {
+103: 
+104:         console.error(
+105:             "Cooperative Admin authentication error:",
+106:             error
+107:         );
+108: 
+109:         window.location.href = "login.html";
+110:     }
+111: 
+112: });
+113: 
+114: 
+115: const logoutBtn =
+116:     document.getElementById("logoutBtn");
+117: 
+118: if (logoutBtn) {
+119: 
+120:     logoutBtn.addEventListener(
+121:         "click",
+122:         async () => {
+123: 
+124:             await signOut(auth);
+125: 
+126:             window.location.href =
+127:                 "login.html";
+128: 
+129:         }
+130:     );
+131: 
+132: }
+133: 
+
+===============================================
+RC388 TARGETED OWNERSHIP TRACE
+===============================================
+2: import { rolesMatch } from "./components/roleAuthorization.js";
+6:     onAuthStateChanged,
+36: const dashboardRole = "cooperative_admin";
+38: onAuthStateChanged(auth, async (user) => {
+47:         const currentUser = auth.currentUser;
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+64:         const userData = userDoc.data();
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+74:                 rolesMatch(
+75:                     userData.role,
+85:             userData.name ||
+86:             userData.displayName ||
+88:             "Cooperative Administrator";
+99:             buildSidebar("sidebarMenu", userData.role);
+105:             "Cooperative Admin authentication error:",
+
+===============================================
+RC388 DECISION
+===============================================
+IDENTIFY THE EXACT PROFILE OBJECT USED BY THE COOPERATIVE ADMIN DASHBOARD.
+IDENTIFY WHETHER THAT PROFILE OBJECT CONTAINS cooperativeId.
+IDENTIFY WHETHER cooperativeId IS STORED IN AN EXISTING DASHBOARD STATE, VARIABLE, OR PROFILE OBJECT.
+TRACE WHETHER THE CREATE-GROUP MODULE CAN REUSE THAT AUTHORITATIVE SOURCE.
+DO NOT CREATE ownerId, createdByUserId, OR ANY DUPLICATE OWNERSHIP FIELD.
+DO NOT DERIVE cooperativeId FROM uid, groupId, memberId, OR adminId.
+DO NOT MODIFY createDrawGroup() OR FIRESTORE RULES YET.
+RC388 STATUS: AUDIT ONLY — NO FILES MODIFIED.
+
+===============================================
+RC388 AUDIT COMPLETE
+===============================================

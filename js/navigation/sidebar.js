@@ -1,107 +1,236 @@
-import { menuData } from "./menu-data.js";
+import { auth, db } from "../firebase-config.js";
+import { rolesMatch } from "../components/roleAuthorization.js";
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-export function buildSidebar(containerId) {
+function getDashboardUrl(role) {
+    if (rolesMatch(role, "super_admin")) {
+        return "super-admin.html";
+    }
 
-    const container =
-    document.getElementById(
-        containerId
-    );
+    if (rolesMatch(role, "cooperative_admin")) {
+        return "cooperative-admin.html";
+    }
 
-    if (!container) return;
+    if (rolesMatch(role, "member")) {
+        return "modules/member-portal/index.html";
+    }
+
+    return "login.html";
+}
+
+function getMenuItems(role) {
+    if (rolesMatch(role, "super_admin")) {
+        return [
+            {
+                title: "Register Cooperative",
+                icon: "🏢",
+                url: "register-cooperative.html"
+            },
+            {
+                title: "Cooperatives",
+                icon: "🏢",
+                url: "#"
+            },
+            {
+                title: "Members",
+                icon: "👥",
+                url: "modules/members/index.html"
+            },
+            {
+                title: "Contributions",
+                icon: "💰",
+                url: "modules/contributions/index.html"
+            },
+            {
+                title: "Contribution Draw",
+                icon: "🎲",
+                url: "modules/contribution-draw/index.html"
+            },
+            {
+                title: "Loans",
+                icon: "🏦",
+                url: "modules/loans/loan-directory/index.html"
+            },
+            {
+                title: "Welfare",
+                icon: "❤️",
+                url: "modules/welfare/index.html"
+            },
+            {
+                title: "Investments",
+                icon: "📈",
+                url: "#"
+            },
+            {
+                title: "Marketplace",
+                icon: "🛒",
+                url: "#"
+            },
+            {
+                title: "Reports",
+                icon: "📊",
+                url: "#"
+            },
+            {
+                title: "Users",
+                icon: "👤",
+                url: "#"
+            },
+            {
+                title: "Settings",
+                icon: "⚙️",
+                url: "#"
+            }
+        ];
+    }
+
+    if (rolesMatch(role, "cooperative_admin")) {
+        return [
+            {
+                title: "Members",
+                icon: "👥",
+                url: "modules/members/index.html"
+            },
+            {
+                title: "Contributions",
+                icon: "💰",
+                url: "modules/contributions/index.html"
+            },
+            {
+                title: "Loans",
+                icon: "🏦",
+                url: "modules/loans/loan-directory/index.html"
+            },
+            {
+                title: "Welfare",
+                icon: "❤️",
+                url: "modules/welfare/index.html"
+            },
+            {
+                title: "Reports",
+                icon: "📊",
+                url: "#"
+            },
+            {
+                title: "Settings",
+                icon: "⚙️",
+                url: "#"
+            }
+        ];
+    }
+
+    if (rolesMatch(role, "member")) {
+        return [
+            {
+                title: "My Profile",
+                icon: "👤",
+                url: "modules/members/member-profile/index.html"
+            },
+            {
+                title: "My Contributions",
+                icon: "💰",
+                url: "modules/contributions/index.html"
+            },
+            {
+                title: "My Loans",
+                icon: "🏦",
+                url: "modules/loans/loan-directory/index.html"
+            },
+            {
+                title: "Welfare",
+                icon: "❤️",
+                url: "modules/welfare/welfare-directory/index.html"
+            },
+            {
+                title: "Statements",
+                icon: "📄",
+                url: "#",
+                disabled: true
+            }
+        ];
+    }
+
+    return [];
+}
+
+export function buildSidebar(containerId, role = null) {
+    const container = document.getElementById(containerId);
+
+    if (!container) {
+        return;
+    }
 
     container.innerHTML = "";
 
-    menuData.forEach(menu => {
+    const dashboardLink = document.createElement("a");
 
-        if (menu.children) {
+    dashboardLink.href = getDashboardUrl(role);
+    dashboardLink.textContent = "🏠 Dashboard";
+    dashboardLink.className = "sidebar-link";
 
-            const parent =
-            document.createElement("div");
+    container.appendChild(dashboardLink);
 
-            parent.className =
-            "sidebar-parent";
+    const menuItems = getMenuItems(role);
 
-            parent.innerHTML =
-            `${menu.icon} ${menu.title}`;
+    menuItems.forEach(menu => {
+        const link = document.createElement("a");
 
-            const subMenu =
-            document.createElement("div");
+        link.textContent = `${menu.icon} ${menu.title}`;
+        link.className = "sidebar-link";
 
-            subMenu.style.display =
-            "none";
+        if (menu.disabled || menu.url === "#") {
+            link.href = "#";
+            link.classList.add("disabled");
+            link.setAttribute("aria-disabled", "true");
+            link.title = "Coming Soon";
 
-            menu.children.forEach(
-                child => {
-
-                    const link =
-                    document.createElement("a");
-
-                    link.href =
-                    child.url;
-
-                    link.textContent =
-                    child.icon +
-                    " " +
-                    child.title;
-
-                    link.className =
-                    "sidebar-link";
-
-                    subMenu.appendChild(
-                        link
-                    );
-
-                }
-            );
-
-            parent.addEventListener(
-                "click",
-
-                () => {
-
-                    subMenu.style.display =
-
-                    subMenu.style.display ===
-                    "none"
-
-                    ? "block"
-
-                    : "none";
-
-                }
-
-            );
-
-            container.appendChild(
-                parent
-            );
-
-            container.appendChild(
-                subMenu
-            );
-
+            link.addEventListener("click", event => {
+                event.preventDefault();
+            });
         } else {
-
-            const link =
-            document.createElement("a");
-
-            link.href =
-            menu.url;
-
-            link.textContent =
-            menu.icon +
-            " " +
-            menu.title;
-
-            link.className =
-            "sidebar-link";
-
-            container.appendChild(
-                link
-            );
-
+            link.href = menu.url;
         }
 
+        container.appendChild(link);
     });
+}
 
+export function buildAuthenticatedSidebar(containerId) {
+    onAuthStateChanged(auth, async user => {
+        if (!user) {
+            window.location.href = new URL("../../login.html", import.meta.url).href;
+            return;
+        }
+
+        try {
+            const userDoc = await getDoc(
+                doc(db, "users", user.uid)
+            );
+
+            if (!userDoc.exists()) {
+                window.location.href = new URL("../../login.html", import.meta.url).href;
+                return;
+            }
+
+            const userData = userDoc.data();
+
+            buildSidebar(
+                containerId,
+                userData.role
+            );
+        } catch (error) {
+            console.error(
+                "Sidebar authentication error:",
+                error
+            );
+
+            window.location.href = new URL("../../login.html", import.meta.url).href;
+        }
+    });
 }

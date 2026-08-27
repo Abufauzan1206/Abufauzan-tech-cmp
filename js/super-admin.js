@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { rolesMatch } from "./components/roleAuthorization.js";
+import { enforceDashboardAccess } from "./controllers/accessController.js";
 
 
 
@@ -42,6 +42,12 @@ function handleDashboardHistoryReentry() {
             window.location.reload();
         }
     });
+
+    window.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            window.location.reload();
+        }
+    });
 }
 
 handleDashboardHistoryReentry();
@@ -55,29 +61,12 @@ onAuthStateChanged(auth, async (user) => {
 
     try {
 
-        const userDoc = await getDoc(
-            doc(db, "users", user.uid)
-        );
+        const access =
+            await enforceDashboardAccess();
 
-        if (!userDoc.exists()) {
-            await signOut(auth);
-            window.location.href = "login.html";
+        if (!access.allowed) {
             return;
         }
-
-        const userData = userDoc.data();
-
-        if (!rolesMatch(userData.role, "super_admin")) {
-
-            window.location.href =
-                rolesMatch(userData.role, "cooperative_admin")
-                    ? "cooperative-admin.html"
-                    : "login.html";
-
-            return;
-        }
-
-
 
     } catch (error) {
 

@@ -14,8 +14,7 @@ import { CMPHealthService } from "./healthService.js";
 import { CMPFrameworkDiagnostics }
     from "./frameworkDiagnostics.js";
     
-    import { CMPFrameworkDiagnostics }
-    from "./frameworkDiagnostics.js";
+
 
 export class CMPFrameworkInitializer {
 

@@ -1,0 +1,3199 @@
+
+===============================================
+RC391 ACTUAL CREATE-GROUP CALLER + PAYLOAD TRACE
+===============================================
+
+===============================================
+FILE: js/auth.js
+===============================================
+20: 
+21:     const email = document.getElementById("email").value.trim();
+22:     const password = document.getElementById("password").value;
+23: 
+24:     try {
+25: 
+26:       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+27: 
+28:       const uid = userCredential.user.uid;
+29: 
+30:       const userDoc = await getDoc(doc(db, "users", uid));
+31: 
+32:       if (!userDoc.exists()) {
+33:         alert("User profile not found.");
+34:         return;
+35:       }
+36: 
+37:       const userData = userDoc.data();
+38: 
+39:       alert("Login successful!");
+40: 
+
+===============================================
+FILE: js/auth.js
+===============================================
+22:     const password = document.getElementById("password").value;
+23: 
+24:     try {
+25: 
+26:       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+27: 
+28:       const uid = userCredential.user.uid;
+29: 
+30:       const userDoc = await getDoc(doc(db, "users", uid));
+31: 
+32:       if (!userDoc.exists()) {
+33:         alert("User profile not found.");
+34:         return;
+35:       }
+36: 
+37:       const userData = userDoc.data();
+38: 
+39:       alert("Login successful!");
+40: 
+41:       if (
+42:             rolesMatch(userData.role, "super_admin")
+
+===============================================
+FILE: js/auth.js
+===============================================
+27: 
+28:       const uid = userCredential.user.uid;
+29: 
+30:       const userDoc = await getDoc(doc(db, "users", uid));
+31: 
+32:       if (!userDoc.exists()) {
+33:         alert("User profile not found.");
+34:         return;
+35:       }
+36: 
+37:       const userData = userDoc.data();
+38: 
+39:       alert("Login successful!");
+40: 
+41:       if (
+42:             rolesMatch(userData.role, "super_admin")
+43:         ) {
+44:             window.location.href = "super-admin.html";
+45:         } else if (
+46:             rolesMatch(userData.role, "cooperative_admin")
+47:         ) {
+
+===============================================
+FILE: js/auth.js
+===============================================
+32:       if (!userDoc.exists()) {
+33:         alert("User profile not found.");
+34:         return;
+35:       }
+36: 
+37:       const userData = userDoc.data();
+38: 
+39:       alert("Login successful!");
+40: 
+41:       if (
+42:             rolesMatch(userData.role, "super_admin")
+43:         ) {
+44:             window.location.href = "super-admin.html";
+45:         } else if (
+46:             rolesMatch(userData.role, "cooperative_admin")
+47:         ) {
+48:             window.location.href = "cooperative-admin.html";
+49:         } else if (
+50:             rolesMatch(userData.role, "member")
+51:         ) {
+52:             window.location.href = "modules/member-portal/index.html";
+
+===============================================
+FILE: js/auth.js
+===============================================
+36: 
+37:       const userData = userDoc.data();
+38: 
+39:       alert("Login successful!");
+40: 
+41:       if (
+42:             rolesMatch(userData.role, "super_admin")
+43:         ) {
+44:             window.location.href = "super-admin.html";
+45:         } else if (
+46:             rolesMatch(userData.role, "cooperative_admin")
+47:         ) {
+48:             window.location.href = "cooperative-admin.html";
+49:         } else if (
+50:             rolesMatch(userData.role, "member")
+51:         ) {
+52:             window.location.href = "modules/member-portal/index.html";
+53:         } else {
+54:             alert("Unsupported user role: " + userData.role);
+55:         }
+56: 
+
+===============================================
+FILE: js/auth.js
+===============================================
+40: 
+41:       if (
+42:             rolesMatch(userData.role, "super_admin")
+43:         ) {
+44:             window.location.href = "super-admin.html";
+45:         } else if (
+46:             rolesMatch(userData.role, "cooperative_admin")
+47:         ) {
+48:             window.location.href = "cooperative-admin.html";
+49:         } else if (
+50:             rolesMatch(userData.role, "member")
+51:         ) {
+52:             window.location.href = "modules/member-portal/index.html";
+53:         } else {
+54:             alert("Unsupported user role: " + userData.role);
+55:         }
+56: 
+57:     } catch (error) {
+58: 
+59:       alert(error.message);
+60: 
+
+===============================================
+FILE: js/auth.js
+===============================================
+44:             window.location.href = "super-admin.html";
+45:         } else if (
+46:             rolesMatch(userData.role, "cooperative_admin")
+47:         ) {
+48:             window.location.href = "cooperative-admin.html";
+49:         } else if (
+50:             rolesMatch(userData.role, "member")
+51:         ) {
+52:             window.location.href = "modules/member-portal/index.html";
+53:         } else {
+54:             alert("Unsupported user role: " + userData.role);
+55:         }
+56: 
+57:     } catch (error) {
+58: 
+59:       alert(error.message);
+60: 
+61:     }
+62: 
+63:   });
+64: 
+
+===============================================
+FILE: js/business/contributionEngine.js
+===============================================
+18:  * Record a contribution
+19:  */
+20: static create(contribution) {
+21: 
+22:         if (!contribution?.memberId) {
+23:             throw new Error(
+24:                 "Contribution member ownership is required."
+25:             );
+26:         }
+27: 
+28:         if (!contribution?.cooperativeId) {
+29:             throw new Error(
+30:                 "Contribution cooperative ownership is required."
+31:             );
+32:         }
+33: 
+34:         const newContribution = {
+35:             contributionId:
+36:                 CMPIdService.generate("CON"),
+37:             createdAt:
+38:                 new Date(),
+
+===============================================
+FILE: js/business/memberValidationService.js
+===============================================
+38:             );
+39: 
+40:         }
+41: 
+42:         /*
+43:          * RC1 OWNERSHIP CONTRACT
+44:          *
+45:          * Every cooperative member must belong to a
+46:          * cooperative before reaching the repository boundary.
+47:          */
+48:         if (!member.cooperativeId?.trim()) {
+49:             throw new Error(
+50:                 "Member cooperative ownership is required."
+51:             );
+52:         }
+53: 
+54:         return true;
+55: 
+56:     }
+57: 
+58: }
+
+===============================================
+FILE: js/components/auth.js
+===============================================
+7:  * =====================================================
+8:  */
+9: 
+10: import { auth } from "../firebase-config.js";
+11: import {
+12:     normalizeRole,
+13:     rolesMatch
+14: } from "./roleAuthorization.js";
+15: 
+16: import {
+17:   onAuthStateChanged,
+18:   signOut
+19: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+20: 
+21: export class CMPAuth {
+22:   
+23:   static role = null;
+24:   
+25:   static permissions = [];
+26: 
+27:   static currentUser() {
+
+===============================================
+FILE: js/components/auth.js
+===============================================
+25:   static permissions = [];
+26: 
+27:   static currentUser() {
+28: 
+29:     return auth.currentUser;
+30: 
+31:   }
+32:   
+33:   static onChange(callback) {
+34: 
+35:   return onAuthStateChanged(
+36: 
+37:     auth,
+38: 
+39:     callback
+40: 
+41:   );
+42: 
+43: }
+44: 
+45: static setRole(role) {
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+1: import { auth, db } from "./firebase-config.js";
+2: import { rolesMatch } from "./components/roleAuthorization.js";
+3: import { buildSidebar } from "./navigation/sidebar.js";
+4: 
+5: import {
+6:     onAuthStateChanged,
+7:     signOut
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+13: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+14: 
+15: 
+16: function handleDashboardHistoryReentry() {
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+28:         if (document.visibilityState === "visible") {
+29:             window.location.reload();
+30:         }
+31:     });
+32: }
+33: 
+34: handleDashboardHistoryReentry();
+35: 
+36: const dashboardRole = "cooperative_admin";
+37: 
+38: onAuthStateChanged(auth, async (user) => {
+39: 
+40:     if (!user) {
+41:         window.location.href = "login.html";
+42:         return;
+43:     }
+44: 
+45:     try {
+46: 
+47:         const currentUser = auth.currentUser;
+48: 
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+44: 
+45:     try {
+46: 
+47:         const currentUser = auth.currentUser;
+48: 
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+48: 
+49:         if (!currentUser) {
+50:             window.location.href = "login.html";
+51:             return;
+52:         }
+53: 
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+54:         const userDoc = await getDoc(
+55:             doc(db, "users", currentUser.uid)
+56:         );
+57: 
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+74:                 rolesMatch(
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+58:         if (!userDoc.exists()) {
+59:             await signOut(auth);
+60:             window.location.href = "login.html";
+61:             return;
+62:         }
+63: 
+64:         const userData = userDoc.data();
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+74:                 rolesMatch(
+75:                     userData.role,
+76:                     "super_admin"
+77:                 )
+78:                     ? "super-admin.html"
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+65: 
+66:         const allowed =
+67:             rolesMatch(
+68:                 userData.role,
+69:                 "cooperative_admin"
+70:             );
+71: 
+72:         if (!allowed) {
+73:             window.location.href =
+74:                 rolesMatch(
+75:                     userData.role,
+76:                     "super_admin"
+77:                 )
+78:                     ? "super-admin.html"
+79:                     : "login.html";
+80: 
+81:             return;
+82:         }
+83: 
+84:         const name =
+85:             userData.name ||
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+75:                     userData.role,
+76:                     "super_admin"
+77:                 )
+78:                     ? "super-admin.html"
+79:                     : "login.html";
+80: 
+81:             return;
+82:         }
+83: 
+84:         const name =
+85:             userData.name ||
+86:             userData.displayName ||
+87:             user.email ||
+88:             "Cooperative Administrator";
+89: 
+90:         const nameElement =
+91:             document.getElementById("adminName");
+92: 
+93:         if (nameElement) {
+94:             nameElement.textContent = name;
+95:         }
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+76:                     "super_admin"
+77:                 )
+78:                     ? "super-admin.html"
+79:                     : "login.html";
+80: 
+81:             return;
+82:         }
+83: 
+84:         const name =
+85:             userData.name ||
+86:             userData.displayName ||
+87:             user.email ||
+88:             "Cooperative Administrator";
+89: 
+90:         const nameElement =
+91:             document.getElementById("adminName");
+92: 
+93:         if (nameElement) {
+94:             nameElement.textContent = name;
+95:         }
+96: 
+
+===============================================
+FILE: js/cooperative-admin.js
+===============================================
+89: 
+90:         const nameElement =
+91:             document.getElementById("adminName");
+92: 
+93:         if (nameElement) {
+94:             nameElement.textContent = name;
+95:         }
+96: 
+97:         const sidebar = document.getElementById("sidebarMenu");
+98:         if (sidebar) {
+99:             buildSidebar("sidebarMenu", userData.role);
+100:         }
+101: 
+102:     } catch (error) {
+103: 
+104:         console.error(
+105:             "Cooperative Admin authentication error:",
+106:             error
+107:         );
+108: 
+109:         window.location.href = "login.html";
+
+===============================================
+FILE: js/navigation/sidebar.js
+===============================================
+1: import { auth, db } from "../firebase-config.js";
+2: import { rolesMatch } from "../components/roleAuthorization.js";
+3: import {
+4:     onAuthStateChanged
+5: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+6: import {
+7:     doc,
+8:     getDoc
+9: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+10: 
+11: function getDashboardUrl(role) {
+12:     if (rolesMatch(role, "super_admin")) {
+13:         return "super-admin.html";
+14:     }
+
+===============================================
+FILE: js/navigation/sidebar.js
+===============================================
+195:             });
+196:         } else {
+197:             link.href = menu.url;
+198:         }
+199: 
+200:         container.appendChild(link);
+201:     });
+202: }
+203: 
+204: export function buildAuthenticatedSidebar(containerId) {
+205:     onAuthStateChanged(auth, async user => {
+206:         if (!user) {
+207:             window.location.href = new URL("../../login.html", import.meta.url).href;
+208:             return;
+209:         }
+210: 
+211:         try {
+212:             const userDoc = await getDoc(
+213:                 doc(db, "users", user.uid)
+214:             );
+215: 
+
+===============================================
+FILE: js/navigation/sidebar.js
+===============================================
+202: }
+203: 
+204: export function buildAuthenticatedSidebar(containerId) {
+205:     onAuthStateChanged(auth, async user => {
+206:         if (!user) {
+207:             window.location.href = new URL("../../login.html", import.meta.url).href;
+208:             return;
+209:         }
+210: 
+211:         try {
+212:             const userDoc = await getDoc(
+213:                 doc(db, "users", user.uid)
+214:             );
+215: 
+216:             if (!userDoc.exists()) {
+217:                 window.location.href = new URL("../../login.html", import.meta.url).href;
+218:                 return;
+219:             }
+220: 
+221:             const userData = userDoc.data();
+222: 
+
+===============================================
+FILE: js/navigation/sidebar.js
+===============================================
+206:         if (!user) {
+207:             window.location.href = new URL("../../login.html", import.meta.url).href;
+208:             return;
+209:         }
+210: 
+211:         try {
+212:             const userDoc = await getDoc(
+213:                 doc(db, "users", user.uid)
+214:             );
+215: 
+216:             if (!userDoc.exists()) {
+217:                 window.location.href = new URL("../../login.html", import.meta.url).href;
+218:                 return;
+219:             }
+220: 
+221:             const userData = userDoc.data();
+222: 
+223:             buildSidebar(
+224:                 containerId,
+225:                 userData.role
+226:             );
+
+===============================================
+FILE: js/navigation/sidebar.js
+===============================================
+211:         try {
+212:             const userDoc = await getDoc(
+213:                 doc(db, "users", user.uid)
+214:             );
+215: 
+216:             if (!userDoc.exists()) {
+217:                 window.location.href = new URL("../../login.html", import.meta.url).href;
+218:                 return;
+219:             }
+220: 
+221:             const userData = userDoc.data();
+222: 
+223:             buildSidebar(
+224:                 containerId,
+225:                 userData.role
+226:             );
+227:         } catch (error) {
+228:             console.error(
+229:                 "Sidebar authentication error:",
+230:                 error
+231:             );
+
+===============================================
+FILE: js/navigation/sidebar.js
+===============================================
+215: 
+216:             if (!userDoc.exists()) {
+217:                 window.location.href = new URL("../../login.html", import.meta.url).href;
+218:                 return;
+219:             }
+220: 
+221:             const userData = userDoc.data();
+222: 
+223:             buildSidebar(
+224:                 containerId,
+225:                 userData.role
+226:             );
+227:         } catch (error) {
+228:             console.error(
+229:                 "Sidebar authentication error:",
+230:                 error
+231:             );
+232: 
+233:             window.location.href = new URL("../../login.html", import.meta.url).href;
+234:         }
+235:     });
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+22:     );
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+40:         profile.role !== "super_admin" &&
+41:         profile.role !== "cooperative_admin"
+42:     ) {
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+23: 
+24:     if (!profileSnap.exists()) {
+25:         throw new Error("User profile not found.");
+26:     }
+27: 
+28:     return profileSnap.data();
+29: }
+30: 
+31: 
+32: export async function createDrawGroup(
+33:     groupData
+34: ) {
+35: 
+36:     const profile =
+37:         await getCurrentUserProfile();
+38: 
+39:     if (
+40:         profile.role !== "super_admin" &&
+41:         profile.role !== "cooperative_admin"
+42:     ) {
+43:         throw new Error(
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+40:         profile.role !== "super_admin" &&
+41:         profile.role !== "cooperative_admin"
+42:     ) {
+43:         throw new Error(
+44:             "Only authorized administrators can create draw groups."
+45:         );
+46:     }
+47: 
+48:     if (
+49:         profile.role === "cooperative_admin" &&
+50:         !profile.cooperativeId
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+47: 
+48:     if (
+49:         profile.role === "cooperative_admin" &&
+50:         !profile.cooperativeId
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+50:         !profile.cooperativeId
+51:     ) {
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+52:         throw new Error(
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+53:             "Cooperative administrator has no cooperative ownership."
+54:         );
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+55:     }
+56: 
+57:     groupData.status =
+58:         "Draft";
+59: 
+60:     groupData.cooperativeId =
+61:         profile.role === "cooperative_admin"
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+62:             ? profile.cooperativeId
+63:             : groupData.cooperativeId ?? null;
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+80: export async function getDrawGroups() {
+81:     if (typeof status !== "string") {
+82:         throw new Error(
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+64: 
+65:     groupData.createdAt =
+66:         serverTimestamp();
+67: 
+68:     const docRef =
+69:         await addDoc(
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+80: export async function getDrawGroups() {
+81:     if (typeof status !== "string") {
+82:         throw new Error(
+83:             "Invalid draw group status."
+84:         );
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+70:             collection(
+71:                 db,
+72:                 "drawGroups"
+73:             ),
+74:             groupData
+75:         );
+76: 
+77:     return docRef.id;
+78: }
+79: 
+80: export async function getDrawGroups() {
+81:     if (typeof status !== "string") {
+82:         throw new Error(
+83:             "Invalid draw group status."
+84:         );
+85:     }
+86: 
+87:     if (status.trim().length === 0) {
+88:         throw new Error(
+89:             "Invalid draw group status."
+90:         );
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+83:             "Invalid draw group status."
+84:         );
+85:     }
+86: 
+87:     if (status.trim().length === 0) {
+88:         throw new Error(
+89:             "Invalid draw group status."
+90:         );
+91:     }
+92: 
+93:     const validDrawGroupStatuses = [
+94:         "Draft"
+95:     ];
+96: 
+97:     if (
+98:         !validDrawGroupStatuses.includes(
+99:             status.trim()
+100:         )
+101:     ) {
+102:         throw new Error(
+103:             "Invalid draw group status."
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+88:         throw new Error(
+89:             "Invalid draw group status."
+90:         );
+91:     }
+92: 
+93:     const validDrawGroupStatuses = [
+94:         "Draft"
+95:     ];
+96: 
+97:     if (
+98:         !validDrawGroupStatuses.includes(
+99:             status.trim()
+100:         )
+101:     ) {
+102:         throw new Error(
+103:             "Invalid draw group status."
+104:         );
+105:     }
+106: 
+107:     status = status.trim();
+108: 
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+106: 
+107:     status = status.trim();
+108: 
+109:     const profile =
+110:         await getCurrentUserProfile();
+111: 
+112:     const snapshot =
+113:         await getDocs(
+114:             collection(
+115:                 db,
+116:                 "drawGroups"
+117:             )
+118:         );
+119: 
+120:     const groups = [];
+121: 
+122:     snapshot.forEach(doc => {
+123:         const data = doc.data();
+124: 
+125:         if (
+126:             profile.role === "cooperative_admin" &&
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+117:             )
+118:         );
+119: 
+120:     const groups = [];
+121: 
+122:     snapshot.forEach(doc => {
+123:         const data = doc.data();
+124: 
+125:         if (
+126:             profile.role === "cooperative_admin" &&
+127:             data.cooperativeId !== profile.cooperativeId
+128:         ) {
+129:             return;
+130:         }
+131: 
+132:         groups.push({
+133:             id: doc.id,
+134:             ...data
+135:         });
+136:     });
+137: 
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+141: export async function getDrawGroupById(
+142:     groupId
+143: ) {
+144:     const profile =
+145:         await getCurrentUserProfile();
+146: 
+147:     const snapshot =
+148:         await getDocs(
+149:             collection(
+150:                 db,
+151:                 "drawGroups"
+152:             )
+153:         );
+154: 
+155:     let group = null;
+156: 
+157:     snapshot.forEach(doc => {
+158:         if (
+159:             doc.id === groupId
+160:         ) {
+161:             const data = doc.data();
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+155:     let group = null;
+156: 
+157:     snapshot.forEach(doc => {
+158:         if (
+159:             doc.id === groupId
+160:         ) {
+161:             const data = doc.data();
+162: 
+163:             if (
+164:                 profile.role === "cooperative_admin" &&
+165:                 data.cooperativeId !== profile.cooperativeId
+166:             ) {
+167:                 return;
+168:             }
+169: 
+170:             group = {
+171:                 id: doc.id,
+172:                 ...data
+173:             };
+174:         }
+175:     });
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+193:             "Invalid draw group status."
+194:         );
+195:     }
+196: 
+197:     if (status.trim().length === 0) {
+198:         throw new Error(
+199:             "Invalid draw group status."
+200:         );
+201:     }
+202: 
+203:     const validDrawGroupStatuses = [
+204:         "Draft"
+205:     ];
+206: 
+207:     if (
+208:         !validDrawGroupStatuses.includes(
+209:             status.trim()
+210:         )
+211:     ) {
+212:         throw new Error(
+213:             "Invalid draw group status."
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+198:         throw new Error(
+199:             "Invalid draw group status."
+200:         );
+201:     }
+202: 
+203:     const validDrawGroupStatuses = [
+204:         "Draft"
+205:     ];
+206: 
+207:     if (
+208:         !validDrawGroupStatuses.includes(
+209:             status.trim()
+210:         )
+211:     ) {
+212:         throw new Error(
+213:             "Invalid draw group status."
+214:         );
+215:     }
+216: 
+217:     status = status.trim();
+218: 
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+225:         profile.role !== "super_admin" &&
+226:         profile.role !== "cooperative_admin"
+227:     ) {
+228:         throw new Error(
+229:             "Unauthorized: only authorized administrators can update draw group status."
+230:         );
+231:     }
+232: 
+233:     const groupRef = doc(
+234:         db,
+235:         "drawGroups",
+236:         groupId
+237:     );
+238: 
+239:     const groupSnap =
+240:         await getDoc(groupRef);
+241: 
+242:     if (!groupSnap.exists()) {
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+238: 
+239:     const groupSnap =
+240:         await getDoc(groupRef);
+241: 
+242:     if (!groupSnap.exists()) {
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+246:     }
+247: 
+248:     const groupData =
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+243:         throw new Error(
+244:             "Draw group not found."
+245:         );
+246:     }
+247: 
+248:     const groupData =
+249:         groupSnap.data();
+250: 
+251:     if (
+252:         profile.role === "cooperative_admin" &&
+253:         groupData.cooperativeId !== profile.cooperativeId
+254:     ) {
+255:         throw new Error(
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+260:     await updateDoc(
+261: 
+262:         doc(
+263: 
+
+===============================================
+FILE: js/services/drawGroupService.js
+===============================================
+256:             "Cooperative administrator cannot update a draw group owned by another cooperative."
+257:         );
+258:     }
+259: 
+260:     await updateDoc(
+261: 
+262:         doc(
+263: 
+264:             db,
+265: 
+266:             "drawGroups",
+267: 
+268:             groupId
+269: 
+270:         ),
+271: 
+272:         {
+273: 
+274:             status
+275: 
+276:         }
+
+===============================================
+FILE: js/services/loanService.js
+===============================================
+42: 
+43:     if (!profile.memberId) {
+44:         throw new Error(
+45:             "Authenticated member profile has no memberId."
+46:         );
+47:     }
+48: 
+49:     const ownedLoanData = {
+50:         ...loanData,
+51:         memberId: profile.memberId,
+52:         cooperativeId:
+53:             profile.cooperativeId ?? null,
+54:         status: "Pending",
+55:         createdAt: serverTimestamp()
+56:     };
+57: 
+58:     const docRef = await addDoc(
+59:         collection(db, "loans"),
+60:         ownedLoanData
+61:     );
+62: 
+
+===============================================
+FILE: js/services/loanService.js
+===============================================
+43:     if (!profile.memberId) {
+44:         throw new Error(
+45:             "Authenticated member profile has no memberId."
+46:         );
+47:     }
+48: 
+49:     const ownedLoanData = {
+50:         ...loanData,
+51:         memberId: profile.memberId,
+52:         cooperativeId:
+53:             profile.cooperativeId ?? null,
+54:         status: "Pending",
+55:         createdAt: serverTimestamp()
+56:     };
+57: 
+58:     const docRef = await addDoc(
+59:         collection(db, "loans"),
+60:         ownedLoanData
+61:     );
+62: 
+63:     return docRef.id;
+
+===============================================
+FILE: js/services/welfareService.js
+===============================================
+41: 
+42:     if (!profile.memberId) {
+43:         throw new Error(
+44:             "Authenticated member profile has no memberId."
+45:         );
+46:     }
+47: 
+48:     const ownedWelfareData = {
+49:         ...welfareData,
+50:         memberId: profile.memberId,
+51:         cooperativeId:
+52:             profile.cooperativeId ?? null,
+53:         status: "Pending",
+54:         createdAt: serverTimestamp()
+55:     };
+56: 
+57:     const docRef = await addDoc(
+58:         collection(db, "welfare"),
+59:         ownedWelfareData
+60:     );
+61: 
+
+===============================================
+FILE: js/services/welfareService.js
+===============================================
+42:     if (!profile.memberId) {
+43:         throw new Error(
+44:             "Authenticated member profile has no memberId."
+45:         );
+46:     }
+47: 
+48:     const ownedWelfareData = {
+49:         ...welfareData,
+50:         memberId: profile.memberId,
+51:         cooperativeId:
+52:             profile.cooperativeId ?? null,
+53:         status: "Pending",
+54:         createdAt: serverTimestamp()
+55:     };
+56: 
+57:     const docRef = await addDoc(
+58:         collection(db, "welfare"),
+59:         ownedWelfareData
+60:     );
+61: 
+62:     return docRef.id;
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+1: import { auth, db } from "./firebase-config.js";
+2: import { rolesMatch } from "./components/roleAuthorization.js";
+3: 
+4: 
+5: 
+6: import {
+7:     signOut,
+8:     onAuthStateChanged
+9: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+10: 
+11: import {
+12:     getFunctions,
+13:     httpsCallable
+14: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js";
+15: 
+16: import {
+17:     collection,
+18:     doc,
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+45: 
+46:     window.addEventListener("visibilitychange", () => {
+47:         if (document.visibilityState === "visible") {
+48:             window.location.reload();
+49:         }
+50:     });
+51: }
+52: 
+53: handleDashboardHistoryReentry();
+54: 
+55: onAuthStateChanged(auth, async (user) => {
+56: 
+57:     if (!user) {
+58:         window.location.href = "login.html";
+59:         return;
+60:     }
+61: 
+62:     try {
+63: 
+64:         const currentUser = auth.currentUser;
+65: 
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+61: 
+62:     try {
+63: 
+64:         const currentUser = auth.currentUser;
+65: 
+66:         if (!currentUser) {
+67:             window.location.href = "login.html";
+68:             return;
+69:         }
+70: 
+71:         const userDoc = await getDoc(
+72:             doc(db, "users", currentUser.uid)
+73:         );
+74: 
+75:         if (!userDoc.exists()) {
+76:             await signOut(auth);
+77:             window.location.href = "login.html";
+78:             return;
+79:         }
+80: 
+81:         const userData = userDoc.data();
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+65: 
+66:         if (!currentUser) {
+67:             window.location.href = "login.html";
+68:             return;
+69:         }
+70: 
+71:         const userDoc = await getDoc(
+72:             doc(db, "users", currentUser.uid)
+73:         );
+74: 
+75:         if (!userDoc.exists()) {
+76:             await signOut(auth);
+77:             window.location.href = "login.html";
+78:             return;
+79:         }
+80: 
+81:         const userData = userDoc.data();
+82: 
+83:         if (!rolesMatch(userData.role, "super_admin")) {
+84: 
+85:             window.location.href =
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+71:         const userDoc = await getDoc(
+72:             doc(db, "users", currentUser.uid)
+73:         );
+74: 
+75:         if (!userDoc.exists()) {
+76:             await signOut(auth);
+77:             window.location.href = "login.html";
+78:             return;
+79:         }
+80: 
+81:         const userData = userDoc.data();
+82: 
+83:         if (!rolesMatch(userData.role, "super_admin")) {
+84: 
+85:             window.location.href =
+86:                 rolesMatch(userData.role, "cooperative_admin")
+87:                     ? "cooperative-admin.html"
+88:                     : "login.html";
+89: 
+90:             return;
+91:         }
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+73:         );
+74: 
+75:         if (!userDoc.exists()) {
+76:             await signOut(auth);
+77:             window.location.href = "login.html";
+78:             return;
+79:         }
+80: 
+81:         const userData = userDoc.data();
+82: 
+83:         if (!rolesMatch(userData.role, "super_admin")) {
+84: 
+85:             window.location.href =
+86:                 rolesMatch(userData.role, "cooperative_admin")
+87:                     ? "cooperative-admin.html"
+88:                     : "login.html";
+89: 
+90:             return;
+91:         }
+92: 
+93: 
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+76:             await signOut(auth);
+77:             window.location.href = "login.html";
+78:             return;
+79:         }
+80: 
+81:         const userData = userDoc.data();
+82: 
+83:         if (!rolesMatch(userData.role, "super_admin")) {
+84: 
+85:             window.location.href =
+86:                 rolesMatch(userData.role, "cooperative_admin")
+87:                     ? "cooperative-admin.html"
+88:                     : "login.html";
+89: 
+90:             return;
+91:         }
+92: 
+93: 
+94: 
+95:     } catch (error) {
+96: 
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+188:         );
+189: 
+190:         container.innerHTML = `
+191:             <div class="card">
+192:                 <p>Unable to load cooperative applications.</p>
+193:             </div>
+194:         `;
+195:     }
+196: }
+197: 
+198: async function approveCooperativeApplication(cooperativeId) {
+199:     const confirmed = window.confirm(
+200:         "Are you sure you want to approve this cooperative application?"
+201:     );
+202: 
+203:     if (!confirmed) {
+204:         return;
+205:     }
+206: 
+207:     try {
+208:         const result = await approveCooperative({
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+199:     const confirmed = window.confirm(
+200:         "Are you sure you want to approve this cooperative application?"
+201:     );
+202: 
+203:     if (!confirmed) {
+204:         return;
+205:     }
+206: 
+207:     try {
+208:         const result = await approveCooperative({
+209:             cooperativeId
+210:         });
+211: 
+212:         const data = result.data || {};
+213: 
+214:         alert(
+215:             data.message ||
+216:             "Cooperative application approved."
+217:         );
+218: 
+219:         await loadCooperativeApplications();
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+224:             error
+225:         );
+226: 
+227:         alert(
+228:             "Unable to approve cooperative application: " +
+229:             (error.message || "Unknown error.")
+230:         );
+231:     }
+232: }
+233: 
+234: async function rejectCooperativeApplication(cooperativeId) {
+235:     const confirmed = window.confirm(
+236:         "Are you sure you want to reject this cooperative application?"
+237:     );
+238: 
+239:     if (!confirmed) {
+240:         return;
+241:     }
+242: 
+243:     try {
+244:         const result = await rejectCooperative({
+
+===============================================
+FILE: js/super-admin.js
+===============================================
+235:     const confirmed = window.confirm(
+236:         "Are you sure you want to reject this cooperative application?"
+237:     );
+238: 
+239:     if (!confirmed) {
+240:         return;
+241:     }
+242: 
+243:     try {
+244:         const result = await rejectCooperative({
+245:             cooperativeId
+246:         });
+247: 
+248:         const data = result.data || {};
+249: 
+250:         alert(
+251:             data.message ||
+252:             "Cooperative application rejected."
+253:         );
+254: 
+255:         await loadCooperativeApplications();
+
+===============================================
+FILE: modules/contribution-draw/create-group/index.html
+===============================================
+9: content="width=device-width, initial-scale=1.0">
+10: 
+11: <title>Create Draw Group</title>
+12: 
+13: </head>
+14: 
+15: <body>
+16: 
+17: <h1>📦 Create Draw Group</h1>
+18: 
+19: <form id="groupForm">
+20: 
+21: <label>
+22: Group Name
+23: </label>
+24: 
+25: <br>
+26: 
+27: <input
+28: type="text"
+29: id="groupName"
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+1: import {
+2:     createDrawGroup
+3: }
+4: from "../../../js/services/drawGroupService.js";
+5: 
+6: const groupForm =
+7: document.getElementById(
+8:     "groupForm"
+9: );
+10: 
+11: groupForm.addEventListener(
+12:     "submit",
+13: 
+14:     async function(event) {
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+1: import {
+2:     createDrawGroup
+3: }
+4: from "../../../js/services/drawGroupService.js";
+5: 
+6: const groupForm =
+7: document.getElementById(
+8:     "groupForm"
+9: );
+10: 
+11: groupForm.addEventListener(
+12:     "submit",
+13: 
+14:     async function(event) {
+15: 
+16:         event.preventDefault();
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+1: import {
+2:     createDrawGroup
+3: }
+4: from "../../../js/services/drawGroupService.js";
+5: 
+6: const groupForm =
+7: document.getElementById(
+8:     "groupForm"
+9: );
+10: 
+11: groupForm.addEventListener(
+12:     "submit",
+13: 
+14:     async function(event) {
+15: 
+16:         event.preventDefault();
+17: 
+18:         try {
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+1: import {
+2:     createDrawGroup
+3: }
+4: from "../../../js/services/drawGroupService.js";
+5: 
+6: const groupForm =
+7: document.getElementById(
+8:     "groupForm"
+9: );
+10: 
+11: groupForm.addEventListener(
+12:     "submit",
+13: 
+14:     async function(event) {
+15: 
+16:         event.preventDefault();
+17: 
+18:         try {
+19: 
+20:             const groupData = {
+21: 
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+10: 
+11: groupForm.addEventListener(
+12:     "submit",
+13: 
+14:     async function(event) {
+15: 
+16:         event.preventDefault();
+17: 
+18:         try {
+19: 
+20:             const groupData = {
+21: 
+22:                 groupName:
+23: 
+24:                 document.getElementById(
+25:                     "groupName"
+26:                 ).value,
+27: 
+28:                 startMonth:
+29: 
+30:                 document.getElementById(
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+62: ),
+63: 
+64: drawPreparationPolicy:
+65: 
+66: document.getElementById(
+67:     "drawPreparationPolicy"
+68: ).value,
+69: 
+70:             };
+71: 
+72:             await createDrawGroup(
+73:                 groupData
+74:             );
+75: 
+76:             alert(
+77:                 "Draw Group Created Successfully"
+78:             );
+79: 
+80:             groupForm.reset();
+81: 
+82:         } catch(error) {
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+63: 
+64: drawPreparationPolicy:
+65: 
+66: document.getElementById(
+67:     "drawPreparationPolicy"
+68: ).value,
+69: 
+70:             };
+71: 
+72:             await createDrawGroup(
+73:                 groupData
+74:             );
+75: 
+76:             alert(
+77:                 "Draw Group Created Successfully"
+78:             );
+79: 
+80:             groupForm.reset();
+81: 
+82:         } catch(error) {
+83: 
+
+===============================================
+FILE: modules/contribution-draw/create-group/script.js
+===============================================
+70:             };
+71: 
+72:             await createDrawGroup(
+73:                 groupData
+74:             );
+75: 
+76:             alert(
+77:                 "Draw Group Created Successfully"
+78:             );
+79: 
+80:             groupForm.reset();
+81: 
+82:         } catch(error) {
+83: 
+84:             console.error(error);
+85: 
+86:             alert(
+87:                 "Unable to create draw group."
+88:             );
+89: 
+90:         }
+
+===============================================
+FILE: modules/contribution-draw/group-directory/script.js
+===============================================
+1: import {
+2:     getDrawGroups
+3: }
+4: from "../../../js/services/drawGroupService.js";
+5: 
+6: const groupBody =
+7: document.getElementById(
+8:     "groupBody"
+9: );
+10: 
+11: const groupCount =
+12: document.getElementById(
+
+===============================================
+FILE: modules/contribution-draw/group-directory/script.js
+===============================================
+1: import {
+2:     getDrawGroups
+3: }
+4: from "../../../js/services/drawGroupService.js";
+5: 
+6: const groupBody =
+7: document.getElementById(
+8:     "groupBody"
+9: );
+10: 
+11: const groupCount =
+12: document.getElementById(
+13:     "groupCount"
+14: );
+
+===============================================
+FILE: modules/contribution-draw/group-directory/script.js
+===============================================
+11: const groupCount =
+12: document.getElementById(
+13:     "groupCount"
+14: );
+15: 
+16: async function loadGroups() {
+17: 
+18:     try {
+19: 
+20:         const groups =
+21:         await getDrawGroups();
+22: 
+23:         groupCount.textContent =
+24:         `📦 Total Groups: ${groups.length}`;
+25: 
+26:         if (groups.length === 0) {
+27: 
+28:             groupBody.innerHTML = `
+29:             <tr>
+30:                 <td colspan="5">
+31:                     No groups found.
+
+===============================================
+FILE: modules/contribution-draw/group-participants/script.js
+===============================================
+5: 
+6: import {
+7:     addParticipantToGroup,
+8:     participantExists
+9: }
+10: from "../../../js/services/drawParticipantService.js";
+11: 
+12: import {
+13:     getDrawGroupById
+14: }
+15: from "../../../js/services/drawGroupService.js";
+16: 
+17: import {
+18:     createDrawBox
+19: }
+20: from "../../../js/services/drawBoxService.js";
+21: 
+22: const params =
+23: new URLSearchParams(
+24:     window.location.search
+25: );
+
+===============================================
+FILE: modules/contribution-draw/group-profile/script.js
+===============================================
+1: import {
+2:     getDrawGroupById,
+3:     updateGroupStatus
+4: }
+5: from "../../../js/services/drawGroupService.js";
+6: 
+7: import {
+8:     getGroupParticipants,
+9:     getUsedSlots
+10: }
+11: from "../../../js/services/drawParticipantService.js";
+12: 
+13: import {
+14:     getGroupBoxes,
+15:     revealDrawBox
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+1: import { auth, db } from "../../js/firebase-config.js";
+2: import { rolesMatch } from "../../js/components/roleAuthorization.js";
+3: import { buildSidebar } from "../../js/navigation/sidebar.js";
+4: 
+5: import {
+6:     onAuthStateChanged,
+7:     signOut
+8: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+13: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+14: 
+15: function redirectToLogin() {
+16:     window.location.href = "../../login.html";
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+9: 
+10: import {
+11:     doc,
+12:     getDoc
+13: } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+14: 
+15: function redirectToLogin() {
+16:     window.location.href = "../../login.html";
+17: }
+18: 
+19: onAuthStateChanged(auth, async (user) => {
+20:     if (!user) {
+21:         redirectToLogin();
+22:         return;
+23:     }
+24: 
+25:     try {
+26:         const userDoc = await getDoc(
+27:             doc(db, "users", user.uid)
+28:         );
+29: 
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+16:     window.location.href = "../../login.html";
+17: }
+18: 
+19: onAuthStateChanged(auth, async (user) => {
+20:     if (!user) {
+21:         redirectToLogin();
+22:         return;
+23:     }
+24: 
+25:     try {
+26:         const userDoc = await getDoc(
+27:             doc(db, "users", user.uid)
+28:         );
+29: 
+30:         if (!userDoc.exists()) {
+31:             await signOut(auth);
+32:             redirectToLogin();
+33:             return;
+34:         }
+35: 
+36:         const userData = userDoc.data();
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+20:     if (!user) {
+21:         redirectToLogin();
+22:         return;
+23:     }
+24: 
+25:     try {
+26:         const userDoc = await getDoc(
+27:             doc(db, "users", user.uid)
+28:         );
+29: 
+30:         if (!userDoc.exists()) {
+31:             await signOut(auth);
+32:             redirectToLogin();
+33:             return;
+34:         }
+35: 
+36:         const userData = userDoc.data();
+37: 
+38:         if (!rolesMatch(userData.role, "member")) {
+39:             if (rolesMatch(userData.role, "cooperative_admin")) {
+40:                 window.location.href = "../../cooperative-admin.html";
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+26:         const userDoc = await getDoc(
+27:             doc(db, "users", user.uid)
+28:         );
+29: 
+30:         if (!userDoc.exists()) {
+31:             await signOut(auth);
+32:             redirectToLogin();
+33:             return;
+34:         }
+35: 
+36:         const userData = userDoc.data();
+37: 
+38:         if (!rolesMatch(userData.role, "member")) {
+39:             if (rolesMatch(userData.role, "cooperative_admin")) {
+40:                 window.location.href = "../../cooperative-admin.html";
+41:             } else if (rolesMatch(userData.role, "super_admin")) {
+42:                 window.location.href = "../../super-admin.html";
+43:             } else {
+44:                 await signOut(auth);
+45:                 redirectToLogin();
+46:             }
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+28:         );
+29: 
+30:         if (!userDoc.exists()) {
+31:             await signOut(auth);
+32:             redirectToLogin();
+33:             return;
+34:         }
+35: 
+36:         const userData = userDoc.data();
+37: 
+38:         if (!rolesMatch(userData.role, "member")) {
+39:             if (rolesMatch(userData.role, "cooperative_admin")) {
+40:                 window.location.href = "../../cooperative-admin.html";
+41:             } else if (rolesMatch(userData.role, "super_admin")) {
+42:                 window.location.href = "../../super-admin.html";
+43:             } else {
+44:                 await signOut(auth);
+45:                 redirectToLogin();
+46:             }
+47: 
+48:             return;
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+29: 
+30:         if (!userDoc.exists()) {
+31:             await signOut(auth);
+32:             redirectToLogin();
+33:             return;
+34:         }
+35: 
+36:         const userData = userDoc.data();
+37: 
+38:         if (!rolesMatch(userData.role, "member")) {
+39:             if (rolesMatch(userData.role, "cooperative_admin")) {
+40:                 window.location.href = "../../cooperative-admin.html";
+41:             } else if (rolesMatch(userData.role, "super_admin")) {
+42:                 window.location.href = "../../super-admin.html";
+43:             } else {
+44:                 await signOut(auth);
+45:                 redirectToLogin();
+46:             }
+47: 
+48:             return;
+49:         }
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+31:             await signOut(auth);
+32:             redirectToLogin();
+33:             return;
+34:         }
+35: 
+36:         const userData = userDoc.data();
+37: 
+38:         if (!rolesMatch(userData.role, "member")) {
+39:             if (rolesMatch(userData.role, "cooperative_admin")) {
+40:                 window.location.href = "../../cooperative-admin.html";
+41:             } else if (rolesMatch(userData.role, "super_admin")) {
+42:                 window.location.href = "../../super-admin.html";
+43:             } else {
+44:                 await signOut(auth);
+45:                 redirectToLogin();
+46:             }
+47: 
+48:             return;
+49:         }
+50: 
+51:         const memberName =
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+42:                 window.location.href = "../../super-admin.html";
+43:             } else {
+44:                 await signOut(auth);
+45:                 redirectToLogin();
+46:             }
+47: 
+48:             return;
+49:         }
+50: 
+51:         const memberName =
+52:             userData.name ||
+53:             userData.displayName ||
+54:             user.email ||
+55:             "Member";
+56: 
+57:         const memberNameElement =
+58:             document.getElementById("memberName");
+59: 
+60:         if (memberNameElement) {
+61:             memberNameElement.textContent = memberName;
+62:         }
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+43:             } else {
+44:                 await signOut(auth);
+45:                 redirectToLogin();
+46:             }
+47: 
+48:             return;
+49:         }
+50: 
+51:         const memberName =
+52:             userData.name ||
+53:             userData.displayName ||
+54:             user.email ||
+55:             "Member";
+56: 
+57:         const memberNameElement =
+58:             document.getElementById("memberName");
+59: 
+60:         if (memberNameElement) {
+61:             memberNameElement.textContent = memberName;
+62:         }
+63: 
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+59: 
+60:         if (memberNameElement) {
+61:             memberNameElement.textContent = memberName;
+62:         }
+63: 
+64:         const memberIdElement =
+65:             document.getElementById("memberId");
+66: 
+67:         if (memberIdElement) {
+68:             memberIdElement.textContent =
+69:                 userData.memberId || "—";
+70:         }
+71: 
+72:         const sidebar = document.getElementById("sidebarMenu");
+73:         if (sidebar) {
+74:             buildSidebar("sidebarMenu", userData.role);
+75:         }
+76: 
+77:     } catch (error) {
+78:         console.error(
+79:             "Member Portal authentication error:",
+
+===============================================
+FILE: modules/member-portal/member-portal.js
+===============================================
+64:         const memberIdElement =
+65:             document.getElementById("memberId");
+66: 
+67:         if (memberIdElement) {
+68:             memberIdElement.textContent =
+69:                 userData.memberId || "—";
+70:         }
+71: 
+72:         const sidebar = document.getElementById("sidebarMenu");
+73:         if (sidebar) {
+74:             buildSidebar("sidebarMenu", userData.role);
+75:         }
+76: 
+77:     } catch (error) {
+78:         console.error(
+79:             "Member Portal authentication error:",
+80:             error
+81:         );
+82: 
+83:         await signOut(auth);
+84:         redirectToLogin();
+
+===============================================
+FILE: modules/member-registration/script.js
+===============================================
+234: 
+235:       if (
+236:         profile.role !== "cooperative_admin" &&
+237:         profile.role !== "super_admin"
+238:       ) {
+239:         throw new Error(
+240:           "Only authorized administrators can register members."
+241:         );
+242:       }
+243: 
+244:       let cooperativeId = null;
+245: 
+246:       if (profile.role === "cooperative_admin") {
+247:         if (!profile.cooperativeId) {
+248:           throw new Error(
+249:             "Cooperative administrator has no cooperative ownership."
+250:           );
+251:         }
+252: 
+253:         cooperativeId = profile.cooperativeId;
+254:       } else {
+
+===============================================
+FILE: modules/member-registration/script.js
+===============================================
+237:         profile.role !== "super_admin"
+238:       ) {
+239:         throw new Error(
+240:           "Only authorized administrators can register members."
+241:         );
+242:       }
+243: 
+244:       let cooperativeId = null;
+245: 
+246:       if (profile.role === "cooperative_admin") {
+247:         if (!profile.cooperativeId) {
+248:           throw new Error(
+249:             "Cooperative administrator has no cooperative ownership."
+250:           );
+251:         }
+252: 
+253:         cooperativeId = profile.cooperativeId;
+254:       } else {
+255:         const selectedCooperative =
+256:           document.getElementById("cooperative")?.value?.trim();
+257: 
+
+===============================================
+FILE: modules/member-registration/script.js
+===============================================
+243: 
+244:       let cooperativeId = null;
+245: 
+246:       if (profile.role === "cooperative_admin") {
+247:         if (!profile.cooperativeId) {
+248:           throw new Error(
+249:             "Cooperative administrator has no cooperative ownership."
+250:           );
+251:         }
+252: 
+253:         cooperativeId = profile.cooperativeId;
+254:       } else {
+255:         const selectedCooperative =
+256:           document.getElementById("cooperative")?.value?.trim();
+257: 
+258:         if (!selectedCooperative) {
+259:           throw new Error(
+260:             "Please select a cooperative."
+261:           );
+262:         }
+263: 
+
+===============================================
+FILE: modules/member-registration/script.js
+===============================================
+274:             "Selected cooperative was not found."
+275:           );
+276:         }
+277: 
+278:         if (cooperativeSnapshot.size !== 1) {
+279:           throw new Error(
+280:             "Selected cooperative could not be uniquely identified."
+281:           );
+282:         }
+283: 
+284:         cooperativeId =
+285:           cooperativeSnapshot.docs[0].id;
+286:       }
+287: 
+288:       memberData.cooperativeId = cooperativeId;
+289: 
+290:       const result = await registerMember(memberData);
+291: 
+292:       alert(
+293:   "✅ Member Registered Successfully!\n\n" +
+294:   "Membership Number: " + result.memberNumber
+
+===============================================
+FILE: modules/member-registration/script.js
+===============================================
+278:         if (cooperativeSnapshot.size !== 1) {
+279:           throw new Error(
+280:             "Selected cooperative could not be uniquely identified."
+281:           );
+282:         }
+283: 
+284:         cooperativeId =
+285:           cooperativeSnapshot.docs[0].id;
+286:       }
+287: 
+288:       memberData.cooperativeId = cooperativeId;
+289: 
+290:       const result = await registerMember(memberData);
+291: 
+292:       alert(
+293:   "✅ Member Registered Successfully!\n\n" +
+294:   "Membership Number: " + result.memberNumber
+295: );
+296: 
+297:       document.getElementById("memberRegistrationForm").reset();
+298: 
+
+===============================================
+FILE: modules/members/registration/app.js
+===============================================
+72:             profile.role !== "cooperative_admin" &&
+73:             profile.role !== "super_admin"
+74:         ) {
+75:             throw new Error(
+76:                 "Only authorized administrators can register members."
+77:             );
+78:         }
+79: 
+80:         if (
+81:             profile.role === "cooperative_admin" &&
+82:             !profile.cooperativeId
+83:         ) {
+84:             throw new Error(
+85:                 "Cooperative administrator has no cooperative ownership."
+86:             );
+87:         }
+88: 
+89:         const member =
+90:             await registerMember({
+91:                 firstName,
+92:                 lastName,
+
+===============================================
+FILE: modules/members/registration/app.js
+===============================================
+85:                 "Cooperative administrator has no cooperative ownership."
+86:             );
+87:         }
+88: 
+89:         const member =
+90:             await registerMember({
+91:                 firstName,
+92:                 lastName,
+93:                 phone,
+94:                 email,
+95:                 cooperativeId: profile.cooperativeId ?? null
+96:             });
+97: 
+98:         console.log(
+99:             "Member registered:",
+100:             member
+101:         );
+102: 
+103:         if (message) {
+104:             message.textContent =
+105:                 `Member registered successfully. Member ID: ${member.memberId}`;
+
+===============================================
+FILE: modules/register-cooperative/script.js
+===============================================
+52:     const data = CMPForm.getData(form);
+53: 
+54:     if (!validateForm(data)) {
+55:       return;
+56:     }
+57:     
+58:     CMPToast.info("Validation completed.");
+59:     
+60:     try {
+61: 
+62:   const cooperativeId =
+63:     await createCooperative(data);
+64: 
+65:   CMPToast.success(
+66:   "Cooperative created successfully!\n\nID: "
+67:   + cooperativeId
+68: );
+69: 
+70: CMPStorage.remove("registerCooperativeDraft");
+71: 
+72: } catch (error) {
+
+===============================================
+FILE: modules/register-cooperative/script.js
+===============================================
+57:     
+58:     CMPToast.info("Validation completed.");
+59:     
+60:     try {
+61: 
+62:   const cooperativeId =
+63:     await createCooperative(data);
+64: 
+65:   CMPToast.success(
+66:   "Cooperative created successfully!\n\nID: "
+67:   + cooperativeId
+68: );
+69: 
+70: CMPStorage.remove("registerCooperativeDraft");
+71: 
+72: } catch (error) {
+73: 
+74:   CMPToast.error(error.message);
+75: 
+76: }
+77: 
+
+===============================================
+FILE: modules/register-cooperative/service.js
+===============================================
+18:   functions,
+19:   "submitCooperativeApplication"
+20: );
+21: 
+22: export async function createCooperative(data) {
+23:   const result =
+24:     await submitCooperativeApplication(data);
+25: 
+26:   if (
+27:     !result?.data?.success ||
+28:     !result?.data?.cooperativeId
+29:   ) {
+30:     throw new Error(
+31:       result?.data?.message ||
+32:       "Unable to submit cooperative application."
+33:     );
+34:   }
+35: 
+36:   return result.data.cooperativeId;
+37: }
+
+===============================================
+FILE: modules/register-cooperative/service.js
+===============================================
+26:   if (
+27:     !result?.data?.success ||
+28:     !result?.data?.cooperativeId
+29:   ) {
+30:     throw new Error(
+31:       result?.data?.message ||
+32:       "Unable to submit cooperative application."
+33:     );
+34:   }
+35: 
+36:   return result.data.cooperativeId;
+37: }
+
+===============================================
+FILE: functions/index.js
+===============================================
+15: setGlobalOptions({
+16:   maxInstances: 10,
+17: });
+18: 
+19: exports.submitCooperativeApplication = onCall(async (request) => {
+20:   /*
+21:    * Public cooperative application boundary.
+22:    *
+23:    * This function replaces the former unrestricted client-side
+24:    * Firestore create path. The client may submit an application,
+25:    * but cannot directly write to cooperatives/{cooperativeId}.
+26:    */
+27: 
+28:   const data = request.data || {};
+29: 
+30:   const requiredStrings = {
+31:     coopName: data.coopName,
+32:     registrationNumber: data.registrationNumber,
+33:     coopType: data.coopType,
+34:     country: data.country,
+35:     state: data.state,
+
+===============================================
+FILE: functions/index.js
+===============================================
+46:     if (typeof value !== "string" || value.trim() === "") {
+47:       throw new HttpsError(
+48:         "invalid-argument",
+49:         `A valid ${field} is required.`
+50:       );
+51:     }
+52:   }
+53: 
+54:   const crypto = require("crypto");
+55: 
+56:   const cooperativeId =
+57:     `CMP-${data.country.trim().toUpperCase()}-${crypto
+58:       .randomUUID()
+59:       .replace(/-/g, "")
+60:       .slice(0, 12)
+61:       .toUpperCase()}`;
+62: 
+63:   const cooperativeRef = db
+64:     .collection("cooperatives")
+65:     .doc(cooperativeId);
+66: 
+
+===============================================
+FILE: functions/index.js
+===============================================
+55: 
+56:   const cooperativeId =
+57:     `CMP-${data.country.trim().toUpperCase()}-${crypto
+58:       .randomUUID()
+59:       .replace(/-/g, "")
+60:       .slice(0, 12)
+61:       .toUpperCase()}`;
+62: 
+63:   const cooperativeRef = db
+64:     .collection("cooperatives")
+65:     .doc(cooperativeId);
+66: 
+67:   await cooperativeRef.create({
+68:     cooperativeId,
+69:     cooperativeName: data.coopName.trim(),
+70:     registrationNumber: data.registrationNumber.trim(),
+71:     cooperativeType: data.coopType.trim(),
+72:     country: data.country.trim(),
+73:     state: data.state.trim(),
+74:     city: data.city.trim(),
+75:     officeAddress: data.officeAddress.trim(),
+
+===============================================
+FILE: functions/index.js
+===============================================
+58:       .randomUUID()
+59:       .replace(/-/g, "")
+60:       .slice(0, 12)
+61:       .toUpperCase()}`;
+62: 
+63:   const cooperativeRef = db
+64:     .collection("cooperatives")
+65:     .doc(cooperativeId);
+66: 
+67:   await cooperativeRef.create({
+68:     cooperativeId,
+69:     cooperativeName: data.coopName.trim(),
+70:     registrationNumber: data.registrationNumber.trim(),
+71:     cooperativeType: data.coopType.trim(),
+72:     country: data.country.trim(),
+73:     state: data.state.trim(),
+74:     city: data.city.trim(),
+75:     officeAddress: data.officeAddress.trim(),
+76:     officialEmail: data.coopEmail.trim().toLowerCase(),
+77:     officialPhone: data.coopPhone.trim(),
+78:     administratorName: data.adminName.trim(),
+
+===============================================
+FILE: functions/index.js
+===============================================
+76:     officialEmail: data.coopEmail.trim().toLowerCase(),
+77:     officialPhone: data.coopPhone.trim(),
+78:     administratorName: data.adminName.trim(),
+79:     administratorEmail: data.adminEmail.trim().toLowerCase(),
+80:     subscriptionPlan: data.subscriptionPlan.trim(),
+81:     status: "pending",
+82:     createdAt: FieldValue.serverTimestamp(),
+83:   });
+84: 
+85:   logger.info("Cooperative application submitted", {
+86:     cooperativeId,
+87:   });
+88: 
+89:   return {
+90:     success: true,
+91:     cooperativeId,
+92:     message: "Cooperative application submitted successfully.",
+93:   };
+94: });
+95: 
+96: exports.approveCooperative = onCall(async (request) => {
+
+===============================================
+FILE: functions/index.js
+===============================================
+81:     status: "pending",
+82:     createdAt: FieldValue.serverTimestamp(),
+83:   });
+84: 
+85:   logger.info("Cooperative application submitted", {
+86:     cooperativeId,
+87:   });
+88: 
+89:   return {
+90:     success: true,
+91:     cooperativeId,
+92:     message: "Cooperative application submitted successfully.",
+93:   };
+94: });
+95: 
+96: exports.approveCooperative = onCall(async (request) => {
+97:   /*
+98:    * 1. The caller must be authenticated.
+99:    */
+100:   if (!request.auth) {
+101:     throw new HttpsError(
+
+===============================================
+FILE: functions/index.js
+===============================================
+127:   if (approverData.role !== "super_admin") {
+128:     throw new HttpsError(
+129:       "permission-denied",
+130:       "Only a Super Admin can approve cooperative applications."
+131:     );
+132:   }
+133: 
+134:   /*
+135:    * 3. Validate the cooperative ID supplied by the client.
+136:    */
+137:   const cooperativeId = request.data?.cooperativeId;
+138: 
+139:   if (
+140:     typeof cooperativeId !== "string" ||
+141:     cooperativeId.trim() === ""
+142:   ) {
+143:     throw new HttpsError(
+144:       "invalid-argument",
+145:       "A valid cooperativeId is required."
+146:     );
+147:   }
+
+===============================================
+FILE: functions/index.js
+===============================================
+130:       "Only a Super Admin can approve cooperative applications."
+131:     );
+132:   }
+133: 
+134:   /*
+135:    * 3. Validate the cooperative ID supplied by the client.
+136:    */
+137:   const cooperativeId = request.data?.cooperativeId;
+138: 
+139:   if (
+140:     typeof cooperativeId !== "string" ||
+141:     cooperativeId.trim() === ""
+142:   ) {
+143:     throw new HttpsError(
+144:       "invalid-argument",
+145:       "A valid cooperativeId is required."
+146:     );
+147:   }
+148: 
+149:   /*
+150:    * 4. Read the pending cooperative application.
+
+===============================================
+FILE: functions/index.js
+===============================================
+131:     );
+132:   }
+133: 
+134:   /*
+135:    * 3. Validate the cooperative ID supplied by the client.
+136:    */
+137:   const cooperativeId = request.data?.cooperativeId;
+138: 
+139:   if (
+140:     typeof cooperativeId !== "string" ||
+141:     cooperativeId.trim() === ""
+142:   ) {
+143:     throw new HttpsError(
+144:       "invalid-argument",
+145:       "A valid cooperativeId is required."
+146:     );
+147:   }
+148: 
+149:   /*
+150:    * 4. Read the pending cooperative application.
+151:    */
+
+===============================================
+FILE: functions/index.js
+===============================================
+135:    * 3. Validate the cooperative ID supplied by the client.
+136:    */
+137:   const cooperativeId = request.data?.cooperativeId;
+138: 
+139:   if (
+140:     typeof cooperativeId !== "string" ||
+141:     cooperativeId.trim() === ""
+142:   ) {
+143:     throw new HttpsError(
+144:       "invalid-argument",
+145:       "A valid cooperativeId is required."
+146:     );
+147:   }
+148: 
+149:   /*
+150:    * 4. Read the pending cooperative application.
+151:    */
+152:   const cooperativeRef = db
+153:     .collection("cooperatives")
+154:     .doc(cooperativeId);
+155: 
+
+===============================================
+FILE: functions/index.js
+===============================================
+144:       "invalid-argument",
+145:       "A valid cooperativeId is required."
+146:     );
+147:   }
+148: 
+149:   /*
+150:    * 4. Read the pending cooperative application.
+151:    */
+152:   const cooperativeRef = db
+153:     .collection("cooperatives")
+154:     .doc(cooperativeId);
+155: 
+156:   const cooperativeSnap = await cooperativeRef.get();
+157: 
+158:   if (!cooperativeSnap.exists) {
+159:     throw new HttpsError(
+160:       "not-found",
+161:       "Cooperative application not found."
+162:     );
+163:   }
+164: 
+
+===============================================
+FILE: functions/index.js
+===============================================
+229:       email: administratorEmail,
+230:       displayName: administratorName,
+231:       password: temporaryPassword,
+232:       emailVerified: false,
+233:       disabled: false,
+234:     });
+235: 
+236: 
+237:   } catch (error) {
+238:     logger.error("Administrator Auth account creation failed", {
+239:       cooperativeId,
+240:       administratorEmail,
+241:       error: error.message,
+242:     });
+243: 
+244:     throw new HttpsError(
+245:       "internal",
+246:       "Unable to create the cooperative administrator account."
+247:     );
+248:   }
+249: 
+
+===============================================
+FILE: functions/index.js
+===============================================
+251:    * 7. Create the application's user profile.
+252:    */
+253:   const userRef = db.collection("users").doc(administratorUser.uid);
+254: 
+255:   await userRef.set({
+256:     uid: administratorUser.uid,
+257:     name: administratorName,
+258:     displayName: administratorName,
+259:     email: administratorEmail,
+260:     role: "cooperative_admin",
+261:     cooperativeId: cooperativeId,
+262:     status: "active",
+263:     createdAt: FieldValue.serverTimestamp(),
+264:     createdBy: approverUid,
+265:   });
+266: 
+267:   /*
+268:    * 8. Activate the cooperative and link its administrator.
+269:    */
+270:   await cooperativeRef.update({
+271:     status: "active",
+
+===============================================
+FILE: functions/index.js
+===============================================
+282:    * Email delivery will be added as a separate step.
+283:    */
+284:   let passwordSetupLink = null;
+285: 
+286:   try {
+287:     passwordSetupLink = await auth.generatePasswordResetLink(
+288:       administratorEmail
+289:     );
+290:   } catch (error) {
+291:     logger.error("Password setup link generation failed", {
+292:       cooperativeId,
+293:       administratorEmail,
+294:       error: error.message,
+295:     });
+296:   }
+297: 
+298:   logger.info("Cooperative approved successfully", {
+299:     cooperativeId,
+300:     administratorUid: administratorUser.uid,
+301:     approvedBy: approverUid,
+302:   });
+
+===============================================
+FILE: functions/index.js
+===============================================
+289:     );
+290:   } catch (error) {
+291:     logger.error("Password setup link generation failed", {
+292:       cooperativeId,
+293:       administratorEmail,
+294:       error: error.message,
+295:     });
+296:   }
+297: 
+298:   logger.info("Cooperative approved successfully", {
+299:     cooperativeId,
+300:     administratorUid: administratorUser.uid,
+301:     approvedBy: approverUid,
+302:   });
+303: 
+304:   return {
+305:     success: true,
+306:     cooperativeId,
+307:     administratorUid: administratorUser.uid,
+308:     administratorEmail,
+309:     passwordSetupLink,
+
+===============================================
+FILE: functions/index.js
+===============================================
+296:   }
+297: 
+298:   logger.info("Cooperative approved successfully", {
+299:     cooperativeId,
+300:     administratorUid: administratorUser.uid,
+301:     approvedBy: approverUid,
+302:   });
+303: 
+304:   return {
+305:     success: true,
+306:     cooperativeId,
+307:     administratorUid: administratorUser.uid,
+308:     administratorEmail,
+309:     passwordSetupLink,
+310:     message:
+311:       "Cooperative approved and administrator account created.",
+312:   };
+313: });
+314: 
+315: exports.rejectCooperative = onCall(async (request) => {
+316:   /*
+
+===============================================
+FILE: functions/index.js
+===============================================
+343:   if (rejectorData.role !== "super_admin") {
+344:     throw new HttpsError(
+345:       "permission-denied",
+346:       "Only a Super Admin can reject cooperative applications."
+347:     );
+348:   }
+349: 
+350:   /*
+351:    * 3. Validate the cooperative ID.
+352:    */
+353:   const cooperativeId = request.data?.cooperativeId;
+354: 
+355:   if (
+356:     typeof cooperativeId !== "string" ||
+357:     cooperativeId.trim() === ""
+358:   ) {
+359:     throw new HttpsError(
+360:       "invalid-argument",
+361:       "A valid cooperativeId is required."
+362:     );
+363:   }
+
+===============================================
+FILE: functions/index.js
+===============================================
+346:       "Only a Super Admin can reject cooperative applications."
+347:     );
+348:   }
+349: 
+350:   /*
+351:    * 3. Validate the cooperative ID.
+352:    */
+353:   const cooperativeId = request.data?.cooperativeId;
+354: 
+355:   if (
+356:     typeof cooperativeId !== "string" ||
+357:     cooperativeId.trim() === ""
+358:   ) {
+359:     throw new HttpsError(
+360:       "invalid-argument",
+361:       "A valid cooperativeId is required."
+362:     );
+363:   }
+364: 
+365:   /*
+366:    * 4. Read the cooperative application.
+
+===============================================
+FILE: functions/index.js
+===============================================
+347:     );
+348:   }
+349: 
+350:   /*
+351:    * 3. Validate the cooperative ID.
+352:    */
+353:   const cooperativeId = request.data?.cooperativeId;
+354: 
+355:   if (
+356:     typeof cooperativeId !== "string" ||
+357:     cooperativeId.trim() === ""
+358:   ) {
+359:     throw new HttpsError(
+360:       "invalid-argument",
+361:       "A valid cooperativeId is required."
+362:     );
+363:   }
+364: 
+365:   /*
+366:    * 4. Read the cooperative application.
+367:    */
+
+===============================================
+FILE: functions/index.js
+===============================================
+351:    * 3. Validate the cooperative ID.
+352:    */
+353:   const cooperativeId = request.data?.cooperativeId;
+354: 
+355:   if (
+356:     typeof cooperativeId !== "string" ||
+357:     cooperativeId.trim() === ""
+358:   ) {
+359:     throw new HttpsError(
+360:       "invalid-argument",
+361:       "A valid cooperativeId is required."
+362:     );
+363:   }
+364: 
+365:   /*
+366:    * 4. Read the cooperative application.
+367:    */
+368:   const cooperativeRef = db
+369:     .collection("cooperatives")
+370:     .doc(cooperativeId);
+371: 
+
+===============================================
+FILE: functions/index.js
+===============================================
+360:       "invalid-argument",
+361:       "A valid cooperativeId is required."
+362:     );
+363:   }
+364: 
+365:   /*
+366:    * 4. Read the cooperative application.
+367:    */
+368:   const cooperativeRef = db
+369:     .collection("cooperatives")
+370:     .doc(cooperativeId);
+371: 
+372:   const cooperativeSnap = await cooperativeRef.get();
+373: 
+374:   if (!cooperativeSnap.exists) {
+375:     throw new HttpsError(
+376:       "not-found",
+377:       "Cooperative application not found."
+378:     );
+379:   }
+380: 
+
+===============================================
+FILE: functions/index.js
+===============================================
+395:   /*
+396:    * 6. Reject the cooperative application.
+397:    */
+398:   await cooperativeRef.update({
+399:     status: "rejected",
+400:     rejectedBy: rejectorUid,
+401:     rejectedAt: FieldValue.serverTimestamp(),
+402:   });
+403: 
+404:   logger.info("Cooperative rejected successfully", {
+405:     cooperativeId,
+406:     rejectedBy: rejectorUid,
+407:   });
+408: 
+409:   return {
+410:     success: true,
+411:     cooperativeId,
+412:     rejectedBy: rejectorUid,
+413:     message: "Cooperative application rejected.",
+414:   };
+415: });
+
+===============================================
+FILE: functions/index.js
+===============================================
+401:     rejectedAt: FieldValue.serverTimestamp(),
+402:   });
+403: 
+404:   logger.info("Cooperative rejected successfully", {
+405:     cooperativeId,
+406:     rejectedBy: rejectorUid,
+407:   });
+408: 
+409:   return {
+410:     success: true,
+411:     cooperativeId,
+412:     rejectedBy: rejectorUid,
+413:     message: "Cooperative application rejected.",
+414:   };
+415: });
+416: 
+
+===============================================
+FILE: server/cooperativeApplicationServer.js
+===============================================
+55: 
+56:     const validationError = validateApplication(data);
+57: 
+58:     if (validationError) {
+59:       return res.status(400).json({
+60:         success: false,
+61:         message: validationError
+62:       });
+63:     }
+64: 
+65:     const cooperativeId =
+66:       `CMP-${data.country.trim().toUpperCase()}-${crypto
+67:         .randomUUID()
+68:         .replace(/-/g, "")
+69:         .slice(0, 12)
+70:         .toUpperCase()}`;
+71: 
+72:     const cooperativeRef = db
+73:       .collection("cooperatives")
+74:       .doc(cooperativeId);
+75: 
+
+===============================================
+FILE: server/cooperativeApplicationServer.js
+===============================================
+64: 
+65:     const cooperativeId =
+66:       `CMP-${data.country.trim().toUpperCase()}-${crypto
+67:         .randomUUID()
+68:         .replace(/-/g, "")
+69:         .slice(0, 12)
+70:         .toUpperCase()}`;
+71: 
+72:     const cooperativeRef = db
+73:       .collection("cooperatives")
+74:       .doc(cooperativeId);
+75: 
+76:     await cooperativeRef.create({
+77:       cooperativeId,
+78:       cooperativeName: data.coopName.trim(),
+79:       registrationNumber: data.registrationNumber.trim(),
+80:       cooperativeType: data.coopType.trim(),
+81:       country: data.country.trim(),
+82:       state: data.state.trim(),
+83:       city: data.city.trim(),
+84:       officeAddress: data.officeAddress.trim(),
+
+===============================================
+FILE: server/cooperativeApplicationServer.js
+===============================================
+67:         .randomUUID()
+68:         .replace(/-/g, "")
+69:         .slice(0, 12)
+70:         .toUpperCase()}`;
+71: 
+72:     const cooperativeRef = db
+73:       .collection("cooperatives")
+74:       .doc(cooperativeId);
+75: 
+76:     await cooperativeRef.create({
+77:       cooperativeId,
+78:       cooperativeName: data.coopName.trim(),
+79:       registrationNumber: data.registrationNumber.trim(),
+80:       cooperativeType: data.coopType.trim(),
+81:       country: data.country.trim(),
+82:       state: data.state.trim(),
+83:       city: data.city.trim(),
+84:       officeAddress: data.officeAddress.trim(),
+85:       officialEmail: data.coopEmail.trim().toLowerCase(),
+86:       officialPhone: data.coopPhone.trim(),
+87:       administratorName: data.adminName.trim(),
+
+===============================================
+FILE: server/cooperativeApplicationServer.js
+===============================================
+86:       officialPhone: data.coopPhone.trim(),
+87:       administratorName: data.adminName.trim(),
+88:       administratorEmail: data.adminEmail.trim().toLowerCase(),
+89:       subscriptionPlan: data.subscriptionPlan.trim(),
+90:       status: "pending",
+91:       createdAt: FieldValue.serverTimestamp()
+92:     });
+93: 
+94:     console.log(
+95:       "Cooperative application submitted:",
+96:       cooperativeId
+97:     );
+98: 
+99:     return res.status(201).json({
+100:       success: true,
+101:       cooperativeId,
+102:       message: "Cooperative application submitted successfully."
+103:     });
+104:   } catch (error) {
+105:     console.error(
+106:       "Cooperative application submission failed:",
+
+===============================================
+FILE: server/cooperativeApplicationServer.js
+===============================================
+91:       createdAt: FieldValue.serverTimestamp()
+92:     });
+93: 
+94:     console.log(
+95:       "Cooperative application submitted:",
+96:       cooperativeId
+97:     );
+98: 
+99:     return res.status(201).json({
+100:       success: true,
+101:       cooperativeId,
+102:       message: "Cooperative application submitted successfully."
+103:     });
+104:   } catch (error) {
+105:     console.error(
+106:       "Cooperative application submission failed:",
+107:       error
+108:     );
+109: 
+110:     return res.status(500).json({
+111:       success: false,
+
+===============================================
+RC391 DECISION QUESTIONS
+===============================================
+1. IDENTIFY THE ACTUAL CALLER OF createDrawGroup().
+2. IDENTIFY THE EXACT VARIABLE USED AS THE createDrawGroup() ARGUMENT.
+3. PRINT THE FULL CONSTRUCTION PATH OF THAT PAYLOAD.
+4. DETERMINE WHETHER cooperativeId IS ALREADY PRESENT.
+5. IF cooperativeId IS ABSENT, IDENTIFY THE EXISTING AUTHORITATIVE USER/COOPERATIVE RELATIONSHIP.
+6. DO NOT DERIVE cooperativeId FROM uid, groupId, memberId, adminId, OR CLIENT-GENERATED IDENTIFIERS.
+7. DO NOT CREATE ownerId, createdByUserId, OR ANY DUPLICATE OWNERSHIP FIELD.
+8. DO NOT MODIFY APPLICATION FILES OR FIRESTORE RULES IN RC391.
+RC391 STATUS: AUDIT ONLY — NO APPLICATION FILES MODIFIED.
+
+===============================================
+RC391 AUDIT COMPLETE
+===============================================
