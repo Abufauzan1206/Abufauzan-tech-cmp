@@ -1,16 +1,11 @@
-import { auth, db } from "../../js/firebase-config.js";
-import { rolesMatch } from "../../js/components/roleAuthorization.js";
+import { auth } from "../../js/firebase-config.js";
 import { buildSidebar } from "../../js/navigation/sidebar.js";
+import { enforceDashboardAccess } from "../../js/controllers/accessController.js";
 
 import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-import {
-    doc,
-    getDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 function redirectToLogin() {
     window.location.href = "../../login.html";
@@ -23,30 +18,14 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     try {
-        const userDoc = await getDoc(
-            doc(db, "users", user.uid)
-        );
+        const access =
+            await enforceDashboardAccess("member");
 
-        if (!userDoc.exists()) {
-            await signOut(auth);
-            redirectToLogin();
+        if (!access.allowed) {
             return;
         }
 
-        const userData = userDoc.data();
-
-        if (!rolesMatch(userData.role, "member")) {
-            if (rolesMatch(userData.role, "cooperative_admin")) {
-                window.location.href = "../../cooperative-admin.html";
-            } else if (rolesMatch(userData.role, "super_admin")) {
-                window.location.href = "../../super-admin.html";
-            } else {
-                await signOut(auth);
-                redirectToLogin();
-            }
-
-            return;
-        }
+        const userData = access.profile;
 
         const memberName =
             userData.name ||

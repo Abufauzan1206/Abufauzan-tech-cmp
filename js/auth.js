@@ -1,15 +1,9 @@
-import { auth, db } from "./firebase-config.js";
-import { rolesMatch } from "./components/roleAuthorization.js";
-import { resolveAccess } from "./controllers/accessController.js";
+import { auth } from "./firebase-config.js";
+import { enforceDashboardAccess } from "./controllers/accessController.js";
 
 import {
   signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-import {
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const loginForm = document.getElementById("loginForm");
 
@@ -26,46 +20,23 @@ if (loginForm) {
 
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-      const uid = userCredential.user.uid;
-
-      const userDoc = await getDoc(doc(db, "users", uid));
-
-      if (!userDoc.exists()) {
-        alert("User profile not found.");
-        return;
-      }
-
-      const userData = userDoc.data();
-
-      alert("Login successful!");
-
       /*
-       * Super Admin is automatic and is never selectable
-       * through the Login-as control.
+       * Authentication is established by Firebase.
+       * Profile and role authority belongs exclusively to
+       * the Central Access Controller.
        */
-      if (rolesMatch(userData.role, "super_admin")) {
-          const access = await resolveAccess();
-
-          if (!access.allowed) {
-              alert(access.reason);
-              return;
-          }
-
-          window.location.href = access.destination;
-          return;
-      }
-
       const loginAsRole =
           document.getElementById("loginAsRole")?.value || null;
 
-      const access = await resolveAccess(loginAsRole);
+      const access = await enforceDashboardAccess(loginAsRole);
 
       if (!access.allowed) {
+          await auth.signOut();
           alert(access.reason);
           return;
       }
 
-      window.location.href = access.destination;
+      return;
 
     } catch (error) {
 

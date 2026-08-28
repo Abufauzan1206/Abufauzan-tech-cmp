@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase-config.js";
+import { auth } from "./firebase-config.js";
 import { enforceDashboardAccess } from "./controllers/accessController.js";
 import { buildSidebar } from "./navigation/sidebar.js";
 
@@ -6,11 +6,6 @@ import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-import {
-    doc,
-    getDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
 function handleDashboardHistoryReentry() {
@@ -51,29 +46,12 @@ onAuthStateChanged(auth, async (user) => {
             return;
         }
 
-        const currentUser = auth.currentUser;
-
-        if (!currentUser) {
-            window.location.href = "login.html";
-            return;
-        }
-
-        const userDoc = await getDoc(
-            doc(db, "users", currentUser.uid)
-        );
-
-        if (!userDoc.exists()) {
-            await signOut(auth);
-            window.location.href = "login.html";
-            return;
-        }
-
-        const userData = userDoc.data();
+        const userData = access.profile;
 
         const name =
             userData.name ||
             userData.displayName ||
-            user.email ||
+            access.user?.email ||
             "Cooperative Administrator";
 
         const nameElement =
@@ -89,7 +67,7 @@ onAuthStateChanged(auth, async (user) => {
         if (sidebar) {
             buildSidebar(
                 "sidebarMenu",
-                userData.role
+                access.role
             );
         }
 

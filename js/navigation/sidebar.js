@@ -1,12 +1,5 @@
-import { auth, db } from "../firebase-config.js";
 import { rolesMatch } from "../components/roleAuthorization.js";
-import {
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-import {
-    doc,
-    getDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { enforceDashboardAccess } from "../controllers/accessController.js";
 
 function getDashboardUrl(role) {
     if (rolesMatch(role, "super_admin")) {
@@ -201,36 +194,23 @@ export function buildSidebar(containerId, role = null) {
     });
 }
 
-export function buildAuthenticatedSidebar(containerId) {
-    onAuthStateChanged(auth, async user => {
-        if (!user) {
-            window.location.href = new URL("../../login.html", import.meta.url).href;
+export async function buildAuthenticatedSidebar(containerId) {
+    try {
+        const access =
+            await enforceDashboardAccess();
+
+        if (!access.allowed) {
             return;
         }
 
-        try {
-            const userDoc = await getDoc(
-                doc(db, "users", user.uid)
-            );
-
-            if (!userDoc.exists()) {
-                window.location.href = new URL("../../login.html", import.meta.url).href;
-                return;
-            }
-
-            const userData = userDoc.data();
-
-            buildSidebar(
-                containerId,
-                userData.role
-            );
-        } catch (error) {
-            console.error(
-                "Sidebar authentication error:",
-                error
-            );
-
-            window.location.href = new URL("../../login.html", import.meta.url).href;
-        }
-    });
+        buildSidebar(
+            containerId,
+            access.role
+        );
+    } catch (error) {
+        console.error(
+            "Sidebar access error:",
+            error
+        );
+    }
 }

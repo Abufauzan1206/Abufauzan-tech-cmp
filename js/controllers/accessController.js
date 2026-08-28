@@ -22,10 +22,22 @@ import {
     getDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+const APP_BASE_URL = new URL(
+    "../../",
+    import.meta.url
+);
+
 const DASHBOARD_ROUTES = Object.freeze({
     cooperative_admin: "cooperative-admin.html",
     member: "modules/member-portal/index.html"
 });
+
+function resolveAppRoute(destination) {
+    return new URL(
+        destination,
+        APP_BASE_URL
+    ).href;
+}
 
 export async function getAuthenticatedProfile() {
     const user = auth.currentUser;
@@ -71,7 +83,10 @@ export async function resolveAccess(requestedRole = null) {
             allowed: true,
             role: "super_admin",
             automatic: true,
-            destination: "super-admin.html"
+            destination: "super-admin.html",
+            uid: session.uid,
+            user: session.user,
+            profile: session.profile
         };
     }
 
@@ -114,28 +129,90 @@ export async function resolveAccess(requestedRole = null) {
         allowed: true,
         role: actualRole,
         automatic: false,
-        destination
+        destination,
+        uid: session.uid,
+        user: session.user,
+        profile: session.profile
     };
 }
 
-export async function enforceDashboardAccess(requestedRole = null) {
-    const result = await resolveAccess(requestedRole);
+export async function enforceDashboardAccess(
+    requestedRole = null,
+    options = {}
+) {
+    const {
+        requireRequestedRole = false
+    } = options;
+
+    const session = await getAuthenticatedProfile();
+
+    if (!session) {
+        window.location.href =
+            resolveAppRoute("login.html");
+
+        return {
+            allowed: false,
+            reason: "AUTHENTICATION_REQUIRED",
+            destination: "login.html"
+        };
+    }
+
+    const actualRole =
+        normalizeRole(session.profile.role);
+
+    /*
+     * Dashboard enforcement is based on the
+     * Firebase-UID-bound authoritative profile.
+     *
+     * If a caller explicitly requires Login-as
+     * selection, preserve the existing selection
+     * contract.
+     */
+    if (!requestedRole && requireRequestedRole) {
+        return {
+            allowed: false,
+            reason: "LOGIN_AS_SELECTION_REQUIRED",
+            actualRole
+        };
+    }
+
+    /*
+     * No requested role means direct dashboard
+     * enforcement. The authenticated user's
+     * authoritative role owns the destination.
+     */
+    const effectiveRequestedRole =
+        requestedRole || actualRole;
+
+    const result =
+        await resolveAccess(effectiveRequestedRole);
 
     if (!result.allowed) {
         if (result.reason === "AUTHENTICATION_REQUIRED") {
-            window.location.href = "login.html";
+            window.location.href =
+                resolveAppRoute("login.html");
         }
 
         return result;
     }
 
-    const currentPage = window.location.pathname;
+    const destinationUrl = result.destination
+        ? new URL(
+            result.destination,
+            APP_BASE_URL
+        )
+        : null;
+
+    const currentUrl = new URL(
+        window.location.href
+    );
 
     if (
-        result.destination &&
-        !currentPage.endsWith(result.destination)
+        destinationUrl &&
+        currentUrl.pathname !== destinationUrl.pathname
     ) {
-        window.location.href = result.destination;
+        window.location.href =
+            destinationUrl.href;
     }
 
     return result;

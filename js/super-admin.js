@@ -15,10 +15,7 @@ import {
 
 import {
     collection,
-    doc,
-    getDoc,
-    getDocs,
-    updateDoc
+    getDocs
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const functions = getFunctions();
@@ -66,6 +63,21 @@ onAuthStateChanged(auth, async (user) => {
 
         if (!access.allowed) {
             return;
+        }
+
+        const userData = access.profile;
+
+        const name =
+            userData.name ||
+            userData.displayName ||
+            access.user?.email ||
+            "Super Admin";
+
+        const nameElement =
+            document.getElementById("adminName");
+
+        if (nameElement) {
+            nameElement.textContent = name;
         }
 
     } catch (error) {
