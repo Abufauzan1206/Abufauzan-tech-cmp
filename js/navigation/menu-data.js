@@ -15,7 +15,7 @@ export const menuData = [
   {
     title: "Cooperatives",
     icon: "🏢",
-    url: "#"
+    url: "super-admin.html#cooperativeApplicationsSection"
   },
 
   {

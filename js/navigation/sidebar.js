@@ -28,7 +28,7 @@ function getMenuItems(role) {
             {
                 title: "Cooperatives",
                 icon: "🏢",
-                url: "#"
+                url: "super-admin.html#cooperativeApplicationsSection"
             },
             {
                 title: "Members",
