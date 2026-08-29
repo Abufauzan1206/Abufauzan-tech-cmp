@@ -1,5 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { enforceDashboardAccess } from "./controllers/accessController.js";
+import { buildSidebar } from "./navigation/sidebar.js";
 
 
 
@@ -40,11 +41,7 @@ function handleDashboardHistoryReentry() {
         }
     });
 
-    window.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") {
-            window.location.reload();
-        }
-    });
+
 }
 
 handleDashboardHistoryReentry();
@@ -80,11 +77,26 @@ onAuthStateChanged(auth, async (user) => {
             nameElement.textContent = name;
         }
 
+        const sidebar =
+            document.getElementById("sidebarMenu");
+
+        if (sidebar) {
+            buildSidebar(
+                "sidebarMenu",
+                access.role
+            );
+        }
+
     } catch (error) {
 
         console.error(
-            "Super Admin authorization error:",
+            "RC406-D56 SUPER ADMIN RUNTIME ERROR:",
             error
+        );
+
+        alert(
+            "RC406-D56 ERROR: " +
+            (error?.message || String(error))
         );
 
         await signOut(auth);
