@@ -1,20 +1,34 @@
 import { rolesMatch } from "../components/roleAuthorization.js";
 import { enforceDashboardAccess } from "../controllers/accessController.js";
 
+const APP_BASE_URL = new URL(
+    "../../",
+    import.meta.url
+);
+
+function resolveAppRoute(destination) {
+    return new URL(
+        destination,
+        APP_BASE_URL
+    ).href;
+}
+
 function getDashboardUrl(role) {
     if (rolesMatch(role, "super_admin")) {
-        return "super-admin.html";
+        return resolveAppRoute("super-admin.html");
     }
 
     if (rolesMatch(role, "cooperative_admin")) {
-        return "cooperative-admin.html";
+        return resolveAppRoute("cooperative-admin.html");
     }
 
     if (rolesMatch(role, "member")) {
-        return "modules/member-portal/index.html";
+        return resolveAppRoute(
+            "modules/member-portal/index.html"
+        );
     }
 
-    return "login.html";
+    return resolveAppRoute("login.html");
 }
 
 function getMenuItems(role) {
@@ -187,7 +201,7 @@ export function buildSidebar(containerId, role = null) {
                 event.preventDefault();
             });
         } else {
-            link.href = menu.url;
+            link.href = resolveAppRoute(menu.url);
         }
 
         container.appendChild(link);

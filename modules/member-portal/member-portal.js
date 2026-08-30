@@ -50,7 +50,7 @@ onAuthStateChanged(auth, async (user) => {
 
         const sidebar = document.getElementById("sidebarMenu");
         if (sidebar) {
-            buildSidebar("sidebarMenu", userData.role);
+            buildSidebar("sidebarMenu", access.role);
         }
 
     } catch (error) {
