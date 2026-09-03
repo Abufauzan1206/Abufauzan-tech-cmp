@@ -60,4 +60,26 @@ static async register(member) {
 
 }
 
+    /**
+     * Get members belonging to one cooperative
+     */
+    static async getByCooperativeId(cooperativeId) {
+
+        if (
+            typeof cooperativeId !== "string" ||
+            !cooperativeId.trim()
+        ) {
+            throw new Error(
+                "Cooperative ID is required."
+            );
+        }
+
+        return await CMPRepositoryManager
+            .member
+            .findAllByCooperativeId(
+                cooperativeId.trim()
+            );
+
+    }
+
 }

@@ -16,6 +16,773 @@ setGlobalOptions({
   maxInstances: 10,
 });
 
+/**
+ * RC406-D65
+ *
+ * Public cooperative discovery boundary.
+ *
+ * Only cooperatives that have already been approved and are
+ * currently active are exposed. The response intentionally
+ * contains only the fields required by the public membership
+ * application selector.
+ */
+exports.getActiveCooperatives = onCall(async () => {
+  const snapshot = await db
+    .collection("cooperatives")
+    .where("status", "==", "active")
+    .get();
+
+  const cooperatives = [];
+
+  snapshot.forEach((document) => {
+    const data = document.data();
+
+    if (
+      typeof data.cooperativeId !== "string" ||
+      typeof data.cooperativeName !== "string"
+    ) {
+      return;
+    }
+
+    cooperatives.push({
+      cooperativeId: data.cooperativeId.trim(),
+      cooperativeName: data.cooperativeName.trim(),
+    });
+  });
+
+  return {
+    success: true,
+    cooperatives,
+  };
+});
+
+/**
+ * RC406-D66
+ *
+ * Public membership application submission boundary.
+ *
+ * This callable accepts an unauthenticated membership application,
+ * verifies that the selected cooperative is active, and stores the
+ * application as pending. It does not create an active member.
+ */
+/**
+ * RC406-D68
+ *
+ * Cooperative Admin membership application retrieval boundary.
+ *
+ * The caller must be an authenticated Cooperative Admin.
+ * The cooperativeId is derived from the authenticated user's
+ * Firestore profile and is never accepted from the client as
+ * an authorization input.
+ */
+exports.getPendingMembershipApplications = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in to view membership applications."
+    );
+  }
+
+  const callerUid = request.auth.uid;
+
+  const userRef =
+    db.collection("users").doc(callerUid);
+
+  const userSnap =
+    await userRef.get();
+
+  if (!userSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "Administrator profile not found."
+    );
+  }
+
+  const userData =
+    userSnap.data();
+
+  if (userData.role !== "cooperative_admin") {
+    throw new HttpsError(
+      "permission-denied",
+      "Only a Cooperative Admin can view membership applications."
+    );
+  }
+
+  const cooperativeId =
+    typeof userData.cooperativeId === "string"
+      ? userData.cooperativeId.trim()
+      : "";
+
+  if (!cooperativeId) {
+    throw new HttpsError(
+      "permission-denied",
+      "Cooperative ownership is not configured for this administrator."
+    );
+  }
+
+  const snapshot =
+    await db
+      .collection("membershipApplications")
+      .where("cooperativeId", "==", cooperativeId)
+      .where("status", "==", "pending")
+      .get();
+
+  const applications = [];
+
+  snapshot.forEach((document) => {
+    const data = document.data();
+
+    applications.push({
+      applicationId:
+        typeof data.applicationId === "string"
+          ? data.applicationId.trim()
+          : document.id,
+      cooperativeId,
+      firstName:
+        typeof data.firstName === "string"
+          ? data.firstName.trim()
+          : "",
+      ...(typeof data.middleName === "string" && data.middleName.trim()
+        ? { middleName: data.middleName.trim() }
+        : {}),
+      lastName:
+        typeof data.lastName === "string"
+          ? data.lastName.trim()
+          : "",
+      phone:
+        typeof data.phone === "string"
+          ? data.phone.trim()
+          : "",
+      ...(typeof data.email === "string" && data.email.trim()
+        ? { email: data.email.trim().toLowerCase() }
+        : {}),
+      status: "pending",
+      submittedAt: data.submittedAt ?? null
+    });
+  });
+
+  return {
+    success: true,
+    applications
+  };
+});
+
+/**
+ * RC406-D68
+ *
+ * Cooperative Admin membership application retrieval boundary.
+ *
+ * The caller must be an authenticated Cooperative Admin.
+ * The cooperativeId is derived from the authenticated user's
+ * Firestore profile and is never accepted from the client as
+ * an authorization input.
+ */
+exports.getPendingMembershipApplications = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in to view membership applications."
+    );
+  }
+
+  const callerUid = request.auth.uid;
+
+  const userRef =
+    db.collection("users").doc(callerUid);
+
+  const userSnap =
+    await userRef.get();
+
+  if (!userSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "Administrator profile not found."
+    );
+  }
+
+  const userData =
+    userSnap.data();
+
+  if (userData.role !== "cooperative_admin") {
+    throw new HttpsError(
+      "permission-denied",
+      "Only a Cooperative Admin can view membership applications."
+    );
+  }
+
+  const cooperativeId =
+    typeof userData.cooperativeId === "string"
+      ? userData.cooperativeId.trim()
+      : "";
+
+  if (!cooperativeId) {
+    throw new HttpsError(
+      "permission-denied",
+      "Cooperative ownership is not configured for this administrator."
+    );
+  }
+
+  const snapshot =
+    await db
+      .collection("membershipApplications")
+      .where("cooperativeId", "==", cooperativeId)
+      .where("status", "==", "pending")
+      .get();
+
+  const applications = [];
+
+  snapshot.forEach((document) => {
+    const data = document.data();
+
+    applications.push({
+      applicationId:
+        typeof data.applicationId === "string"
+          ? data.applicationId.trim()
+          : document.id,
+      cooperativeId,
+      firstName:
+        typeof data.firstName === "string"
+          ? data.firstName.trim()
+          : "",
+      ...(typeof data.middleName === "string" && data.middleName.trim()
+        ? { middleName: data.middleName.trim() }
+        : {}),
+      lastName:
+        typeof data.lastName === "string"
+          ? data.lastName.trim()
+          : "",
+      phone:
+        typeof data.phone === "string"
+          ? data.phone.trim()
+          : "",
+      ...(typeof data.email === "string" && data.email.trim()
+        ? { email: data.email.trim().toLowerCase() }
+        : {}),
+      status: "pending",
+      submittedAt: data.submittedAt ?? null
+    });
+  });
+
+  return {
+    success: true,
+    applications
+  };
+});
+
+/**
+ * RC406-D69
+ *
+ * Cooperative Admin membership application decision boundary.
+ *
+ * ACCEPT:
+ *   pending application -> active member + approved application
+ *
+ * REJECT:
+ *   pending application -> rejected application
+ *
+ * Authorization is derived from the authenticated user's
+ * Firestore profile. The client cannot supply cooperative
+ * ownership as an authorization authority.
+ */
+
+async function getCooperativeAdminDecisionContext(request) {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in to manage membership applications."
+    );
+  }
+
+  const callerUid = request.auth.uid;
+
+  const userSnapshot =
+    await db.collection("users").doc(callerUid).get();
+
+  if (!userSnapshot.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "Administrator profile not found."
+    );
+  }
+
+  const userData = userSnapshot.data();
+
+  if (userData.role !== "cooperative_admin") {
+    throw new HttpsError(
+      "permission-denied",
+      "Only a Cooperative Admin can manage membership applications."
+    );
+  }
+
+  const cooperativeId =
+    typeof userData.cooperativeId === "string"
+      ? userData.cooperativeId.trim()
+      : "";
+
+  if (!cooperativeId) {
+    throw new HttpsError(
+      "permission-denied",
+      "Cooperative ownership is not configured for this administrator."
+    );
+  }
+
+  return {
+    callerUid,
+    cooperativeId,
+  };
+}
+
+function normalizeApplicationId(data) {
+  return typeof data?.applicationId === "string"
+    ? data.applicationId.trim()
+    : "";
+}
+
+function generateMemberId() {
+  const year = new Date().getFullYear();
+  const randomPart = crypto
+    .randomInt(0, 1000000)
+    .toString()
+    .padStart(6, "0");
+
+  return `ATC-MEM-${year}-${randomPart}`;
+}
+
+exports.approveMembershipApplication = onCall(async (request) => {
+  const { callerUid, cooperativeId } =
+    await getCooperativeAdminDecisionContext(request);
+
+  const applicationId =
+    normalizeApplicationId(request?.data);
+
+  if (!applicationId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Membership application ID is required."
+    );
+  }
+
+  const applicationRef =
+    db.collection("membershipApplications").doc(applicationId);
+
+  const memberId = generateMemberId();
+
+  const memberRef =
+    db.collection("members").doc(memberId);
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      const applicationSnapshot =
+        await transaction.get(applicationRef);
+
+      if (!applicationSnapshot.exists) {
+        throw new HttpsError(
+          "not-found",
+          "Membership application was not found."
+        );
+      }
+
+      const application =
+        applicationSnapshot.data();
+
+      if (application.cooperativeId !== cooperativeId) {
+        throw new HttpsError(
+          "permission-denied",
+          "This application does not belong to your cooperative."
+        );
+      }
+
+      if (application.status !== "pending") {
+        throw new HttpsError(
+          "failed-precondition",
+          "Only pending membership applications can be approved."
+        );
+      }
+
+      const firstName =
+        typeof application.firstName === "string"
+          ? application.firstName.trim()
+          : "";
+
+      const middleName =
+        typeof application.middleName === "string"
+          ? application.middleName.trim()
+          : "";
+
+      const lastName =
+        typeof application.lastName === "string"
+          ? application.lastName.trim()
+          : "";
+
+      const phone =
+        typeof application.phone === "string"
+          ? application.phone.trim()
+          : "";
+
+      const email =
+        typeof application.email === "string"
+          ? application.email.trim().toLowerCase()
+          : "";
+
+      if (!firstName || !lastName || !phone) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Membership application is missing required member identity data."
+        );
+      }
+
+      const normalizedPhone =
+        phone.trim();
+
+      const normalizedEmail =
+        email.trim().toLowerCase();
+
+      const existingMembersSnapshot =
+        await transaction.get(
+          db
+            .collection("members")
+            .where(
+              "cooperativeId",
+              "==",
+              cooperativeId
+            )
+            .where(
+              "status",
+              "==",
+              "active"
+            )
+        );
+
+      const duplicateActiveMember =
+        existingMembersSnapshot.docs.find(
+          (document) => {
+            const existingMember =
+              document.data();
+
+            const existingPhone =
+              typeof existingMember.phone === "string"
+                ? existingMember.phone.trim()
+                : "";
+
+            const existingEmail =
+              typeof existingMember.email === "string"
+                ? existingMember.email.trim().toLowerCase()
+                : "";
+
+            const phoneMatches =
+              normalizedPhone &&
+              existingPhone === normalizedPhone;
+
+            const emailMatches =
+              normalizedEmail &&
+              existingEmail === normalizedEmail;
+
+            return phoneMatches || emailMatches;
+          }
+        );
+
+      if (duplicateActiveMember) {
+        throw new HttpsError(
+          "already-exists",
+          "An active member with the same phone number or email already exists in this cooperative."
+        );
+      }
+
+      const memberData = {
+        memberId,
+        cooperativeId,
+        firstName,
+        ...(middleName ? { middleName } : {}),
+        lastName,
+        phone,
+        ...(email ? { email } : {}),
+        status: "active",
+        createdAt: FieldValue.serverTimestamp(),
+      };
+
+      transaction.create(memberRef, memberData);
+
+      transaction.update(applicationRef, {
+        status: "approved",
+        approvedAt: FieldValue.serverTimestamp(),
+        approvedBy: callerUid,
+        memberId,
+      });
+    });
+  } catch (error) {
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+
+    logger.error("Membership application approval failed", {
+      applicationId,
+      cooperativeId,
+      callerUid,
+      error: error?.message || String(error),
+    });
+
+    throw new HttpsError(
+      "internal",
+      "Unable to approve membership application."
+    );
+  }
+
+  logger.info("Membership application approved", {
+    applicationId,
+    cooperativeId,
+    memberId,
+    approvedBy: callerUid,
+  });
+
+  return {
+    success: true,
+    applicationId,
+    memberId,
+    status: "approved",
+  };
+});
+
+exports.rejectMembershipApplication = onCall(async (request) => {
+  const { callerUid, cooperativeId } =
+    await getCooperativeAdminDecisionContext(request);
+
+  const applicationId =
+    normalizeApplicationId(request?.data);
+
+  if (!applicationId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Membership application ID is required."
+    );
+  }
+
+  const applicationRef =
+    db.collection("membershipApplications").doc(applicationId);
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      const applicationSnapshot =
+        await transaction.get(applicationRef);
+
+      if (!applicationSnapshot.exists) {
+        throw new HttpsError(
+          "not-found",
+          "Membership application was not found."
+        );
+      }
+
+      const application =
+        applicationSnapshot.data();
+
+      if (application.cooperativeId !== cooperativeId) {
+        throw new HttpsError(
+          "permission-denied",
+          "This application does not belong to your cooperative."
+        );
+      }
+
+      if (application.status !== "pending") {
+        throw new HttpsError(
+          "failed-precondition",
+          "Only pending membership applications can be rejected."
+        );
+      }
+
+      transaction.update(applicationRef, {
+        status: "rejected",
+        rejectedAt: FieldValue.serverTimestamp(),
+        rejectedBy: callerUid,
+      });
+    });
+  } catch (error) {
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+
+    logger.error("Membership application rejection failed", {
+      applicationId,
+      cooperativeId,
+      callerUid,
+      error: error?.message || String(error),
+    });
+
+    throw new HttpsError(
+      "internal",
+      "Unable to reject membership application."
+    );
+  }
+
+  logger.info("Membership application rejected", {
+    applicationId,
+    cooperativeId,
+    rejectedBy: callerUid,
+  });
+
+  return {
+    success: true,
+    applicationId,
+    status: "rejected",
+  };
+});
+
+exports.submitMembershipApplication = onCall(async (request) => {
+  const data = request?.data || {};
+
+  const firstName =
+    typeof data.firstName === "string"
+      ? data.firstName.trim()
+      : "";
+
+  const middleName =
+    typeof data.middleName === "string"
+      ? data.middleName.trim()
+      : "";
+
+  const lastName =
+    typeof data.lastName === "string"
+      ? data.lastName.trim()
+      : "";
+
+  const phone =
+    typeof data.phone === "string"
+      ? data.phone.trim()
+      : "";
+
+  const email =
+    typeof data.email === "string"
+      ? data.email.trim().toLowerCase()
+      : "";
+
+  const cooperativeId =
+    typeof data.cooperativeId === "string"
+      ? data.cooperativeId.trim()
+      : "";
+
+  if (!firstName) {
+    throw new HttpsError(
+      "invalid-argument",
+      "First name is required."
+    );
+  }
+
+  if (!lastName) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Last name is required."
+    );
+  }
+
+  if (!phone) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Phone number is required."
+    );
+  }
+
+  if (!cooperativeId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Cooperative ID is required."
+    );
+  }
+
+  const cooperativeRef =
+    db.collection("cooperatives").doc(cooperativeId);
+
+  const cooperativeSnapshot =
+    await cooperativeRef.get();
+
+  if (!cooperativeSnapshot.exists) {
+    throw new HttpsError(
+      "not-found",
+      "Selected cooperative was not found."
+    );
+  }
+
+  const cooperative =
+    cooperativeSnapshot.data();
+
+  if (cooperative?.status !== "active") {
+    throw new HttpsError(
+      "failed-precondition",
+      "Selected cooperative is not accepting membership applications."
+    );
+  }
+
+  const pendingApplicationsQuery =
+    db
+      .collection("membershipApplications")
+      .where("cooperativeId", "==", cooperativeId)
+      .where("status", "==", "pending");
+
+  const pendingApplicationsSnapshot =
+    await pendingApplicationsQuery.get();
+
+  const normalizedPhone =
+    phone.trim();
+
+  const normalizedEmail =
+    email.trim().toLowerCase();
+
+  const duplicatePendingApplication =
+    pendingApplicationsSnapshot.docs.find(
+      (document) => {
+        const application =
+          document.data();
+
+        const applicationPhone =
+          typeof application.phone === "string"
+            ? application.phone.trim()
+            : "";
+
+        const applicationEmail =
+          typeof application.email === "string"
+            ? application.email.trim().toLowerCase()
+            : "";
+
+        const phoneMatches =
+          normalizedPhone &&
+          applicationPhone === normalizedPhone;
+
+        const emailMatches =
+          normalizedEmail &&
+          applicationEmail === normalizedEmail;
+
+        return phoneMatches || emailMatches;
+      }
+    );
+
+  if (duplicatePendingApplication) {
+    throw new HttpsError(
+      "already-exists",
+      "A pending membership application already exists for this applicant."
+    );
+  }
+
+  const applicationRef =
+    db.collection("membershipApplications").doc();
+
+  const applicationId =
+    applicationRef.id;
+
+  await applicationRef.set({
+    applicationId,
+    cooperativeId,
+    firstName,
+    ...(middleName ? { middleName } : {}),
+    lastName,
+    phone,
+    ...(email ? { email } : {}),
+    status: "pending",
+    submittedAt: FieldValue.serverTimestamp()
+  });
+
+  return {
+    success: true,
+    applicationId
+  };
+});
+
 exports.submitCooperativeApplication = onCall(async (request) => {
   /*
    * Public cooperative application boundary.

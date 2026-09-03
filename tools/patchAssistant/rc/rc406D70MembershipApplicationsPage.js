@@ -1,0 +1,71 @@
+import { patch } from "../patchEngine.js";
+
+const result = await patch({
+    mode: "create",
+    path: "modules/members/membership-applications/index.html",
+    replace: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Applications</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <main class="container">
+        <h1>📥 Membership Applications</h1>
+
+        <p>
+            Review membership applications submitted to your cooperative.
+        </p>
+
+        <div class="application-summary">
+            <strong id="applicationCount">
+                Pending Applications: 0
+            </strong>
+        </div>
+
+        <p id="applicationMessage" role="status"></p>
+
+        <section id="applicationsSection">
+            <table id="applicationsTable" width="100%">
+                <thead>
+                    <tr>
+                        <th>Applicant</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Application ID</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="applicationsBody">
+                    <tr>
+                        <td colspan="7">
+                            Loading applications...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <br>
+
+        <a href="../index.html" class="secondary-btn">
+            ⬅ Back to Members
+        </a>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
+`
+});
+
+console.log(
+    "RC406-D70 PAGE PATCH RESULT:",
+    JSON.stringify(result, null, 2)
+);

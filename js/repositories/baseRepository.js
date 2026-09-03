@@ -44,6 +44,17 @@ export class CMPBaseRepository {
 
     }
 
+    async findAllByCooperativeId(
+        cooperativeId
+    ) {
+
+        return await this.adapter
+            .findAllByCooperativeId(
+                cooperativeId
+            );
+
+    }
+
 
     async update(id, data) {
 

@@ -26,5 +26,14 @@ export class CMPMemberRepository
 
     }
 
+    async findAllByCooperativeId(cooperativeId) {
+
+        return await this.adapter
+            .findAllByCooperativeId(
+                cooperativeId
+            );
+
+    }
+
 
 }

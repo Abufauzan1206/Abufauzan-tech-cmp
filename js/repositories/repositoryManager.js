@@ -12,6 +12,7 @@
  */
 
 import { CMPMemberRepository } from "./memberRepository.js";
+import { CMPMembershipApplicationRepository } from "./membershipApplicationRepository.js";
 import { CMPContributionRepository } from "./contributionRepository.js";
 import { CMPTransactionRepository } from "./transactionRepository.js";
 import { CMPLedgerRepository } from "./ledgerRepository.js";
@@ -32,6 +33,9 @@ export class CMPRepositoryManager {
 
     static member =
         new CMPMemberRepository();
+
+    static membershipApplication =
+        new CMPMembershipApplicationRepository();
 
     static contribution =
         new CMPContributionRepository();
@@ -73,6 +77,11 @@ export class CMPRepositoryManager {
         this.register(
             "member",
             this.member
+        );
+
+        this.register(
+            "membershipApplication",
+            this.membershipApplication
         );
 
         this.register(

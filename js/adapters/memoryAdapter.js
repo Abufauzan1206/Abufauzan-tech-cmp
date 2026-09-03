@@ -165,6 +165,33 @@ async findById(
 
     }
 
+    async findAllByCooperativeId(
+        cooperativeId
+    ) {
+
+        if (typeof cooperativeId !== "string") {
+            throw new TypeError(
+                "Cooperative ID must be a string."
+            );
+        }
+
+        const normalizedCooperativeId =
+            cooperativeId.trim();
+
+        if (!normalizedCooperativeId) {
+            throw new Error(
+                "Cooperative ID is required."
+            );
+        }
+
+        return this.data.filter(
+            record =>
+                record.cooperativeId ===
+                normalizedCooperativeId
+        );
+
+    }
+
 
     async update(
         id,
