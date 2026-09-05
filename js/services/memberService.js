@@ -37,6 +37,39 @@ export async function getMemberById(id) {
 
 export async function getAllMembers() {
 
+    const { getAuthenticatedProfile } = await import(
+        "../controllers/accessController.js"
+    );
+
+    const session = await getAuthenticatedProfile();
+
+    if (!session) {
+        throw new Error("Authenticated user required.");
+    }
+
+    const role = session.profile?.role;
+
+    if (
+        role === "cooperative_admin" ||
+        role === "cooperativeAdmin"
+    ) {
+        const cooperativeId =
+            session.profile?.cooperativeId;
+
+        if (
+            typeof cooperativeId !== "string" ||
+            !cooperativeId.trim()
+        ) {
+            throw new Error(
+                "Cooperative administrator profile has no cooperativeId."
+            );
+        }
+
+        return await memberRepository.findAllByCooperativeId(
+            cooperativeId.trim()
+        );
+    }
+
     return await memberRepository.findAll();
 
 }

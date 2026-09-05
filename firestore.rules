@@ -139,6 +139,45 @@ service cloud.firestore {
     }
 
 
+    match /members/{memberId} {
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        )
+        || (
+          isMember()
+          && userProfile().data.memberId == memberId
+        );
+
+      allow create: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && request.resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+          && request.resource.data.memberId == memberId
+        );
+
+      allow update: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+          && request.resource.data.cooperativeId ==
+             resource.data.cooperativeId
+          && request.resource.data.memberId ==
+             resource.data.memberId
+        );
+
+      allow delete: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
