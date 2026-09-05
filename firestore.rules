@@ -49,7 +49,12 @@ service cloud.firestore {
       allow create: if isSuperAdmin();
 
       allow update: if isSuperAdmin()
-        || isOwnUserProfile(userId);
+        || (
+          isOwnUserProfile(userId)
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.cooperativeId == resource.data.cooperativeId
+          && request.resource.data.memberId == resource.data.memberId
+        );
 
       allow delete: if isSuperAdmin();
     }
@@ -67,7 +72,10 @@ service cloud.firestore {
 
     match /loans/{loanId} {
       allow read: if isSuperAdmin()
-        || isCooperativeAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId == userProfile().data.cooperativeId
+        )
         || (
           isMember()
           && resource.data.memberId == userProfile().data.memberId
@@ -77,20 +85,31 @@ service cloud.firestore {
         && request.resource.data.memberId == userProfile().data.memberId;
 
       allow update: if isSuperAdmin()
-        || isCooperativeAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId == userProfile().data.cooperativeId
+          && request.resource.data.cooperativeId == resource.data.cooperativeId
+        )
         || (
           isMember()
           && resource.data.memberId == userProfile().data.memberId
           && request.resource.data.memberId == resource.data.memberId
+          && request.resource.data.cooperativeId == resource.data.cooperativeId
         );
 
       allow delete: if isSuperAdmin()
-        || isCooperativeAdmin();
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId == userProfile().data.cooperativeId
+        );
     }
 
     match /welfare/{welfareId} {
       allow read: if isSuperAdmin()
-        || isCooperativeAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId == userProfile().data.cooperativeId
+        )
         || (
           isMember()
           && resource.data.memberId == userProfile().data.memberId
@@ -100,15 +119,23 @@ service cloud.firestore {
         && request.resource.data.memberId == userProfile().data.memberId;
 
       allow update: if isSuperAdmin()
-        || isCooperativeAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId == userProfile().data.cooperativeId
+          && request.resource.data.cooperativeId == resource.data.cooperativeId
+        )
         || (
           isMember()
           && resource.data.memberId == userProfile().data.memberId
           && request.resource.data.memberId == resource.data.memberId
+          && request.resource.data.cooperativeId == resource.data.cooperativeId
         );
 
       allow delete: if isSuperAdmin()
-        || isCooperativeAdmin();
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId == userProfile().data.cooperativeId
+        );
     }
 
 
