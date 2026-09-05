@@ -1,4 +1,5 @@
 import { db, auth } from "../firebase-config.js";
+import { getAuthenticatedProfile } from "../controllers/accessController.js";
 
 import {
 collection,
@@ -145,23 +146,55 @@ export async function getApprovedLoans(
     
 export async function getLoans() {
 
-    const snapshot =
-        await getDocs(
+    const session = await getAuthenticatedProfile();
+
+    if (!session) {
+        throw new Error("Authenticated user required.");
+    }
+
+    const role = session.profile?.role;
+
+    let snapshot;
+
+    if (
+        role === "cooperative_admin" ||
+        role === "cooperativeAdmin"
+    ) {
+        const cooperativeId =
+            session.profile?.cooperativeId;
+
+        if (
+            typeof cooperativeId !== "string" ||
+            !cooperativeId.trim()
+        ) {
+            throw new Error(
+                "Cooperative administrator profile has no cooperativeId."
+            );
+        }
+
+        const q = query(
+            collection(db, "loans"),
+            where(
+                "cooperativeId",
+                "==",
+                cooperativeId.trim()
+            )
+        );
+
+        snapshot = await getDocs(q);
+    } else {
+        snapshot = await getDocs(
             collection(db, "loans")
         );
+    }
 
     const loans = [];
 
     snapshot.forEach(doc => {
-
         loans.push({
-
             id: doc.id,
-
             ...doc.data()
-
         });
-
     });
 
     return loans;
