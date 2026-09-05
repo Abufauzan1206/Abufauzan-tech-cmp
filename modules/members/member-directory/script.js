@@ -1,4 +1,4 @@
-import { getMembers } from "../../../js/services/memberService.js";
+import { getAllMembers } from "../../../js/services/memberService.js";
 
 const membersBody =
 document.getElementById("membersBody");
@@ -27,7 +27,7 @@ async function loadMembers() {
 
   try {
 
-    const members = await getMembers();
+    const members = await getAllMembers();
     
     allMembers = members;
     
