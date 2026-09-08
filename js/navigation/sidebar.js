@@ -142,7 +142,7 @@ function getMenuItems(role) {
             {
                 title: "My Contributions",
                 icon: "💰",
-                url: "modules/contributions/index.html"
+                url: "modules/members/member-profile/index.html#contributions"
             },
             {
                 title: "My Loans",
