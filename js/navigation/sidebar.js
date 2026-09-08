@@ -147,12 +147,12 @@ function getMenuItems(role) {
             {
                 title: "My Loans",
                 icon: "🏦",
-                url: "modules/loans/loan-directory/index.html"
+                url: "modules/loans/member-loans/index.html"
             },
             {
                 title: "Welfare",
                 icon: "❤️",
-                url: "modules/welfare/welfare-directory/index.html"
+                url: "modules/welfare/member-welfare/index.html"
             },
             {
                 title: "Statements",

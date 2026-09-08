@@ -19,13 +19,7 @@ welfareForm.addEventListener(
         try {
 
             await applyWelfare({
-
-                memberId:
-                document.getElementById(
-                    "memberId"
-                ).value,
-
-                requestType:
+requestType:
                 document.getElementById(
                     "requestType"
                 ).value,

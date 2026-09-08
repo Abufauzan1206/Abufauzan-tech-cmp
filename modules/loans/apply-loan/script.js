@@ -3,57 +3,6 @@ import {
 }
 from "../../../js/services/loanService.js";
 
-import {
-    getAllMembers
-}
-from "../../../js/services/memberService.js";
-
-const loanForm =
-document.getElementById(
-    "loanForm"
-);
-
-const memberSelect =
-document.getElementById(
-    "memberId"
-);
-
-async function loadMembers() {
-
-    try {
-
-        const members =
-            await getAllMembers();
-
-        memberSelect.innerHTML =
-            '<option value="">Select Member</option>';
-
-        members.forEach(member => {
-
-            memberSelect.innerHTML += `
-            <option value="${member.id}">
-                ${member.memberNumber} -
-                ${member.firstName}
-                ${member.lastName}
-            </option>
-            `;
-
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Unable to load members."
-        );
-
-    }
-
-}
-
-loadMembers();
-
 loanForm.addEventListener(
     "submit",
 
@@ -64,11 +13,7 @@ loanForm.addEventListener(
         try {
 
             await applyLoan({
-
-                memberId:
-                memberSelect.value,
-
-                amount:
+amount:
                 Number(
                     document.getElementById(
                         "amount"
