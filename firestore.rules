@@ -178,6 +178,29 @@ service cloud.firestore {
         );
     }
 
+    match /contributions/{contributionId} {
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        )
+        || (
+          isMember()
+          && resource.data.memberId ==
+             userProfile().data.memberId
+        );
+
+      allow create: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && request.resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
+      allow update, delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

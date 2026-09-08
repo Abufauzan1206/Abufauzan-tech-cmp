@@ -79,17 +79,13 @@ await getContributionSummary(
 document.getElementById(
     "contributionCount"
 ).textContent =
-
-contributionSummary
-.totalContributions;
+    contributionSummary.contributionCount;
 
 document.getElementById(
     "contributionAmount"
 ).textContent =
-
-contributionSummary
-.totalAmount
-.toLocaleString();
+    contributionSummary.totalContributions
+        .toLocaleString();
 
 const contributions =
 await getMemberContributions(
