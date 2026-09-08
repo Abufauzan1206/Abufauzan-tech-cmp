@@ -1,5 +1,5 @@
 import {
-    getMembers
+    getAllMembers
 }
 from "../../../js/services/memberService.js";
 
@@ -55,7 +55,7 @@ groupName.textContent =
 group.groupName;
 
         const members =
-        await getMembers();
+        await getAllMembers();
 
         if (
             members.length === 0
@@ -121,7 +121,7 @@ async function(memberId) {
     try {
 
         const members =
-        await getMembers();
+        await getAllMembers();
 
         const member =
         members.find(

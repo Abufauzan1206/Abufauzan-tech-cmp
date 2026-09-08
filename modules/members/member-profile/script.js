@@ -1,5 +1,7 @@
 import { getMemberById }
 from "../../../js/services/memberService.js";
+import { getAuthenticatedProfile }
+from "../../../js/controllers/accessController.js";
 
 import {
     getContributionSummary,
@@ -19,23 +21,27 @@ import {
 }
 from "../../../js/services/welfareService.js";
 
-// Get member ID from URL
-const params = new URLSearchParams(window.location.search);
-
-const memberId = params.get("id");
-
-// Load member
+// Load the authenticated member profile
 async function loadMember() {
-
-  if (!memberId) {
-
-    alert("No member selected.");
-
-    return;
-
-  }
-
   try {
+    const session = await getAuthenticatedProfile();
+
+    if (!session) {
+      window.location.href = "../../../login.html";
+      return;
+    }
+
+    if (session.profile?.role !== "member") {
+      alert("Member access required.");
+      return;
+    }
+
+    const memberId = session.profile?.memberId;
+
+    if (!memberId) {
+      alert("Authenticated member profile has no memberId.");
+      return;
+    }
 
     const member = await getMemberById(memberId);
 

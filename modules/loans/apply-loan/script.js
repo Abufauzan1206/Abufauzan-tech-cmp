@@ -4,7 +4,7 @@ import {
 from "../../../js/services/loanService.js";
 
 import {
-    getMembers
+    getAllMembers
 }
 from "../../../js/services/memberService.js";
 
@@ -23,7 +23,7 @@ async function loadMembers() {
     try {
 
         const members =
-            await getMembers();
+            await getAllMembers();
 
         memberSelect.innerHTML =
             '<option value="">Select Member</option>';

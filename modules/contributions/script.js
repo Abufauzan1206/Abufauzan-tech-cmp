@@ -5,7 +5,7 @@ import {
 } from "../../js/business/contributionPostingEngine.js";
 
 import {
-    getMembers
+    getAllMembers
 }
 from "../../js/services/memberService.js";
 
@@ -22,7 +22,7 @@ document.getElementById(
 async function loadMembers() {
 
     const members =
-        await getMembers();
+        await getAllMembers();
 
     memberSelect.innerHTML =
         '<option value="">Select Member</option>';
