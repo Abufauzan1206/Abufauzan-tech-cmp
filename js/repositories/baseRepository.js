@@ -44,6 +44,18 @@ export class CMPBaseRepository {
 
     }
 
+    async findAllByMemberId(
+        memberId
+    ) {
+
+        return await this.adapter
+            .findAllByMemberId(
+                memberId
+            );
+
+    }
+
+
     async findAllByCooperativeId(
         cooperativeId
     ) {

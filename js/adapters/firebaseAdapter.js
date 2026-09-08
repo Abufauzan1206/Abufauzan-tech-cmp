@@ -161,6 +161,62 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
 
     }
 
+    async findAllByMemberId(memberId) {
+
+        if (typeof memberId !== "string") {
+
+            throw new TypeError(
+                "Member ID must be a string."
+            );
+
+        }
+
+        const normalizedMemberId =
+            memberId.trim();
+
+        if (!normalizedMemberId) {
+
+            throw new Error(
+                "Member ID is required."
+            );
+
+        }
+
+        const snapshot = await getDocs(
+
+            query(
+
+                collection(db, this.collectionName),
+
+                where(
+                    "memberId",
+                    "==",
+                    normalizedMemberId
+                )
+
+            )
+
+        );
+
+        const records = [];
+
+        snapshot.forEach((document) => {
+
+            records.push({
+
+                id: document.id,
+
+                ...document.data()
+
+            });
+
+        });
+
+        return records;
+
+    }
+
+
     async findAllByCooperativeId(cooperativeId) {
 
         if (typeof cooperativeId !== "string") {

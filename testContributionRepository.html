@@ -32,56 +32,75 @@ report += "=========================================\n\n";
 
 
 const id = await repository.create({
-
     memberId:"MEMBER001",
-
     amount:25000,
-
     month:"August 2026",
-
     status:"SUCCESS",
-
     createdBy:"CMP"
-
 });
-
 
 report += "CREATE(): PASS\n";
 report += "ID: " + id + "\n\n";
 
-
-
 const record = await repository.findById(id);
-
 
 report += "FIND BY ID(): PASS\n";
 report += JSON.stringify(record,null,4) + "\n\n";
 
-
-
 const all = await repository.findAll();
-
 
 report += "FIND ALL(): PASS\n";
 report += "Total Contributions: " + all.length + "\n\n";
 
-
-
 await repository.update(id,{
-
     status:"UPDATED"
-
 });
-
 
 report += "UPDATE(): PASS\n\n";
 
+const secondId = await repository.create({
+    memberId:"MEMBER001",
+    amount:30000,
+    month:"September 2026",
+    status:"SUCCESS",
+    createdBy:"CMP"
+});
 
+report += "SECOND SAME-MEMBER CREATE(): PASS\n";
+report += "SECOND ID: " + secondId + "\n";
+
+if (id === secondId) {
+    throw new Error(
+        "REGRESSION FAIL: two contributions for the same member received the same document ID."
+    );
+}
+
+report += "UNIQUE DOCUMENT IDS: PASS\n";
+
+const memberContributions =
+    await repository.findAllByMemberId("MEMBER001");
+
+const matchingIds = memberContributions
+    .map((contribution) => contribution.id);
+
+if (
+    !matchingIds.includes(id) ||
+    !matchingIds.includes(secondId)
+) {
+    throw new Error(
+        "REGRESSION FAIL: both same-member contributions were not persisted."
+    );
+}
+
+report += "FIND ALL BY MEMBER ID(): PASS\n";
+report += "Same-member records found: " +
+    memberContributions.length + "\n\n";
 
 await repository.delete(id);
-
+await repository.delete(secondId);
 
 report += "DELETE(): PASS\n";
+report += "DUPLICATE CONTRIBUTION REGRESSION TEST: PASS\n";
 
 
 

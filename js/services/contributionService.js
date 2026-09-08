@@ -34,9 +34,11 @@ export async function getContributionById(id) {
 
 
 export async function getAllContributions() {
-
     return await contributionRepository.findAll();
+}
 
+export async function getMemberContributions(memberId) {
+    return await contributionRepository.findAllByMemberId(memberId);
 }
 
 

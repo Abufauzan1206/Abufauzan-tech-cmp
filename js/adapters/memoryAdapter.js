@@ -165,6 +165,38 @@ async findById(
 
     }
 
+    async findAllByMemberId(
+        memberId
+    ) {
+
+        if (typeof memberId !== "string") {
+
+            throw new TypeError(
+                "Member ID must be a string."
+            );
+
+        }
+
+        const normalizedMemberId =
+            memberId.trim();
+
+        if (!normalizedMemberId) {
+
+            throw new Error(
+                "Member ID is required."
+            );
+
+        }
+
+        return this.data.filter(
+            record =>
+                record.memberId ===
+                normalizedMemberId
+        );
+
+    }
+
+
     async findAllByCooperativeId(
         cooperativeId
     ) {
