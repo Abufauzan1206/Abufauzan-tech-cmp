@@ -893,9 +893,10 @@ exports.approveCooperative = onCall(async (request) => {
   /*
    * 6. Create the Firebase Authentication account.
    *
-   * A random password is generated server-side. The administrator
-   * will use a password-reset/setup link rather than receiving this
-   * password.
+   * A random password is generated server-side so the account can be
+   * created without exposing a password to the administrator. The
+   * authenticated Super Admin client sends the password setup email
+   * after successful cooperative approval.
    */
   const temporaryPassword = crypto.randomUUID() + "A9!";
 
@@ -950,41 +951,25 @@ exports.approveCooperative = onCall(async (request) => {
   });
 
   /*
-   * 9. Generate the password setup link.
-   *
-   * We do not store it in Firestore.
-   * We also do not expose it in the production response yet.
-   * Email delivery will be added as a separate step.
-   */
-  let passwordSetupLink = null;
+ * Password setup is handled by the authenticated Super Admin client
+ * after successful cooperative approval. No password-reset link is
+ * generated or returned by this privileged callable.
+ */
 
-  try {
-    passwordSetupLink = await auth.generatePasswordResetLink(
-      administratorEmail
-    );
-  } catch (error) {
-    logger.error("Password setup link generation failed", {
-      cooperativeId,
-      administratorEmail,
-      error: error.message,
-    });
-  }
+logger.info("Cooperative approved successfully", {
+  cooperativeId,
+  administratorUid: administratorUser.uid,
+  approvedBy: approverUid,
+});
 
-  logger.info("Cooperative approved successfully", {
-    cooperativeId,
-    administratorUid: administratorUser.uid,
-    approvedBy: approverUid,
-  });
-
-  return {
-    success: true,
-    cooperativeId,
-    administratorUid: administratorUser.uid,
-    administratorEmail,
-    passwordSetupLink,
-    message:
-      "Cooperative approved and administrator account created.",
-  };
+return {
+  success: true,
+  cooperativeId,
+  administratorUid: administratorUser.uid,
+  administratorEmail,
+  message:
+    "Cooperative approved and administrator account created.",
+};
 });
 
 exports.rejectCooperative = onCall(async (request) => {

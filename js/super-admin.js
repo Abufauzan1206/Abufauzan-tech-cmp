@@ -6,7 +6,8 @@ import { buildSidebar } from "./navigation/sidebar.js";
 
 import {
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 import {
@@ -211,9 +212,33 @@ async function approveCooperativeApplication(cooperativeId) {
 
         const data = result.data || {};
 
+        if (!data.administratorEmail) {
+            throw new Error(
+                "Cooperative approved but administrator email was not returned."
+            );
+        }
+
+        try {
+            await sendPasswordResetEmail(
+                auth,
+                data.administratorEmail
+            );
+        } catch (emailError) {
+            console.error(
+                "Administrator password setup email error:",
+                emailError
+            );
+
+            alert(
+                "Cooperative was approved, but the administrator password setup email could not be sent."
+            );
+
+            await loadCooperativeApplications();
+            return;
+        }
+
         alert(
-            data.message ||
-            "Cooperative application approved."
+            "Cooperative approved. A password setup email has been sent to the administrator."
         );
 
         await loadCooperativeApplications();
