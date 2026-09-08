@@ -16,6 +16,14 @@ import {
 } from "../services/contributionService.js";
 
 import {
+    getMemberById
+} from "../services/memberService.js";
+
+import {
+    getAuthenticatedProfile
+} from "../controllers/accessController.js";
+
+import {
     CMPTransactionEngine
 } from "./transactionEngine.js";
 
@@ -32,7 +40,26 @@ import {
 
 export async function postContribution(data) {
 
-    if (!data.memberId) {
+    const session = await getAuthenticatedProfile();
+
+    if (!session) {
+        throw new Error("Authenticated user required.");
+    }
+
+    const role = session.profile?.role;
+
+    if (
+        role !== "super_admin" &&
+        role !== "cooperative_admin" &&
+        role !== "cooperativeAdmin"
+    ) {
+        throw new Error("Contribution posting access required.");
+    }
+
+    if (
+        typeof data?.memberId !== "string" ||
+        !data.memberId.trim()
+    ) {
         throw new Error("Member ID is required.");
     }
 
@@ -42,6 +69,52 @@ export async function postContribution(data) {
         );
     }
 
+    const memberId = data.memberId.trim();
+    const member = await getMemberById(memberId);
+
+    if (!member) {
+        throw new Error("Selected member was not found.");
+    }
+
+    const memberCooperativeId =
+        typeof member.cooperativeId === "string"
+            ? member.cooperativeId.trim()
+            : "";
+
+    if (!memberCooperativeId) {
+        throw new Error(
+            "Selected member has no cooperativeId."
+        );
+    }
+
+    if (
+        role === "cooperative_admin" ||
+        role === "cooperativeAdmin"
+    ) {
+        const adminCooperativeId =
+            typeof session.profile?.cooperativeId === "string"
+                ? session.profile.cooperativeId.trim()
+                : "";
+
+        if (!adminCooperativeId) {
+            throw new Error(
+                "Cooperative administrator profile has no cooperativeId."
+            );
+        }
+
+        if (adminCooperativeId !== memberCooperativeId) {
+            throw new Error(
+                "Contribution posting outside your cooperative is not allowed."
+            );
+        }
+    }
+
+    const ownedData = {
+        ...data,
+        memberId,
+        cooperativeId: memberCooperativeId
+    };
+
     const sequence =
         await getNextSequence("CON");
 
@@ -49,7 +122,7 @@ export async function postContribution(data) {
         generateDocumentNumber("CON", sequence);
 
     const contribution = {
-        ...data,
+        ...ownedData,
         contributionNumber,
         status: "POSTED"
     };
@@ -61,7 +134,7 @@ export async function postContribution(data) {
         await CMPTransactionEngine.create({
             type: "CONTRIBUTION",
             amount: data.amount,
-            memberId: data.memberId,
+            memberId,
             reference: contributionNumber,
             description: "Member Contribution",
             account: "Cash Account",

@@ -41,6 +41,23 @@ export async function getMemberContributions(memberId) {
     return await contributionRepository.findAllByMemberId(memberId);
 }
 
+export async function getContributionSummary(memberId) {
+    const contributions =
+        await getMemberContributions(memberId);
+
+    const totalContributions =
+        contributions.reduce(
+            (sum, contribution) =>
+                sum + Number(contribution.amount || 0),
+            0
+        );
+
+    return {
+        totalContributions,
+        contributionCount: contributions.length
+    };
+}
+
 
 export async function updateContribution(id, data) {
 
