@@ -200,6 +200,19 @@ service cloud.firestore {
 
       allow update, delete: if false;
     }
+    match /journals/{journalId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSuperAdmin();
+      allow update: if false;
+      allow delete: if isSuperAdmin();
+    }
+
+    match /ledgerBatches/{ledgerBatchId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSuperAdmin();
+      allow update: if false;
+      allow delete: if isSuperAdmin();
+    }
 
     match /{document=**} {
       allow read, write: if false;
