@@ -25,6 +25,14 @@ import { CMPJournalBuilderEngine }
 import { CMPJournalPostingEngine }
     from "./journalPostingEngine.js";
 
+import {
+    deleteJournal
+} from "../services/journalService.js";
+
+import {
+    deleteLedgerBatch
+} from "../services/ledgerBatchService.js";
+
 
 export class CMPTransactionEngine {
 
@@ -104,10 +112,42 @@ export class CMPTransactionEngine {
         newTransaction.status = "POSTED";
         newTransaction.postedAt = new Date();
 
-        const transactionRecord =
-            await CMPRepositoryManager
-                .transaction
-                .create(newTransaction);
+        let transactionRecord;
+
+        try {
+            transactionRecord =
+                await CMPRepositoryManager
+                    .transaction
+                    .create(newTransaction);
+        } catch (error) {
+            try {
+                if (postingResult.ledgerDocumentId) {
+                    await deleteLedgerBatch(
+                        postingResult.ledgerDocumentId
+                    );
+                }
+            } catch (rollbackError) {
+                console.error(
+                    "Transaction rollback: ledger deletion failed.",
+                    rollbackError
+                );
+            }
+
+            try {
+                if (postingResult.journalDocumentId) {
+                    await deleteJournal(
+                        postingResult.journalDocumentId
+                    );
+                }
+            } catch (rollbackError) {
+                console.error(
+                    "Transaction rollback: journal deletion failed.",
+                    rollbackError
+                );
+            }
+
+            throw error;
+        }
 
         return {
             ...transactionRecord,

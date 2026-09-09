@@ -20,6 +20,10 @@ import {
 } from "../services/memberService.js";
 
 import {
+    deleteContribution
+} from "../services/contributionService.js";
+
+import {
     getAuthenticatedProfile
 } from "../controllers/accessController.js";
 
@@ -130,8 +134,11 @@ export async function postContribution(data) {
     const contributionResult =
         await createContribution(contribution);
 
-    const transactionResult =
-        await CMPTransactionEngine.create({
+    let transactionResult;
+
+    try {
+        transactionResult =
+            await CMPTransactionEngine.create({
             type: "CONTRIBUTION",
             amount: data.amount,
             memberId,
@@ -139,9 +146,23 @@ export async function postContribution(data) {
             description: "Member Contribution",
             account: "Cash Account",
             createdBy: data.createdBy ?? "CMP"
-        });
+            });
+    } catch (error) {
+        try {
+            if (contributionResult) {
+                await deleteContribution(
+                    contributionResult.id ?? contributionResult
+                );
+            }
+        } catch (rollbackError) {
+            console.error(
+                "Contribution rollback failed.",
+                rollbackError
+            );
+        }
 
-    
+        throw error;
+    }
 
     return {
         success: true,
