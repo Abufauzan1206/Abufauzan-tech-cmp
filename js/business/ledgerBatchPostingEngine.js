@@ -84,12 +84,16 @@ export async function postLedgerBatch(
         batchNumber,
         entries,
 
-        ...(options.journalReference
-            ? {
-                journalReference:
-                    options.journalReference
-            }
-            : {}),
+        ...(
+            options.journalReference
+                ? {
+                    journalReference:
+                        options.journalReference,
+                    cooperativeId:
+                        options.cooperativeId
+                }
+                : {}
+        ),
 
         ...(options.sandboxId
             ? {

@@ -47,6 +47,8 @@ import {
     getCurrentSandbox
 } from "../utils/sandboxManager.js";
 
+import { getAuthenticatedProfile } from "../controllers/accessController.js";
+
 
 function normalizeJournalEntries(data) {
 
@@ -274,7 +276,8 @@ try {
 
                 journalReference:
                     data.reference,
-
+                cooperativeId:
+                    data.cooperativeId,
                 journalNumber,
                 financialYearId:
                     period.financialYearId,
@@ -289,13 +292,31 @@ try {
 }
 catch (error) {
 
-    if (journalResult) {
+    const session =
+        await getAuthenticatedProfile();
 
-        await deleteJournal(
-            journalResult.id ??
-            journalResult
+    const canCompensate =
+        session?.profile?.role === "super_admin";
+
+    if (canCompensate && journalResult) {
+
+        try {
+            await deleteJournal(
+                journalResult.id ??
+                journalResult
+            );
+        } catch (rollbackError) {
+            console.error(
+                "Journal rollback failed.",
+                rollbackError
+            );
+        }
+
+    } else if (!canCompensate) {
+
+        console.error(
+            "Journal compensation skipped: privileged financial deletion is restricted to Super Admin."
         );
-
     }
 
     throw error;

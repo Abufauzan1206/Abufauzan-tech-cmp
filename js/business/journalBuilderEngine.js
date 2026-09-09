@@ -36,6 +36,8 @@ export class CMPJournalBuilderEngine {
                     reference:
             transaction.reference ?? transaction.transactionId,
 
+                    cooperativeId:
+                        transaction.cooperativeId,
                     entries: [
 
                         {

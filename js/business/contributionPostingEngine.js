@@ -142,6 +142,7 @@ export async function postContribution(data) {
             type: "CONTRIBUTION",
             amount: data.amount,
             memberId,
+            cooperativeId: memberCooperativeId,
             reference: contributionNumber,
             description: "Member Contribution",
             account: "Cash Account",

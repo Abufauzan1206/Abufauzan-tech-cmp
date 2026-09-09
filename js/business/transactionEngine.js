@@ -25,9 +25,8 @@ import { CMPJournalBuilderEngine }
 import { CMPJournalPostingEngine }
     from "./journalPostingEngine.js";
 
-import {
-    deleteJournal
-} from "../services/journalService.js";
+import { deleteJournal } from "../services/journalService.js";
+import { getAuthenticatedProfile } from "../controllers/accessController.js";
 
 import {
     deleteLedgerBatch
@@ -120,6 +119,11 @@ export class CMPTransactionEngine {
                     .transaction
                     .create(newTransaction);
         } catch (error) {
+        const session = await getAuthenticatedProfile();
+        const canCompensate =
+            session?.profile?.role === "super_admin";
+
+        if (canCompensate) {
             try {
                 if (postingResult.ledgerDocumentId) {
                     await deleteLedgerBatch(
@@ -127,7 +131,7 @@ export class CMPTransactionEngine {
                     );
                 }
             } catch (rollbackError) {
-                console.error(
+                    console.error(
                     "Transaction rollback: ledger deletion failed.",
                     rollbackError
                 );
@@ -145,6 +149,11 @@ export class CMPTransactionEngine {
                     rollbackError
                 );
             }
+        } else {
+            console.error(
+                "Transaction compensation skipped: privileged financial deletion is restricted to Super Admin."
+            );
+        }
 
             throw error;
         }

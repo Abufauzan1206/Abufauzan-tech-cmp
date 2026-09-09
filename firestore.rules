@@ -200,16 +200,58 @@ service cloud.firestore {
 
       allow update, delete: if false;
     }
+    match /transactions/{transactionId} {
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
+      allow create: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && request.resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
+      allow update, delete: if isSuperAdmin();
+    }
+
     match /journals/{journalId} {
-      allow read: if isSuperAdmin();
-      allow create: if isSuperAdmin();
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
+      allow create: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && request.resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
       allow update: if false;
       allow delete: if isSuperAdmin();
     }
 
     match /ledgerBatches/{ledgerBatchId} {
-      allow read: if isSuperAdmin();
-      allow create: if isSuperAdmin();
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
+      allow create: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && request.resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
       allow update: if false;
       allow delete: if isSuperAdmin();
     }
