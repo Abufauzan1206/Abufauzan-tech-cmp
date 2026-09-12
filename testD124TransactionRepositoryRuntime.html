@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>D124 Transaction Repository Runtime</title>
+</head>
+<body>
+<pre id="out">Running...</pre>
+
+<script type="module">
+import { CMPRepositoryManager } from "./js/repositories/repositoryManager.js";
+
+const out = document.getElementById("out");
+
+try {
+    const repository = CMPRepositoryManager.transaction;
+
+    out.textContent =
+        "D124 TRANSACTION REPOSITORY RUNTIME TRACE\n\n" +
+        "MANAGER TRANSACTION EXISTS: " + Boolean(repository) + "\n" +
+        "CONSTRUCTOR: " + (repository?.constructor?.name || "NONE") + "\n" +
+        "CREATE FUNCTION EXISTS: " + (typeof repository?.create === "function") + "\n" +
+        "CREATE FUNCTION SOURCE:\n" +
+        (repository?.create?.toString?.() || "UNAVAILABLE") +
+        "\n\nD124 RUNTIME TRACE: PASS";
+} catch (error) {
+    out.textContent =
+        "D124 RUNTIME TRACE: FAIL\n\n" +
+        error.stack;
+}
+</script>
+</body>
+</html>

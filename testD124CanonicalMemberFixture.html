@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>D124 Canonical Member Fixture</h2>
+<pre id="output">Running...</pre>
+
+<script type="module">
+import { auth, db } from "./js/firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { registerMember } from "./js/services/memberService.js";
+
+const output = document.getElementById("output");
+
+function waitForAuth() {
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            resolve(user);
+        });
+    });
+}
+
+try {
+    const user = await waitForAuth();
+
+    if (!user) {
+        throw new Error("No authenticated Firebase user.");
+    }
+
+    const profileSnap = await getDoc(
+        doc(db, "users", user.uid)
+    );
+
+    if (!profileSnap.exists()) {
+        throw new Error("Authenticated user profile not found.");
+    }
+
+    const profile = profileSnap.data();
+
+    const cooperativeId = "CMP-NI-1783527637336";
+
+    const result = await registerMember({
+        firstName: "D124",
+        lastName: "ContributionTest",
+        phone: "D124-" + Date.now(),
+        email: "",
+        cooperativeId
+    });
+
+    output.textContent =
+        "=========================================\n" +
+        "D124 CANONICAL MEMBER FIXTURE\n" +
+        "=========================================\n\n" +
+        "AUTH UID: " + user.uid + "\n" +
+        "PROFILE ROLE: " + String(profile.role ?? "") + "\n" +
+        "COOPERATIVE ID: " + cooperativeId + "\n\n" +
+        "CANONICAL MEMBER REGISTRATION: PASS\n" +
+        "MEMBER ID: " + result.memberId + "\n" +
+        "MEMBER STATUS: " + result.status + "\n" +
+        "MEMBER COOPERATIVE ID: " + result.cooperativeId + "\n\n" +
+        "FULL MEMBER RECORD:\n" +
+        JSON.stringify(result, null, 4);
+
+} catch (error) {
+    output.textContent =
+        "D124 CANONICAL MEMBER FIXTURE: FAIL\n\n" +
+        (error?.message || String(error));
+}
+</script>
+</body>
+</html>

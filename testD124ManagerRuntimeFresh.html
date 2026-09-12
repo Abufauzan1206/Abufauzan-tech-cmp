@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>D124 FRESH REPOSITORY MANAGER RUNTIME</h2>
+<pre id="output">Running...</pre>
+
+<script type="module">
+import { CMPRepositoryManager } from "./js/repositories/repositoryManager.js?d124manager=2026091208";
+
+const repo = CMPRepositoryManager.transaction;
+
+document.getElementById("output").textContent =
+`D124 FRESH REPOSITORY MANAGER RUNTIME
+
+MANAGER TRANSACTION EXISTS: ${!!repo}
+CONSTRUCTOR: ${repo?.constructor?.name || "NONE"}
+
+CREATE SOURCE:
+${repo?.create?.toString() || "NONE"}
+
+HAS SETDOC LOGIC:
+${repo?.create?.toString()?.includes("setDoc") || false}
+
+USES ADAPTER:
+${repo?.create?.toString()?.includes("this.adapter.create") || false}
+`;
+</script>
+</body>
+</html>

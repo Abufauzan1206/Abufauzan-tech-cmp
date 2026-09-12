@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<body>
+<pre id="out">D124 FIREBASE ONLINE PROBE</pre>
+<script type="module">
+import { auth, db } from "./js/firebase-config.js";
+import {
+    doc,
+    getDoc,
+    connectFirestoreEmulator
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const out = document.getElementById("out");
+
+try {
+    const uid = auth.currentUser?.uid;
+
+    out.textContent =
+`D124 FIREBASE ONLINE PROBE
+AUTH UID: ${uid || "NONE"}
+ONLINE: ${navigator.onLine}`;
+
+    if (!uid) {
+        throw new Error("No authenticated Firebase user in this browser origin.");
+    }
+
+    const snap = await getDoc(doc(db, "users", uid));
+
+    out.textContent +=
+`\nFIRESTORE READ: PASS
+PROFILE EXISTS: ${snap.exists()}
+D124 FIREBASE ONLINE PROBE: PASS`;
+} catch (error) {
+    out.textContent +=
+`\nFIREBASE PROBE: FAIL
+${error?.message || String(error)}`;
+}
+</script>
+</body>
+</html>

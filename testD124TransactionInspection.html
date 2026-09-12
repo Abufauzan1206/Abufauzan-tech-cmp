@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>D124 Transaction Inspection</title>
+</head>
+<body>
+<pre id="out">D124 TRANSACTION INSPECTION\n</pre>
+
+<script type="module">
+import { auth, db } from "./js/firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const out = document.getElementById("out");
+
+const MEMBER_ID = "ATC-MEM-2026-018077";
+const COOPERATIVE_ID = "CMP-NI-1783527637336";
+
+function log(label, value) {
+  out.textContent += label + ": " + value + "\n";
+}
+
+onAuthStateChanged(auth, async (user) => {
+  log("AUTHENTICATION", user ? "PASS" : "FAIL");
+
+  if (!user) return;
+
+  try {
+    const q = query(
+      collection(db, "transactions"),
+      where("memberId", "==", MEMBER_ID),
+      where("cooperativeId", "==", COOPERATIVE_ID)
+    );
+
+    const snap = await getDocs(q);
+
+    log("TRANSACTION QUERY", "PASS");
+    log("MATCH COUNT", snap.size);
+
+    for (const item of snap.docs) {
+      const data = item.data();
+
+      log(
+        "TRANSACTION " + item.id,
+        JSON.stringify({
+          id: item.id,
+          transactionId: data.transactionId ?? null,
+          type: data.type ?? null,
+          amount: data.amount ?? null,
+          memberId: data.memberId ?? null,
+          cooperativeId: data.cooperativeId ?? null,
+          status: data.status ?? null,
+          transactionDate: data.transactionDate ?? null,
+          reference: data.reference ?? null,
+          createdBy: data.createdBy ?? null
+        })
+      );
+    }
+
+    log("D124 TRANSACTION INSPECTION", "PASS");
+  } catch (error) {
+    log("D124 TRANSACTION INSPECTION", "FAIL");
+    log("ERROR CODE", error?.code ?? "NONE");
+    log("ERROR MESSAGE", error?.message ?? String(error));
+  }
+});
+</script>
+</body>
+</html>

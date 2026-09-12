@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>D124 Direct Transaction Repository Runtime</title>
+</head>
+<body>
+<pre id="out">Running...</pre>
+
+<script type="module">
+import { CMPTransactionRepository }
+    from "./js/repositories/transactionRepository.js?d124direct=2026091201";
+
+const repository = new CMPTransactionRepository();
+
+document.getElementById("out").textContent =
+    "D124 DIRECT TRANSACTION REPOSITORY RUNTIME\n\n" +
+    "CONSTRUCTOR: " +
+    (repository?.constructor?.name || "NONE") +
+    "\n\n" +
+    "CREATE SOURCE:\n" +
+    (repository?.create?.toString?.() || "UNAVAILABLE") +
+    "\n\nD124 DIRECT RUNTIME TRACE: PASS";
+</script>
+</body>
+</html>

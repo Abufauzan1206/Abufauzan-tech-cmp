@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>D124 Accounting Period Inspection</h2>
+<pre id="output">Running...</pre>
+
+<script type="module">
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+import { db } from "./js/firebase-config.js";
+
+const output = document.getElementById("output");
+
+try {
+    const snapshot = await getDocs(
+        collection(db, "accountingPeriods")
+    );
+
+    const records = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        data: doc.data()
+    }));
+
+    output.textContent =
+        "=========================================\n" +
+        "D124 ACCOUNTING PERIOD LIVE INSPECTION\n" +
+        "=========================================\n\n" +
+        "DOCUMENT COUNT: " + records.length + "\n\n" +
+        JSON.stringify(records, null, 4);
+
+} catch (error) {
+    output.textContent =
+        "D124 PERIOD INSPECTION: FAIL\n\n" +
+        (error?.message || String(error));
+}
+</script>
+</body>
+</html>

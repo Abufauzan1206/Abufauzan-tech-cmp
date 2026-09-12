@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>D124 Financial Year Inspection</h2>
+<pre id="output">Running...</pre>
+
+<script type="module">
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+import { db } from "./js/firebase-config.js";
+
+try {
+    const snapshot = await getDocs(
+        collection(db, "financialYears")
+    );
+
+    const records = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        data: doc.data()
+    }));
+
+    document.getElementById("output").textContent =
+        "=========================================\n" +
+        "D124 FINANCIAL YEAR LIVE INSPECTION\n" +
+        "=========================================\n\n" +
+        "DOCUMENT COUNT: " + records.length + "\n\n" +
+        JSON.stringify(records, null, 4);
+
+} catch (error) {
+    document.getElementById("output").textContent =
+        "D124 FINANCIAL YEAR INSPECTION: FAIL\n\n" +
+        (error?.message || String(error));
+}
+</script>
+</body>
+</html>

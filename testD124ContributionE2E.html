@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>D124 Contribution → Accounting E2E</h2>
+<pre id="output">Running...</pre>
+
+<script type="module">
+import { auth } from "./js/firebase-config.js";
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+    collection,
+    getDocs,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { db } from "./js/firebase-config.js";
+import {
+    getAuthenticatedProfile
+} from "./js/controllers/accessController.js";
+import {
+    postContribution
+} from "./js/business/contributionPostingEngine.js";
+
+const output = document.getElementById("output");
+
+const MEMBER_ID = "ATC-MEM-2026-018077";
+const COOPERATIVE_ID = "CMP-NI-1783527637336";
+const AMOUNT = 25000;
+
+function waitForAuth() {
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (user) => {
+                unsubscribe();
+                resolve(user);
+            }
+        );
+    });
+}
+
+function assert(condition, message) {
+    if (!condition) {
+        throw new Error(message);
+    }
+}
+
+try {
+    const user = await waitForAuth();
+
+    assert(user, "No authenticated Firebase user.");
+
+    const session = await getAuthenticatedProfile();
+
+    assert(
+        session,
+        "Authenticated profile could not be resolved."
+    );
+
+    assert(
+        session.profile?.role === "superAdmin" ||
+        session.profile?.role === "super_admin",
+        "Authenticated user is not Super Admin."
+    );
+
+    const result = await postContribution({
+        memberId: MEMBER_ID,
+        amount: AMOUNT,
+        month: "January 2030",
+        createdBy: "D124-E2E"
+    });
+
+    assert(
+        result?.success === true,
+        "postContribution() did not return success=true."
+    );
+
+    assert(
+        result.memberId === MEMBER_ID ||
+        result.contributionId,
+        "Contribution result does not contain a contribution identifier."
+    );
+
+    assert(
+        result.transactionId,
+        "Contribution result does not contain transactionId."
+    );
+
+    assert(
+        result.journalDocumentId,
+        "Contribution result does not contain journalDocumentId."
+    );
+
+    assert(
+        result.ledgerDocumentId,
+        "Contribution result does not contain ledgerDocumentId."
+    );
+
+    const transactionSnapshot = await getDocs(
+        query(
+            collection(db, "transactions"),
+            where("transactionId", "==", result.transactionId)
+        )
+    );
+
+    const journalSnapshot = await getDocs(
+        query(
+            collection(db, "journals"),
+            where("__name__", "==", result.journalDocumentId)
+        )
+    );
+
+    const ledgerSnapshot = await getDocs(
+        query(
+            collection(db, "ledgerBatches"),
+            where("__name__", "==", result.ledgerDocumentId)
+        )
+    );
+
+    assert(
+        transactionSnapshot.size === 1,
+        "Expected exactly one persisted transaction."
+    );
+
+    assert(
+        journalSnapshot.size === 1,
+        "Expected exactly one persisted journal."
+    );
+
+    assert(
+        ledgerSnapshot.size === 1,
+        "Expected exactly one persisted ledger batch."
+    );
+
+    const transaction =
+        transactionSnapshot.docs[0].data();
+
+    const journal =
+        journalSnapshot.docs[0].data();
+
+    const ledger =
+        ledgerSnapshot.docs[0].data();
+
+    assert(
+        transaction.status === "POSTED",
+        "Transaction is not POSTED."
+    );
+
+    assert(
+        transaction.cooperativeId === COOPERATIVE_ID,
+        "Transaction cooperative ownership mismatch."
+    );
+
+    assert(
+        transaction.memberId === MEMBER_ID,
+        "Transaction member ownership mismatch."
+    );
+
+    assert(
+        journal.cooperativeId === COOPERATIVE_ID,
+        "Journal cooperative ownership mismatch."
+    );
+
+    assert(
+        ledger.cooperativeId === COOPERATIVE_ID,
+        "Ledger cooperative ownership mismatch."
+    );
+
+    assert(
+        Number(ledger.totalDebit) === AMOUNT,
+        "Ledger total debit does not equal contribution amount."
+    );
+
+    assert(
+        Number(ledger.totalCredit) === AMOUNT,
+        "Ledger total credit does not equal contribution amount."
+    );
+
+    output.textContent =
+        "=========================================\n" +
+        "RC406-D124 CONTRIBUTION ACCOUNTING E2E\n" +
+        "=========================================\n\n" +
+        "AUTHENTICATION: PASS\n" +
+        "PROFILE: PASS\n" +
+        "CANONICAL MEMBER: PASS\n" +
+        "MEMBER ID: " + MEMBER_ID + "\n" +
+        "COOPERATIVE ID: " + COOPERATIVE_ID + "\n" +
+        "AMOUNT: NGN " + AMOUNT + "\n\n" +
+        "POST CONTRIBUTION(): PASS\n" +
+        "TRANSACTION PERSISTENCE: PASS\n" +
+        "JOURNAL PERSISTENCE: PASS\n" +
+        "LEDGER BATCH PERSISTENCE: PASS\n" +
+        "TRANSACTION STATUS POSTED: PASS\n" +
+        "TRANSACTION OWNERSHIP: PASS\n" +
+        "JOURNAL OWNERSHIP: PASS\n" +
+        "LEDGER OWNERSHIP: PASS\n" +
+        "DOUBLE-ENTRY BALANCE: PASS\n\n" +
+        "TRANSACTION ID: " +
+        String(result.transactionId) + "\n" +
+        "JOURNAL DOCUMENT ID: " +
+        String(result.journalDocumentId) + "\n" +
+        "LEDGER DOCUMENT ID: " +
+        String(result.ledgerDocumentId) + "\n\n" +
+        "=========================================\n" +
+        "D124 E2E: PASS\n" +
+        "=========================================\n\n" +
+        JSON.stringify(
+            {
+                result,
+                transaction,
+                journal,
+                ledger
+            },
+            null,
+            4
+        );
+
+} catch (error) {
+    output.textContent =
+        "=========================================\n" +
+        "D124 E2E: FAIL\n" +
+        "=========================================\n\n" +
+        (error?.message || String(error));
+}
+</script>
+</body>
+</html>

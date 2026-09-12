@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>D124 Transaction Identity Audit</title></head>
+<body>
+<pre id="out">Running...</pre>
+
+<script type="module">
+import { auth, db } from "./js/firebase-config.js";
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const out = document.getElementById("out");
+const MEMBER_ID = "ATC-MEM-2026-018077";
+
+function print(label, value) {
+  out.textContent += `\n${label}: ${value}`;
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    out.textContent = "AUTHENTICATION: FAIL";
+    return;
+  }
+
+  out.textContent = "D124 TRANSACTION IDENTITY AUDIT\n";
+  print("AUTH UID", user.uid);
+
+  try {
+    const snap = await getDocs(
+      query(
+        collection(db, "transactions"),
+        where("memberId", "==", MEMBER_ID)
+      )
+    );
+
+    print("TRANSACTION MEMBER QUERY", "PASS");
+    print("MATCH COUNT", snap.size);
+
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      out.textContent += "\n\nDOCUMENT:\n" + JSON.stringify({
+        firestoreDocumentId: docSnap.id,
+        transactionId: data.transactionId,
+        memberId: data.memberId,
+        cooperativeId: data.cooperativeId,
+        type: data.type,
+        amount: data.amount,
+        status: data.status,
+        transactionDate: data.transactionDate,
+        reference: data.reference,
+        createdBy: data.createdBy
+      }, null, 2);
+    });
+
+    out.textContent += "\n\nD124 TRANSACTION IDENTITY AUDIT: PASS";
+  } catch (error) {
+    out.textContent += "\n\nAUDIT ERROR:\n" + error.message;
+  }
+});
+</script>
+</body>
+</html>

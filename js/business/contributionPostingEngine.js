@@ -28,6 +28,10 @@ import {
 } from "../controllers/accessController.js";
 
 import {
+    rolesMatch
+} from "../components/roleAuthorization.js";
+
+import {
     CMPTransactionEngine
 } from "./transactionEngine.js";
 
@@ -53,9 +57,8 @@ export async function postContribution(data) {
     const role = session.profile?.role;
 
     if (
-        role !== "super_admin" &&
-        role !== "cooperative_admin" &&
-        role !== "cooperativeAdmin"
+        !rolesMatch(role, "super_admin") &&
+        !rolesMatch(role, "cooperative_admin")
     ) {
         throw new Error("Contribution posting access required.");
     }
@@ -131,6 +134,39 @@ export async function postContribution(data) {
         status: "POSTED"
     };
 
+    let transactionDate;
+
+    if (typeof data.month === "string" && data.month.trim()) {
+        const monthMatch =
+            data.month.trim().match(
+                /^([A-Za-z]+)\s+(\d{4})$/
+            );
+
+        if (!monthMatch) {
+            throw new Error(
+                "Contribution month must use the format Month YYYY."
+            );
+        }
+
+        const parsedDate =
+            new Date(
+                `1 ${monthMatch[1]} ${monthMatch[2]} 00:00:00 UTC`
+            );
+
+        if (
+            Number.isNaN(parsedDate.getTime()) ||
+            parsedDate.getUTCFullYear() !==
+                Number(monthMatch[2])
+        ) {
+            throw new Error(
+                "Contribution month is invalid."
+            );
+        }
+
+        transactionDate =
+            parsedDate.toISOString();
+    }
+
     const contributionResult =
         await createContribution(contribution);
 
@@ -146,6 +182,7 @@ export async function postContribution(data) {
             reference: contributionNumber,
             description: "Member Contribution",
             account: "Cash Account",
+            transactionDate,
             createdBy: data.createdBy ?? "CMP"
             });
     } catch (error) {

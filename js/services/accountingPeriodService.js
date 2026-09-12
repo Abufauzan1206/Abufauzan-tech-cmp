@@ -63,19 +63,29 @@ export async function getAccountingPeriodByDate(date) {
     const targetDate =
         new Date(date);
 
-    return periods.find(period => {
+    const matches =
+        periods.filter(period => {
 
-        const start =
-            new Date(period.startDate);
+            if (!period?.financialYearId) {
+                return false;
+            }
 
-        const end =
-            new Date(period.endDate);
+            const start =
+                new Date(period.startDate);
 
-        return (
-            targetDate >= start &&
-            targetDate <= end
-        );
+            const end =
+                new Date(period.endDate);
 
-    }) ?? null;
+            return (
+                targetDate >= start &&
+                targetDate <= end
+            );
+        });
+
+    if (matches.length !== 1) {
+        return null;
+    }
+
+    return matches[0];
 
 }

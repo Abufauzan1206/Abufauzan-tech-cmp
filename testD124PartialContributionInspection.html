@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>D124 Partial Contribution Inspection</h2>
+<pre id="output">Running...</pre>
+
+<script type="module">
+import { auth, db } from "./js/firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+    collection,
+    getDocs,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const MEMBER_ID = "ATC-MEM-2026-018077";
+const COOPERATIVE_ID = "CMP-NI-1783527637336";
+const output = document.getElementById("output");
+
+function waitForAuth() {
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            resolve(user);
+        });
+    });
+}
+
+try {
+    const user = await waitForAuth();
+
+    if (!user) {
+        throw new Error("No authenticated Firebase user.");
+    }
+
+    const snapshot = await getDocs(
+        query(
+            collection(db, "contributions"),
+            where("memberId", "==", MEMBER_ID)
+        )
+    );
+
+    const records = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        data: doc.data()
+    }));
+
+    const d124Records = records.filter((record) =>
+        record.data?.createdBy === "D124-E2E" ||
+        Number(record.data?.amount) === 25000
+    );
+
+    output.textContent =
+        "=========================================\n" +
+        "D124 PARTIAL CONTRIBUTION INSPECTION\n" +
+        "=========================================\n\n" +
+        "AUTHENTICATION: PASS\n" +
+        "MEMBER ID: " + MEMBER_ID + "\n" +
+        "COOPERATIVE ID: " + COOPERATIVE_ID + "\n" +
+        "TOTAL MEMBER CONTRIBUTIONS: " + records.length + "\n" +
+        "D124 MATCHING RECORDS: " + d124Records.length + "\n\n" +
+        JSON.stringify(d124Records, null, 4);
+
+} catch (error) {
+    output.textContent =
+        "=========================================\n" +
+        "D124 PARTIAL INSPECTION: FAIL\n" +
+        "=========================================\n\n" +
+        (error?.message || String(error));
+}
+</script>
+</body>
+</html>

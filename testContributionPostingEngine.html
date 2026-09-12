@@ -9,6 +9,27 @@
 
 <script type="module">
 
+import { auth } from "./js/firebase-config.js";
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+    getAuthenticatedProfile
+} from "./js/controllers/accessController.js";
+
+import {
+    CMPMemberEngine
+} from "./js/business/memberEngine.js";
+
+import {
+    collection,
+    getDocs,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+import { db } from "./js/firebase-config.js";
+
 import {
     postContribution
 } from "./js/business/contributionPostingEngine.js";
@@ -24,8 +45,105 @@ try {
     report += "CONTRIBUTION POSTING ENGINE TEST\n";
     report += "=========================================\n\n";
 
+    const authenticatedUser = await new Promise((resolve) => {
+        let settled = false;
+
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (user) => {
+                if (settled) return;
+                settled = true;
+                unsubscribe();
+                resolve(user);
+            }
+        );
+    });
+
+    if (!authenticatedUser) {
+        throw new Error(
+            "No authenticated Firebase user after auth-state initialization."
+        );
+    }
+
+    report += "AUTH STATE: PASS\n";
+    report += "AUTH UID: " + authenticatedUser.uid + "\n";
+
+    const session = await getAuthenticatedProfile();
+
+    if (!session) {
+        throw new Error(
+            "Authenticated Firebase user exists, but central profile could not be resolved."
+        );
+    }
+
+    report += "PROFILE RESOLUTION: PASS\n";
+    report += "PROFILE ROLE: " +
+        String(session.profile?.role ?? "NULL") + "\n";
+    report += "PROFILE COOPERATIVE ID: " +
+        String(session.profile?.cooperativeId ?? "NULL") + "\n\n";
+
+    const cooperativeSnapshot = await getDocs(
+        collection(db, "cooperatives")
+    );
+
+    report += "LIVE COOPERATIVE DOCUMENT COUNT: " +
+        cooperativeSnapshot.size + "\n";
+
+    report += "ALL LIVE COOPERATIVE RECORDS:\n";
+    report += JSON.stringify(
+        cooperativeSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            data: doc.data()
+        })),
+        null,
+        4
+    ) + "\n\n";
+
+    const liveMembers = await CMPMemberEngine.getAll();
+
+    report += "LIVE MEMBER COUNT: " +
+        liveMembers.length + "\n";
+
+    if (!liveMembers.length) {
+        throw new Error(
+            "No live members exist in the Firestore members collection."
+        );
+    }
+
+    const testMember = liveMembers.find(
+        (member) =>
+            typeof member.memberId === "string" &&
+            member.memberId.trim() &&
+            typeof member.cooperativeId === "string" &&
+            member.cooperativeId.trim()
+    );
+
+    report += "VALID MEMBER CANDIDATES: " +
+        liveMembers.filter(
+            (member) =>
+                typeof member.memberId === "string" &&
+                member.memberId.trim() &&
+                typeof member.cooperativeId === "string" &&
+                member.cooperativeId.trim()
+        ).length + "\n";
+
+    if (!testMember) {
+        report += "ALL LIVE MEMBER RECORDS:\n";
+        report += JSON.stringify(liveMembers, null, 4) + "\n";
+        throw new Error(
+            "No live member has both memberId and cooperativeId."
+        );
+    }
+
+    report += "TEST MEMBER DOCUMENT ID: " +
+        String(testMember.id ?? "NULL") + "\n";
+    report += "TEST MEMBER MEMBER ID: " +
+        String(testMember.memberId ?? "NULL") + "\n";
+    report += "TEST MEMBER COOPERATIVE ID: " +
+        String(testMember.cooperativeId ?? "NULL") + "\n\n";
+
     const result = await postContribution({
-        memberId: "MEMBER001",
+        memberId: testMember.memberId ?? testMember.id,
         amount: 25000,
         month: "August 2026",
         createdBy: "CMP"

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>D124 Fresh Repository Runtime</title>
+</head>
+<body>
+<pre id="out">Running...</pre>
+
+<script type="module">
+import { CMPRepositoryManager } from "./js/repositories/repositoryManager.js?d124fresh=20260912";
+
+const repository = CMPRepositoryManager.transaction;
+
+document.getElementById("out").textContent =
+    "D124 FRESH REPOSITORY RUNTIME\n\n" +
+    "CONSTRUCTOR: " + (repository?.constructor?.name || "NONE") + "\n\n" +
+    "CREATE SOURCE:\n" +
+    (repository?.create?.toString?.() || "UNAVAILABLE") +
+    "\n\nD124 FRESH RUNTIME TRACE: PASS";
+</script>
+</body>
+</html>
