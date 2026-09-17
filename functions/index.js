@@ -182,6 +182,66 @@ exports.createDrawGroup = onCall(async (request) => {
   };
 });
 
+exports.updateDrawGroupStatus = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "You must be signed in.");
+  }
+
+  const callerUid = request.auth.uid;
+  const callerSnap = await db.collection("users").doc(callerUid).get();
+
+  if (!callerSnap.exists) {
+    throw new HttpsError("permission-denied", "User profile not found.");
+  }
+
+  const callerData = callerSnap.data();
+
+  if (
+    callerData.role !== "super_admin" &&
+    callerData.role !== "cooperative_admin"
+  ) {
+    throw new HttpsError("permission-denied", "Unauthorized.");
+  }
+
+  const data = request.data || {};
+  const groupId =
+    typeof data.groupId === "string" ? data.groupId.trim() : "";
+  const status =
+    typeof data.status === "string" ? data.status.trim() : "";
+
+  if (!groupId || !status) {
+    throw new HttpsError("invalid-argument", "groupId and status are required.");
+  }
+
+  if (status !== "Draft") {
+    throw new HttpsError("invalid-argument", "Invalid draw group status.");
+  }
+
+  const groupRef = db.collection("drawGroups").doc(groupId);
+  const groupSnap = await groupRef.get();
+
+  if (!groupSnap.exists) {
+    throw new HttpsError("not-found", "Draw group not found.");
+  }
+
+  const groupData = groupSnap.data();
+
+  if (
+    callerData.role === "cooperative_admin" &&
+    groupData.cooperativeId !== callerData.cooperativeId
+  ) {
+    throw new HttpsError("permission-denied", "Unauthorized.");
+  }
+
+  await groupRef.update({ status });
+
+  return {
+    success: true,
+    groupId,
+    status
+  };
+});
+
 exports.getActiveCooperatives = onCall(async () => {
   const snapshot = await db
     .collection("cooperatives")

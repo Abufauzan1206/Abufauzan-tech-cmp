@@ -144,99 +144,32 @@ export async function getDrawGroupById(
 }
 
 export async function updateGroupStatus(
-
-    groupId,
-
-    status
-
+  groupId,
+  status
 ) {
-    if (typeof status !== "string") {
-        throw new Error(
-            "Invalid draw group status."
-        );
-    }
+  if (typeof status !== "string") {
+    throw new Error("Invalid draw group status.");
+  }
 
-    if (status.trim().length === 0) {
-        throw new Error(
-            "Invalid draw group status."
-        );
-    }
+  if (status.trim().length === 0) {
+    throw new Error("Invalid draw group status.");
+  }
 
-    const validDrawGroupStatuses = [
-        "Draft"
-    ];
+  const validDrawGroupStatuses = [
+    "Draft"
+  ];
 
-    if (
-        !validDrawGroupStatuses.includes(
-            status.trim()
-        )
-    ) {
-        throw new Error(
-            "Invalid draw group status."
-        );
-    }
+  if (!validDrawGroupStatuses.includes(status.trim())) {
+    throw new Error("Invalid draw group status.");
+  }
 
-    status = status.trim();
+  status = status.trim();
 
+  const callable = httpsCallable(functions, "updateDrawGroupStatus");
+  const result = await callable({
+    groupId,
+    status
+  });
 
-
-    const profile =
-        await getCurrentUserProfile();
-
-    if (
-        profile.role !== "super_admin" &&
-        profile.role !== "cooperative_admin"
-    ) {
-        throw new Error(
-            "Unauthorized: only authorized administrators can update draw group status."
-        );
-    }
-
-    const groupRef = doc(
-        db,
-        "drawGroups",
-        groupId
-    );
-
-    const groupSnap =
-        await getDoc(groupRef);
-
-    if (!groupSnap.exists()) {
-        throw new Error(
-            "Draw group not found."
-        );
-    }
-
-    const groupData =
-        groupSnap.data();
-
-    if (
-        profile.role === "cooperative_admin" &&
-        groupData.cooperativeId !== profile.cooperativeId
-    ) {
-        throw new Error(
-            "Cooperative administrator cannot update a draw group owned by another cooperative."
-        );
-    }
-
-    await updateDoc(
-
-        doc(
-
-            db,
-
-            "drawGroups",
-
-            groupId
-
-        ),
-
-        {
-
-            status
-
-        }
-
-    );
-
+  return result.data;
 }
