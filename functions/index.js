@@ -242,6 +242,161 @@ exports.updateDrawGroupStatus = onCall(async (request) => {
   };
 });
 
+exports.addParticipantToGroup = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "You must be signed in.");
+  }
+
+  const callerUid = request.auth.uid;
+  const callerSnap = await db.collection("users").doc(callerUid).get();
+
+  if (!callerSnap.exists) {
+    throw new HttpsError("permission-denied", "User profile not found.");
+  }
+
+  const callerData = callerSnap.data();
+
+  if (
+    callerData.role !== "super_admin" &&
+    callerData.role !== "cooperative_admin"
+  ) {
+    throw new HttpsError("permission-denied", "Unauthorized.");
+  }
+
+  const data = request.data || {};
+
+  const groupId =
+    typeof data.groupId === "string" ? data.groupId.trim() : "";
+  const memberId =
+    typeof data.memberId === "string" ? data.memberId.trim() : "";
+  const slotCount = data.slotCount;
+
+  if (!groupId || !memberId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "groupId and memberId are required."
+    );
+  }
+
+  if (!Number.isInteger(slotCount) || slotCount < 1) {
+    throw new HttpsError(
+      "invalid-argument",
+      "slotCount must be a positive integer."
+    );
+  }
+
+  const callerCooperativeId =
+    typeof callerData.cooperativeId === "string"
+      ? callerData.cooperativeId.trim()
+      : "";
+
+  if (callerData.role === "cooperative_admin" && !callerCooperativeId) {
+    throw new HttpsError(
+      "permission-denied",
+      "Cooperative ownership is not configured for this administrator."
+    );
+  }
+
+  const groupRef = db.collection("drawGroups").doc(groupId);
+  const groupSnap = await groupRef.get();
+
+  if (!groupSnap.exists) {
+    throw new HttpsError("not-found", "Draw group not found.");
+  }
+
+  const groupData = groupSnap.data();
+  const groupCooperativeId =
+    typeof groupData.cooperativeId === "string"
+      ? groupData.cooperativeId.trim()
+      : "";
+
+  if (!groupCooperativeId) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Draw group cooperative ownership is not configured."
+    );
+  }
+
+  if (
+    callerData.role === "cooperative_admin" &&
+    groupCooperativeId !== callerCooperativeId
+  ) {
+    throw new HttpsError("permission-denied", "Unauthorized.");
+  }
+
+  if (
+    Number.isInteger(groupData.maxSlotsPerMember) &&
+    slotCount > groupData.maxSlotsPerMember
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "slotCount exceeds the maximum allowed for this draw group."
+    );
+  }
+
+  const memberRef = db.collection("members").doc(memberId);
+  const memberSnap = await memberRef.get();
+
+  if (!memberSnap.exists) {
+    throw new HttpsError("not-found", "Member not found.");
+  }
+
+  const memberData = memberSnap.data();
+  const memberCooperativeId =
+    typeof memberData.cooperativeId === "string"
+      ? memberData.cooperativeId.trim()
+      : "";
+
+  if (!memberCooperativeId || memberCooperativeId !== groupCooperativeId) {
+    throw new HttpsError(
+      "permission-denied",
+      "Member does not belong to the draw group cooperative."
+    );
+  }
+
+  if (memberData.status !== "active") {
+    throw new HttpsError(
+      "failed-precondition",
+      "Only active members can participate in a draw group."
+    );
+  }
+
+  const firstName =
+    typeof memberData.firstName === "string"
+      ? memberData.firstName.trim()
+      : "";
+  const lastName =
+    typeof memberData.lastName === "string"
+      ? memberData.lastName.trim()
+      : "";
+
+  if (!firstName || !lastName) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Member identity data is incomplete."
+    );
+  }
+
+  const participantRef = db.collection("drawParticipants").doc();
+
+  await participantRef.create({
+    groupId,
+    memberId,
+    fullName: firstName + " " + lastName,
+    slotCount,
+    status: "Active",
+    joinedAt: FieldValue.serverTimestamp()
+  });
+
+  return {
+    success: true,
+    participantId: participantRef.id,
+    groupId,
+    memberId,
+    fullName: firstName + " " + lastName,
+    slotCount
+  };
+});
 exports.getActiveCooperatives = onCall(async () => {
   const snapshot = await db
     .collection("cooperatives")

@@ -205,12 +205,6 @@ await addParticipantToGroup({
     memberId:
     member.id,
 
-    memberNumber:
-    member.memberNumber,
-
-    fullName:
-    `${member.firstName} ${member.lastName}`,
-
     slotCount
 
 });

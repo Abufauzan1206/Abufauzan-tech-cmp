@@ -1,39 +1,29 @@
 import { db } from "../firebase-config.js";
-
 import {
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    where,
-    serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import {
+  getFunctions,
+  httpsCallable
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js";
+
+const functions = getFunctions();
 
 export async function addParticipantToGroup(
-    participantData
+  participantData
 ) {
+  const callable = httpsCallable(functions, "addParticipantToGroup");
 
-    participantData.joinedAt =
-    serverTimestamp();
+  const result = await callable({
+    groupId: participantData?.groupId,
+    memberId: participantData?.memberId,
+    slotCount: participantData?.slotCount
+  });
 
-    participantData.status =
-    "Active";
-
-    const docRef =
-    await addDoc(
-
-        collection(
-            db,
-            "drawParticipants"
-        ),
-
-        participantData
-
-    );
-
-    return docRef.id;
-
+  return result.data?.participantId;
 }
 
 export async function participantExists(
