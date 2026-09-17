@@ -26,6 +26,162 @@ setGlobalOptions({
  * contains only the fields required by the public membership
  * application selector.
  */
+/**
+ * D127
+ *
+ * Authoritative Contribution Draw Group creation boundary.
+ *
+ * Cooperative Admin ownership is derived exclusively from
+ * users/{request.auth.uid}.cooperativeId.
+ *
+ * Super Admin may select an active cooperative, but the selected
+ * cooperative is verified server-side before the group is created.
+ */
+exports.createDrawGroup = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in to create a draw group."
+    );
+  }
+
+  const callerUid = request.auth.uid;
+
+  const callerSnap =
+    await db.collection("users").doc(callerUid).get();
+
+  if (!callerSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "Administrator profile not found."
+    );
+  }
+
+  const callerData = callerSnap.data();
+
+  if (
+    callerData.role !== "super_admin" &&
+    callerData.role !== "cooperative_admin"
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "Only authorized administrators can create draw groups."
+    );
+  }
+
+  const data = request.data || {};
+
+  const requiredStrings = {
+    groupName: data.groupName,
+    startMonth: data.startMonth,
+    drawPreparationPolicy: data.drawPreparationPolicy,
+  };
+
+  for (const [field, value] of Object.entries(requiredStrings)) {
+    if (typeof value !== "string" || value.trim() === "") {
+      throw new HttpsError(
+        "invalid-argument",
+        `A valid ${field} is required.`
+      );
+    }
+  }
+
+  const startYear = Number(data.startYear);
+  const maxSlots = Number(data.maxSlots);
+  const maxSlotsPerMember = Number(data.maxSlotsPerMember);
+
+  if (!Number.isInteger(startYear)) {
+    throw new HttpsError(
+      "invalid-argument",
+      "A valid start year is required."
+    );
+  }
+
+  if (!Number.isInteger(maxSlots) || maxSlots < 1) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Maximum slots must be a positive integer."
+    );
+  }
+
+  if (!Number.isInteger(maxSlotsPerMember) || maxSlotsPerMember < 1) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Maximum slots per member must be a positive integer."
+    );
+  }
+
+  let cooperativeId = "";
+
+  if (callerData.role === "cooperative_admin") {
+    cooperativeId =
+      typeof callerData.cooperativeId === "string"
+        ? callerData.cooperativeId.trim()
+        : "";
+
+    if (!cooperativeId) {
+      throw new HttpsError(
+        "permission-denied",
+        "Cooperative ownership is not configured for this administrator."
+      );
+    }
+  } else {
+    cooperativeId =
+      typeof data.cooperativeId === "string"
+        ? data.cooperativeId.trim()
+        : "";
+
+    if (!cooperativeId) {
+      throw new HttpsError(
+        "invalid-argument",
+        "A cooperative must be selected."
+      );
+    }
+
+    const cooperativeSnap =
+      await db.collection("cooperatives").doc(cooperativeId).get();
+
+    if (!cooperativeSnap.exists) {
+      throw new HttpsError(
+        "not-found",
+        "Selected cooperative was not found."
+      );
+    }
+
+    const cooperativeData = cooperativeSnap.data();
+
+    if (cooperativeData.status !== "active") {
+      throw new HttpsError(
+        "failed-precondition",
+        "Selected cooperative is not active."
+      );
+    }
+  }
+
+  const groupRef =
+    db.collection("drawGroups").doc();
+
+  await groupRef.create({
+    groupName: data.groupName.trim(),
+    startMonth: data.startMonth.trim(),
+    startYear,
+    maxSlots,
+    maxSlotsPerMember,
+    drawPreparationPolicy:
+      data.drawPreparationPolicy.trim(),
+    cooperativeId,
+    status: "Draft",
+    createdAt: FieldValue.serverTimestamp(),
+    createdBy: callerUid,
+  });
+
+  return {
+    success: true,
+    drawGroupId: groupRef.id,
+    cooperativeId,
+  };
+});
+
 exports.getActiveCooperatives = onCall(async () => {
   const snapshot = await db
     .collection("cooperatives")

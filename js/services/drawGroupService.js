@@ -30,52 +30,41 @@ async function getCurrentUserProfile() {
 
 
 
+import {
+    getFunctions,
+    httpsCallable
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js";
+
+const functions = getFunctions();
+
+const createDrawGroupCallable =
+    httpsCallable(
+        functions,
+        "createDrawGroup"
+    );
+
 export async function createDrawGroup(
     groupData
 ) {
-
-    const profile =
-        await getCurrentUserProfile();
-
-    if (
-        profile.role !== "super_admin" &&
-        profile.role !== "cooperative_admin"
-    ) {
-        throw new Error(
-            "Only authorized administrators can create draw groups."
+    if (!groupData || typeof groupData !== "object") {
+        throw new TypeError(
+            "Draw group data is required."
         );
     }
 
-    if (
-        profile.role === "cooperative_admin" &&
-        !profile.cooperativeId
-    ) {
-        throw new Error(
-            "Cooperative administrator has no cooperative ownership."
-        );
-    }
-
-    groupData.status =
-        "Draft";
-
-    groupData.cooperativeId =
-        profile.role === "cooperative_admin"
-            ? profile.cooperativeId
-            : groupData.cooperativeId ?? null;
-
-    groupData.createdAt =
-        serverTimestamp();
-
-    const docRef =
-        await addDoc(
-            collection(
-                db,
-                "drawGroups"
-            ),
+    const result =
+        await createDrawGroupCallable(
             groupData
         );
 
-    return docRef.id;
+    if (!result?.data?.success) {
+        throw new Error(
+            result?.data?.message ||
+            "Unable to create draw group."
+        );
+    }
+
+    return result.data;
 }
 
 export async function getDrawGroups() {
