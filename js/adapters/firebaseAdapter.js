@@ -39,7 +39,19 @@ export class CMPFirebaseAdapter extends CMPDatabaseAdapter {
     }
 
 
-    async create(data) {
+    async create(data, options = {}) {
+        if (options?.documentId) {
+            await setDoc(
+                doc(
+                    db,
+                    this.collectionName,
+                    options.documentId
+                ),
+                data
+            );
+
+            return options.documentId;
+        }
 
         if (data?.memberId) {
 

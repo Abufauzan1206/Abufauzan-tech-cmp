@@ -70,11 +70,12 @@ export class CMPMemoryAdapter {
 
 
     async create(
-        record
+        record,
+        options = {}
     ) {
-
         const item = {
             id:
+                options?.documentId ??
                 record?.id ??
                 record?.memberId ??
                 crypto.randomUUID(),

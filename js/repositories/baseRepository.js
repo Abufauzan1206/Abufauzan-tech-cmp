@@ -20,10 +20,8 @@ export class CMPBaseRepository {
     }
 
 
-    async create(data) {
-
-        return await this.adapter.create(data);
-
+    async create(data, options = {}) {
+        return await this.adapter.create(data, options);
     }
 
 

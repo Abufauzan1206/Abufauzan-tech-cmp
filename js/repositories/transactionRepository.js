@@ -12,11 +12,7 @@
 
 import { CMPBaseRepository } from "./baseRepository.js";
 import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
-import { db } from "../firebase-config.js";
-import {
-    doc,
-    setDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 export class CMPTransactionRepository
     extends CMPBaseRepository {
 
@@ -39,13 +35,18 @@ export class CMPTransactionRepository
             throw new TypeError("Transaction ID is required.");
         }
 
-        await setDoc(
-            doc(db, "transactions", data.transactionId),
-            data
+        const result = await super.create(
+            data,
+            {
+                documentId: data.transactionId
+            }
         );
 
         return {
-            id: data.transactionId,
+            id:
+                typeof result === "string"
+                    ? result
+                    : result?.id ?? data.transactionId,
             ...data
         };
     }

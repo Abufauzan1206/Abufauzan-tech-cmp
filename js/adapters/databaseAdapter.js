@@ -13,7 +13,7 @@
 
 export class CMPDatabaseAdapter {
 
-    async create(data) {
+    async create(data, options = {}) {
         throw new Error("create() not implemented");
     }
 

@@ -16,10 +16,10 @@ import {
 } from "../services/trialBalanceService.js";
 
 
-export async function generateTrialBalance() {
+export async function generateTrialBalance(options = {}) {
 
     const batches =
-        await getAllLedgerBatches();
+        await getAllLedgerBatches(options);
 
     const accounts = {};
 

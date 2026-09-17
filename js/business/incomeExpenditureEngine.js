@@ -19,10 +19,10 @@ import {
     getAccountByName
 } from "../services/chartOfAccountsService.js";
 
-export async function generateIncomeExpenditure() {
+export async function generateIncomeExpenditure(options = {}) {
 
     const trialBalance =
-        await generateTrialBalance();
+        await generateTrialBalance(options);
 
     const incomeAccounts = [];
     const expenseAccounts = [];

@@ -15,14 +15,14 @@ import {
     getAllLedgerBatches
 } from "../services/generalLedgerService.js";
 
-export async function generateGeneralLedger(accountName) {
+export async function generateGeneralLedger(accountName, options = {}) {
 
     if (!accountName) {
         throw new Error("Account name is required.");
     }
 
     const batches =
-        await getAllLedgerBatches();
+        await getAllLedgerBatches(options);
 
     // Sort ledger batches from oldest to newest
     batches.sort((a, b) => {

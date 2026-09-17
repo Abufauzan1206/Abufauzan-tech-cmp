@@ -23,10 +23,10 @@ import {
     generateIncomeExpenditure
 } from "./incomeExpenditureEngine.js?rc020";
 
-export async function generateBalanceSheet() {
+export async function generateBalanceSheet(options = {}) {
 
     const trialBalance =
-        await generateTrialBalance();
+        await generateTrialBalance(options);
 
     const assets = [];
     const liabilities = [];
@@ -78,7 +78,7 @@ export async function generateBalanceSheet() {
     }
 
     const incomeReport =
-        await generateIncomeExpenditure();
+        await generateIncomeExpenditure(options);
 
     totalEquity +=
         incomeReport.netSurplus;
