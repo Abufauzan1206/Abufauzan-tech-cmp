@@ -27,89 +27,32 @@ document.getElementById(
 );
 
 async function handleReservation(event) {
-
     const button = event.target;
-
     const boxId =
-    button.dataset.boxId;
+      button.dataset.boxId;
 
     try {
+        const participantId = prompt(
+          "Enter participant ID:"
+        );
 
-    // Replace with your authenticated admin ID later
-    const adminId = "ADMIN";
+        if(!participantId){
+            alert("Reservation cancelled.");
+            return;
+        }
 
-const participantId = prompt(
+        await reserveMonth(
+          groupId,
+          boxId,
+          participantId
+        );
 
-    "Enter participant ID:"
-
-);
-
-if(!participantId){
-
-    alert("Reservation cancelled.");
-
-    return;
-
-}
-
-const participantName = prompt(
-
-    "Enter participant's name:"
-
-);
-
-if(!participantName){
-
-    alert("Reservation cancelled.");
-
-    return;
-
-}
-
-await reserveMonth(
-
-    boxId,
-
-    adminId
-
-);
-
-const box = await getDrawBox(
-    boxId
-);
-
-await createReservation({
-
-    groupId,
-
-    boxId,
-
-    participantId:
-
-    participantName,
-
-    participantName,
-
-    month: box.month,
-
-    year: box.year,
-
-    reservedBy: adminId
-
-});
-
-await loadMonths();
-
-}
-
-catch(error) {
-
-    console.error(error);
-
-    alert("Unable to reserve month.");
-
-}
-
+        await loadMonths();
+    }
+    catch(error) {
+        console.error(error);
+        alert("Unable to reserve month.");
+    }
 }
 
 async function loadMonths() {
@@ -246,10 +189,6 @@ if(!proceed){
 }
 
 await releaseMonth(
-    boxId
-);
-
-await deleteReservation(
     reservationId
 );
 

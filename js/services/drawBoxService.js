@@ -143,35 +143,22 @@ export async function revealDrawBox(
 }
 
 export async function reserveMonth(
-
-    boxId,
-
-    adminId
-
+  groupId,
+  boxId,
+  participantId
 ) {
+  const callable = httpsCallable(
+    functions,
+    "reserveDrawMonth"
+  );
 
-    await updateDoc(
+  const result = await callable({
+    groupId,
+    boxId,
+    participantId
+  });
 
-        doc(
-            db,
-            "drawBoxes",
-            boxId
-        ),
-
-{
-
-    reserved: true,
-
-    reservedBy: adminId,
-
-    reservedAt: serverTimestamp(),
-
-    status: "Reserved"
-
-}
-
-    );
-
+  return result.data;
 }
 
 export async function getDrawBox(
@@ -212,33 +199,18 @@ export async function getDrawBox(
 }
 
 export async function releaseMonth(
-
-    boxId
-
+  reservationId
 ) {
+  const callable = httpsCallable(
+    functions,
+    "releaseDrawMonth"
+  );
 
-    await updateDoc(
+  const result = await callable({
+    reservationId
+  });
 
-        doc(
-            db,
-            "drawBoxes",
-            boxId
-        ),
-
-        {
-
-            reserved: false,
-
-            reservedBy: null,
-
-            reservedAt: null,
-
-            status: "Ready"
-
-        }
-
-    );
-
+  return result.data;
 }
 
 export async function getBoxByMonth(

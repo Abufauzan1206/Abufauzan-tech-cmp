@@ -799,6 +799,429 @@ exports.updateDrawBoxAssignment = onCall(async (request) => {
   };
 });
 
+exports.reserveDrawMonth = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in."
+    );
+  }
+
+  const callerUid = request.auth.uid;
+  const callerSnap = await db
+    .collection("users")
+    .doc(callerUid)
+    .get();
+
+  if (!callerSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "User profile not found."
+    );
+  }
+
+  const caller = callerSnap.data();
+
+  if (
+    caller.role !== "super_admin" &&
+    caller.role !== "cooperative_admin"
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "You are not authorized to reserve a draw month."
+    );
+  }
+
+  const {
+    groupId,
+    boxId,
+    participantId
+  } = request.data || {};
+
+  if (
+    typeof groupId !== "string" ||
+    typeof boxId !== "string" ||
+    typeof participantId !== "string" ||
+    !groupId ||
+    !boxId ||
+    !participantId
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "groupId, boxId and participantId are required."
+    );
+  }
+
+  const groupRef = db.collection("drawGroups").doc(groupId);
+  const boxRef = db.collection("drawBoxes").doc(boxId);
+  const participantRef =
+    db.collection("drawParticipants").doc(participantId);
+
+  const groupSnap = await groupRef.get();
+
+  if (!groupSnap.exists) {
+    throw new HttpsError(
+      "not-found",
+      "Draw group not found."
+    );
+  }
+
+  const group = groupSnap.data();
+
+  if (
+    caller.role === "cooperative_admin" &&
+    caller.cooperativeId !== group.cooperativeId
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "You are not authorized for this cooperative."
+    );
+  }
+
+  return await db.runTransaction(async (tx) => {
+    const boxSnap = await tx.get(boxRef);
+    const participantSnap = await tx.get(participantRef);
+
+    if (!boxSnap.exists) {
+      throw new HttpsError(
+        "not-found",
+        "Draw box not found."
+      );
+    }
+
+    if (!participantSnap.exists) {
+      throw new HttpsError(
+        "not-found",
+        "Draw participant not found."
+      );
+    }
+
+    const box = boxSnap.data();
+    const participant = participantSnap.data();
+
+    if (box.groupId !== groupId) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Draw box does not belong to the selected group."
+      );
+    }
+
+    if (participant.groupId !== groupId) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Participant does not belong to the selected group."
+      );
+    }
+
+    if (participant.memberId !== box.memberId) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Participant does not match the draw box member."
+      );
+    }
+
+    if (participant.status !== "Active") {
+      throw new HttpsError(
+        "failed-precondition",
+        "Participant is not active."
+      );
+    }
+
+    if (
+      box.month == null ||
+      box.year == null
+    ) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Draw box month and year are not configured."
+      );
+    }
+
+    if (box.reserved === true) {
+      throw new HttpsError(
+        "already-exists",
+        "Draw box is already reserved."
+      );
+    }
+
+    if (box.picked === true || box.locked === true) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Draw box cannot be reserved."
+      );
+    }
+
+    const reservationQuery = db
+      .collection("drawReservations")
+      .where("boxId", "==", boxId)
+      .limit(1);
+
+    const reservationSnap =
+      await tx.get(reservationQuery);
+
+    if (!reservationSnap.empty) {
+      throw new HttpsError(
+        "already-exists",
+        "A reservation already exists for this draw box."
+      );
+    }
+
+    const reservationRef =
+      db.collection("drawReservations").doc();
+
+    tx.create(reservationRef, {
+      groupId,
+      boxId,
+      participantId,
+      participantName:
+        typeof participant.fullName === "string"
+          ? participant.fullName
+          : "",
+      month: box.month,
+      year: box.year,
+      reservedBy: callerUid,
+      createdAt: FieldValue.serverTimestamp()
+    });
+
+    tx.update(boxRef, {
+      reserved: true,
+      reservedBy: callerUid,
+      reservedAt: FieldValue.serverTimestamp(),
+      status: "Reserved"
+    });
+
+    return {
+      success: true,
+      reservationId: reservationRef.id,
+      groupId,
+      boxId,
+      participantId
+    };
+  });
+});
+
+exports.releaseDrawMonth = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in."
+    );
+  }
+
+  const callerUid = request.auth.uid;
+  const callerSnap = await db
+    .collection("users")
+    .doc(callerUid)
+    .get();
+
+  if (!callerSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "User profile not found."
+    );
+  }
+
+  const caller = callerSnap.data();
+
+  if (
+    caller.role !== "super_admin" &&
+    caller.role !== "cooperative_admin"
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "You are not authorized to release a draw reservation."
+    );
+  }
+
+  const { reservationId } =
+    request.data || {};
+
+  if (
+    typeof reservationId !== "string" ||
+    !reservationId
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "reservationId is required."
+    );
+  }
+
+  const reservationRef =
+    db.collection("drawReservations").doc(reservationId);
+
+  return await db.runTransaction(async (tx) => {
+    const reservationSnap =
+      await tx.get(reservationRef);
+
+    if (!reservationSnap.exists) {
+      throw new HttpsError(
+        "not-found",
+        "Reservation not found."
+      );
+    }
+
+    const reservation =
+      reservationSnap.data();
+
+    const groupRef =
+      db.collection("drawGroups").doc(
+        reservation.groupId
+      );
+
+    const boxRef =
+      db.collection("drawBoxes").doc(
+        reservation.boxId
+      );
+
+    const groupSnap = await tx.get(groupRef);
+    const boxSnap = await tx.get(boxRef);
+
+    if (!groupSnap.exists) {
+      throw new HttpsError(
+        "not-found",
+        "Draw group not found."
+      );
+    }
+
+    if (!boxSnap.exists) {
+      throw new HttpsError(
+        "not-found",
+        "Draw box not found."
+      );
+    }
+
+    const group = groupSnap.data();
+    const box = boxSnap.data();
+
+    if (
+      caller.role === "cooperative_admin" &&
+      caller.cooperativeId !== group.cooperativeId
+    ) {
+      throw new HttpsError(
+        "permission-denied",
+        "You are not authorized for this cooperative."
+      );
+    }
+
+    if (
+      box.groupId !== reservation.groupId
+    ) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Reservation and draw box group do not match."
+      );
+    }
+
+    if (
+      box.reserved !== true ||
+      box.reservedBy !== reservation.reservedBy
+    ) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Draw box reservation state does not match the reservation."
+      );
+    }
+
+    tx.delete(reservationRef);
+
+    tx.update(boxRef, {
+      reserved: false,
+      reservedBy: null,
+      reservedAt: null,
+      status: "Ready"
+    });
+
+    return {
+      success: true,
+      reservationId
+    };
+  });
+});
+
+exports.getDrawGroupReservations = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in."
+    );
+  }
+
+  const callerUid = request.auth.uid;
+  const callerSnap = await db
+    .collection("users")
+    .doc(callerUid)
+    .get();
+
+  if (!callerSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "User profile not found."
+    );
+  }
+
+  const caller = callerSnap.data();
+
+  if (
+    caller.role !== "super_admin" &&
+    caller.role !== "cooperative_admin"
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "You are not authorized to read draw reservations."
+    );
+  }
+
+  const { groupId } =
+    request.data || {};
+
+  if (
+    typeof groupId !== "string" ||
+    !groupId
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "groupId is required."
+    );
+  }
+
+  const groupSnap = await db
+    .collection("drawGroups")
+    .doc(groupId)
+    .get();
+
+  if (!groupSnap.exists) {
+    throw new HttpsError(
+      "not-found",
+      "Draw group not found."
+    );
+  }
+
+  const group = groupSnap.data();
+
+  if (
+    caller.role === "cooperative_admin" &&
+    caller.cooperativeId !== group.cooperativeId
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "You are not authorized for this cooperative."
+    );
+  }
+
+  const snapshot = await db
+    .collection("drawReservations")
+    .where("groupId", "==", groupId)
+    .get();
+
+  return {
+    success: true,
+    reservations: snapshot.docs.map((document) => ({
+      id: document.id,
+      ...document.data()
+    }))
+  };
+});
+
 exports.getActiveCooperatives = onCall(async () => {
   const snapshot = await db
     .collection("cooperatives")

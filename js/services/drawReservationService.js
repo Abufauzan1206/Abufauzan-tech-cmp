@@ -1,146 +1,77 @@
-import { db } from "../firebase-config.js";
-
 import {
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    where,
-    serverTimestamp,
-    deleteDoc,
-    updateDoc,
-    doc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+  getFunctions,
+  httpsCallable
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js";
+
+const functions = getFunctions();
 
 export async function createReservation(
-
-    reservation
-
+  reservation
 ) {
+  const callable = httpsCallable(
+    functions,
+    "reserveDrawMonth"
+  );
 
-    reservation.createdAt =
-    serverTimestamp();
+  const result = await callable({
+    groupId: reservation.groupId,
+    boxId: reservation.boxId,
+    participantId: reservation.participantId
+  });
 
-    const docRef =
-    await addDoc(
-
-        collection(
-            db,
-            "drawReservations"
-        ),
-
-        reservation
-
-    );
-
-    return docRef.id;
-
+  return result.data.reservationId;
 }
 
 export async function getGroupReservations(
-
-    groupId
-
+  groupId
 ) {
+  const callable = httpsCallable(
+    functions,
+    "getDrawGroupReservations"
+  );
 
-    const q = query(
+  const result = await callable({
+    groupId
+  });
 
-        collection(
-            db,
-            "drawReservations"
-        ),
-
-        where(
-            "groupId",
-            "==",
-            groupId
-        )
-
-    );
-
-    const snapshot =
-    await getDocs(q);
-
-    const reservations = [];
-
-    snapshot.forEach(doc => {
-
-        reservations.push({
-
-            id: doc.id,
-
-            ...doc.data()
-
-        });
-
-    });
-
-    return reservations;
-
+  return result.data.reservations || [];
 }
 
 export async function deleteReservation(
-
-    reservationId
-
+  reservationId
 ) {
+  const callable = httpsCallable(
+    functions,
+    "releaseDrawMonth"
+  );
 
-    await deleteDoc(
-
-        doc(
-            db,
-            "drawReservations",
-            reservationId
-        )
-
-    );
-
+  await callable({
+    reservationId
+  });
 }
 
 export async function updateReservation(
-
-    reservationId,
-
-    data
-
+  reservationId,
+  data
 ) {
-
-    await updateDoc(
-
-        doc(
-            db,
-            "drawReservations",
-            reservationId
-        ),
-
-        data
-
-    );
-
+  throw new Error(
+    "Reservation updates are not supported by D129."
+  );
 }
 
 export async function getReservationByParticipant(
-
-    groupId,
-
-    participantId
-
+  groupId,
+  participantId
 )
-
 {
-
-    const reservations =
+  const reservations =
     await getGroupReservations(
-        groupId
+      groupId
     );
 
-    return reservations.find(
-
-        reservation =>
-
-            reservation.participantId ===
-participantId
-
-    ) || null;
-
+  return reservations.find(
+    reservation =>
+      reservation.participantId ===
+      participantId
+  ) || null;
 }
