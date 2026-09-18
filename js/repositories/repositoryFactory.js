@@ -13,6 +13,10 @@
 
 import { CMPAdapterFactory } from "../adapters/adapterFactory.js";
 
+import {
+    CMPCooperativeHomepageConfigRepository
+} from "./cooperativeHomepageConfigRepository.js";
+
 
 import { CMPMemberRepository } 
 from "./memberRepository.js";
@@ -60,6 +64,10 @@ export class CMPRepositoryFactory {
     }
 
 
+
+    static cooperativeHomepageConfig() {
+        return new CMPCooperativeHomepageConfigRepository();
+    }
 
     static journal() {
 
