@@ -104,42 +104,25 @@ export async function updateBoxAssignment(
     });
 }
 
-export async function revealDrawBox(
-
-    boxId,
-
-    participantId
-
+export async function executeDraw(
+    groupId,
+    reservationId,
+    selectedBoxId
 ) {
+    const callable =
+        httpsCallable(
+            functions,
+            "executeDraw"
+        );
 
-    await updateDoc(
+    const result =
+        await callable({
+            groupId,
+            reservationId,
+            selectedBoxId
+        });
 
-        doc(
-            db,
-            "drawBoxes",
-            boxId
-        ),
-
-{
-
-    status: "Picked",
-
-    picked: true,
-
-    pickedBy: participantId,
-
-    pickedAt: serverTimestamp(),
-
-    locked: true,
-
-    lockedBy: participantId,
-
-    lockedAt: serverTimestamp()
-
-}
-
-    );
-
+    return result.data;
 }
 
 export async function reserveMonth(
@@ -237,74 +220,6 @@ export async function getBoxByMonth(
             box.year === year
 
     ) || null;
-
-}
-
-export async function swapMonths(
-
-    firstBoxId,
-
-    secondBoxId
-
-) {
-
-    const firstBox =
-    await getDrawBox(
-        firstBoxId
-    );
-
-    const secondBox =
-    await getDrawBox(
-        secondBoxId
-    );
-    
-    const firstMonth =
-firstBox.month;
-
-const firstYear =
-firstBox.year;
-
-const secondMonth =
-secondBox.month;
-
-const secondYear =
-secondBox.year;
-
-await updateDoc(
-
-    doc(
-        db,
-        "drawBoxes",
-        firstBoxId
-    ),
-
-    {
-
-        month: secondMonth,
-
-        year: secondYear
-
-    }
-
-);
-
-await updateDoc(
-
-    doc(
-        db,
-        "drawBoxes",
-        secondBoxId
-    ),
-
-    {
-
-        month: firstMonth,
-
-        year: firstYear
-
-    }
-
-);
 
 }
 

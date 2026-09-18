@@ -1,260 +1,297 @@
-import {
-    getReservationByParticipant
-}
-from "../../../js/services/drawReservationService.js";
+import { auth } from "../../../js/firebase-config.js";
 
 import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
+import {
     getGroupBoxes,
+    executeDraw
+} from "../../../js/services/drawBoxService.js";
 
-    getDrawBox,
-
-    getBoxByMonth,
-
-    swapMonths,
-
-    revealDrawBox
-
-}
-from "../../../js/services/drawBoxService.js";
+import {
+    getGroupReservations
+} from "../../../js/services/drawReservationService.js";
 
 const params =
-new URLSearchParams(
-window.location.search
-);
+    new URLSearchParams(
+        window.location.search
+    );
 
 const groupId =
-params.get("id");
+    params.get("id");
 
 const boxesContainer =
-document.getElementById(
-"boxesContainer"
-);
+    document.getElementById(
+        "boxesContainer"
+    );
 
-// Temporary.
-// Will later come from Firebase Authentication.
+let reservations = [];
+let selectedReservationId = null;
+let drawBusy = false;
 
-const participantName = prompt(
+function showMessage(message) {
+    boxesContainer.innerHTML = "";
+    const paragraph = document.createElement("p");
+    paragraph.textContent = message;
+    boxesContainer.appendChild(paragraph);
+}
 
-    "Enter your name"
+function buildReservationSelector() {
+    const existing =
+        document.getElementById(
+            "reservationSelector"
+        );
 
-);
+    if (existing) {
+        existing.remove();
+    }
 
-const currentUser = {
+    const wrapper =
+        document.createElement("div");
 
-    id: participantName,
+    wrapper.id =
+        "reservationSelector";
 
-    role: "participant"
+    const label =
+        document.createElement("label");
 
-};
+    label.textContent =
+        "Participant reservation:";
 
-async function handleBoxClick(event){
+    const select =
+        document.createElement("select");
 
-    const boxId =
-    event.currentTarget.dataset.boxId;
+    select.id =
+        "reservationSelect";
+
+    const placeholder =
+        document.createElement("option");
+
+    placeholder.value = "";
+    placeholder.textContent =
+        "Select a reserved participant";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+
+    select.appendChild(
+        placeholder
+    );
+
+    reservations.forEach(
+        reservation => {
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                reservation.id;
+
+            option.textContent =
+                reservation.participantName ||
+                reservation.participantId;
+
+            select.appendChild(
+                option
+            );
+        }
+    );
+
+    select.addEventListener(
+        "change",
+        event => {
+            selectedReservationId =
+                event.target.value || null;
+        }
+    );
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(select);
+
+    boxesContainer.before(wrapper);
+}
+
+async function handleBoxClick(event) {
+    if (drawBusy) {
+        return;
+    }
+
+    if (!selectedReservationId) {
+        alert(
+            "Select a reserved participant before executing the draw."
+        );
+        return;
+    }
+
+    const selectedBoxId =
+        event.currentTarget.dataset.boxId;
 
     const box =
-await getDrawBox(boxId);
+        await getGroupBoxes(groupId);
 
-const reservation =
-await getReservationByParticipant(
-
-    groupId,
-
-    currentUser.id
-
-);
-
-if (reservation) {
-
-    const reservedBox =
-    await getBoxByMonth(
-
-        groupId,
-
-        reservation.month,
-
-        reservation.year
-
-    );
-
-    if (
-
-        reservedBox &&
-
-        reservedBox.id !== boxId
-
-    ) {
-
-        await swapMonths(
-
-            boxId,
-
-            reservedBox.id
-
+    const selectedBox =
+        box.find(
+            item => item.id === selectedBoxId
         );
 
-    }
-
-}
-
-console.log(box);
-
-    if(box.locked){
-
-        alert("This box has already been opened.");
-
+    if (!selectedBox) {
+        alert(
+            "Selected draw box was not found."
+        );
         return;
-
     }
 
-    if(
+    if (selectedBox.locked) {
+        alert(
+            "This box has already been opened."
+        );
+        return;
+    }
 
-    box.reserved &&
+    const reservation =
+        reservations.find(
+            item =>
+                item.id ===
+                selectedReservationId
+        );
 
-    currentUser.role !== "admin" &&
+    if (!reservation) {
+        alert(
+            "Selected reservation is no longer available."
+        );
+        return;
+    }
 
-    !reservation
+    const proceed =
+        confirm(
+            "Execute this draw for " +
+            (reservation.participantName ||
+                reservation.participantId) +
+            "?"
+        );
 
-){
+    if (!proceed) {
+        return;
+    }
 
-    alert("Reserved box");
+    drawBusy = true;
 
-    return;
-
-}
-
-    try{
-
-        await revealDrawBox(
-
-    boxId,
-
-    currentUser.id
-
-);
-
-const finalBox =
-await getDrawBox(boxId);
-
-console.log(
-    "Final box after swap:",
-    finalBox
-);
-
-        const updatedBox =
-        await getDrawBox(boxId);
-
-        console.log(updatedBox);
+    try {
+        const result =
+            await executeDraw(
+                groupId,
+                reservation.id,
+                selectedBoxId
+            );
 
         alert(
-
-            updatedBox.month +
+            "Draw completed: " +
+            result.month +
             " " +
-            updatedBox.year
-
+            result.year
         );
 
-        await loadBoxes();
-
-    }catch(error){
-
+        await loadDrawState();
+    } catch (error) {
         console.error(error);
-
-        alert(error.message);
-
-        return;
-
+        alert(
+            error.message ||
+            "Unable to execute draw."
+        );
+    } finally {
+        drawBusy = false;
     }
-
 }
 
-async function loadBoxes(){
-
-    if(!groupId){
-
-        boxesContainer.innerHTML =
-        "No draw group selected.";
-
+async function loadDrawState() {
+    if (!groupId) {
+        showMessage(
+            "No draw group selected."
+        );
         return;
-
     }
 
-    const boxes =
-    await getGroupBoxes(
-        groupId
-    );
+    try {
+        reservations =
+            await getGroupReservations(
+                groupId
+            );
 
-    boxesContainer.innerHTML = "";
+        const boxes =
+            await getGroupBoxes(
+                groupId
+            );
 
-    boxes.forEach(box=>{
-
-        if(box.locked){
-
-            boxesContainer.innerHTML += `
-
-<div
-class="draw-box locked"
-data-box-id="${box.id}">
-
-<div class="revealed-month">
-
-${box.month}
-
-</div>
-
-<div class="revealed-year">
-
-${box.year}
-
-</div>
-
-</div>
-
-`;
-
-        }else{
-
-            boxesContainer.innerHTML += `
-
-<div
-class="draw-box"
-data-box-id="${box.id}">
-
-<div class="gift-icon">
-
-📦
-
-</div>
-
-<div class="box-number">
-
-${box.displayNumber}
-
-</div>
-
-</div>
-
-`;
-
+        if (reservations.length === 0) {
+            showMessage(
+                "No active reservations are available for this draw."
+            );
+            return;
         }
 
-    });
+        buildReservationSelector();
 
-    document
-    .querySelectorAll(".draw-box")
-    .forEach(box=>{
+        boxesContainer.innerHTML = "";
 
-        box.addEventListener(
+        boxes.forEach(box => {
+            const element =
+                document.createElement(
+                    "div"
+                );
 
-            "click",
+            element.dataset.boxId =
+                box.id;
 
-            handleBoxClick
+            if (box.locked) {
+                element.className =
+                    "draw-box locked";
 
+                element.innerHTML =
+                    '<div class="revealed-month">' +
+                    box.month +
+                    '</div>' +
+                    '<div class="revealed-year">' +
+                    box.year +
+                    '</div>';
+            } else {
+                element.className =
+                    "draw-box";
+
+                element.innerHTML =
+                    '<div class="gift-icon">📦</div>' +
+                    '<div class="box-number">' +
+                    box.displayNumber +
+                    '</div>';
+
+                element.addEventListener(
+                    "click",
+                    handleBoxClick
+                );
+            }
+
+            boxesContainer.appendChild(
+                element
+            );
+        });
+    } catch (error) {
+        console.error(error);
+        showMessage(
+            error.message ||
+            "Unable to load draw state."
         );
-
-    });
-
+    }
 }
 
-loadBoxes();
+onAuthStateChanged(
+    auth,
+    async user => {
+        if (!user) {
+            window.location.href =
+                "../login.html";
+            return;
+        }
+
+        await loadDrawState();
+    }
+);

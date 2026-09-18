@@ -11,10 +11,8 @@ import {
 from "../../../js/services/drawParticipantService.js";
 
 import {
-    getGroupBoxes,
-    revealDrawBox
-}
-from "../../../js/services/drawBoxService.js";
+    getGroupBoxes
+} from "../../../js/services/drawBoxService.js";
 
 import {
     assignMonthsToBoxes,
