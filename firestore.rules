@@ -256,6 +256,52 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
+    function drawGroupBelongsToCaller(groupId) {
+      return signedIn()
+        && exists(
+          /databases/$(database)/documents/drawGroups/$(groupId)
+        )
+        && get(
+          /databases/$(database)/documents/drawGroups/$(groupId)
+        ).data.cooperativeId ==
+           userProfile().data.cooperativeId;
+    }
+
+    match /drawGroups/{groupId} {
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && resource.data.cooperativeId ==
+             userProfile().data.cooperativeId
+        );
+
+      allow write: if false;
+    }
+
+    match /drawBoxes/{boxId} {
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && drawGroupBelongsToCaller(resource.data.groupId)
+        );
+
+      allow write: if false;
+    }
+
+    match /drawParticipants/{participantId} {
+      allow read: if isSuperAdmin()
+        || (
+          isCooperativeAdmin()
+          && drawGroupBelongsToCaller(resource.data.groupId)
+        );
+
+      allow write: if false;
+    }
+
+    match /drawReservations/{reservationId} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

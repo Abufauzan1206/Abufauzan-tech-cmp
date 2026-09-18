@@ -7,6 +7,8 @@ import {
     doc,
     updateDoc,
     getDoc,
+    query,
+    where,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
@@ -71,29 +73,32 @@ export async function getDrawGroups() {
     const profile =
         await getCurrentUserProfile();
 
-    const snapshot =
-        await getDocs(
-            collection(
-                db,
-                "drawGroups"
-            )
+    const groupsRef =
+        collection(
+            db,
+            "drawGroups"
         );
+
+    const snapshot =
+        profile.role === "cooperative_admin"
+            ? await getDocs(
+                query(
+                    groupsRef,
+                    where(
+                        "cooperativeId",
+                        "==",
+                        profile.cooperativeId
+                    )
+                )
+            )
+            : await getDocs(groupsRef);
 
     const groups = [];
 
     snapshot.forEach(doc => {
-        const data = doc.data();
-
-        if (
-            profile.role === "cooperative_admin" &&
-            data.cooperativeId !== profile.cooperativeId
-        ) {
-            return;
-        }
-
         groups.push({
             id: doc.id,
-            ...data
+            ...doc.data()
         });
     });
 
@@ -103,44 +108,23 @@ export async function getDrawGroups() {
 export async function getDrawGroupById(
     groupId
 ) {
-    const profile =
-        await getCurrentUserProfile();
-
     const snapshot =
-        await getDocs(
-            collection(
+        await getDoc(
+            doc(
                 db,
-                "drawGroups"
+                "drawGroups",
+                groupId
             )
         );
 
-    let group = null;
-
-    snapshot.forEach(doc => {
-        if (
-            doc.id === groupId
-        ) {
-            const data = doc.data();
-
-            if (
-                profile.role === "cooperative_admin" &&
-                data.cooperativeId !== profile.cooperativeId
-            ) {
-                return;
-            }
-
-            group = {
-                id: doc.id,
-                ...data
-            };
-        }
-    });
-
-    if (!group) {
+    if (!snapshot.exists()) {
         throw new Error("Draw group not found");
     }
 
-    return group;
+    return {
+        id: snapshot.id,
+        ...snapshot.data()
+    };
 }
 
 export async function updateGroupStatus(
