@@ -624,6 +624,181 @@ exports.createDrawBox = onCall(async (request) => {
   };
 });
 
+
+exports.updateDrawBoxAssignment = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      "unauthenticated",
+      "You must be signed in."
+    );
+  }
+
+  const callerUid =
+    request.auth.uid;
+
+  const callerSnap =
+    await db
+      .collection("users")
+      .doc(callerUid)
+      .get();
+
+  if (!callerSnap.exists) {
+    throw new HttpsError(
+      "permission-denied",
+      "User profile not found."
+    );
+  }
+
+  const callerData =
+    callerSnap.data();
+
+  if (
+    callerData.role !== "super_admin" &&
+    callerData.role !== "cooperative_admin"
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "Unauthorized."
+    );
+  }
+
+  const data =
+    request.data || {};
+
+  const boxId =
+    typeof data.boxId === "string"
+      ? data.boxId.trim()
+      : "";
+
+  if (!boxId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "boxId is required."
+    );
+  }
+
+  const boxRef =
+    db
+      .collection("drawBoxes")
+      .doc(boxId);
+
+  const boxSnap =
+    await boxRef.get();
+
+  if (!boxSnap.exists) {
+    throw new HttpsError(
+      "not-found",
+      "Draw box not found."
+    );
+  }
+
+  const boxData =
+    boxSnap.data();
+
+  const groupId =
+    typeof boxData.groupId === "string"
+      ? boxData.groupId.trim()
+      : "";
+
+  if (!groupId) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Draw box group ownership is not configured."
+    );
+  }
+
+  const groupSnap =
+    await db
+      .collection("drawGroups")
+      .doc(groupId)
+      .get();
+
+  if (!groupSnap.exists) {
+    throw new HttpsError(
+      "not-found",
+      "Draw group not found."
+    );
+  }
+
+  const groupData =
+    groupSnap.data();
+
+  const groupCooperativeId =
+    typeof groupData.cooperativeId === "string"
+      ? groupData.cooperativeId.trim()
+      : "";
+
+  if (!groupCooperativeId) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Draw group cooperative ownership is not configured."
+    );
+  }
+
+  const callerCooperativeId =
+    typeof callerData.cooperativeId === "string"
+      ? callerData.cooperativeId.trim()
+      : "";
+
+  if (
+    callerData.role === "cooperative_admin" &&
+    (
+      !callerCooperativeId ||
+      callerCooperativeId !== groupCooperativeId
+    )
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "Unauthorized."
+    );
+  }
+
+  const month = data.month;
+  const year = data.year;
+
+  if (
+    typeof month !== "string" ||
+    !month.trim()
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "month is required."
+    );
+  }
+
+  if (
+    !Number.isInteger(year)
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "year must be an integer."
+    );
+  }
+
+  await boxRef.update({
+    month,
+    year,
+    status: "Ready",
+    picked: false,
+    pickedBy: null,
+    pickedAt: null,
+    locked: false,
+    lockedBy: null,
+    lockedAt: null,
+    reserved: false,
+    reservedBy: null,
+    reservedAt: null
+  });
+
+  return {
+    success: true,
+    boxId,
+    groupId,
+    month,
+    year
+  };
+});
+
 exports.getActiveCooperatives = onCall(async () => {
   const snapshot = await db
     .collection("cooperatives")

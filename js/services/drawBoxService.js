@@ -87,53 +87,21 @@ console.log("Documents found:", snapshot.size);
 }
 
 export async function updateBoxAssignment(
-
     boxId,
-
     month,
-
     year
-
 ) {
+    const callable =
+        httpsCallable(
+            functions,
+            "updateDrawBoxAssignment"
+        );
 
-    await updateDoc(
-
-        doc(
-            db,
-            "drawBoxes",
-            boxId
-        ),
-
-{
-
-    month,
-
-    year,
-
-    status: "Ready",
-
-    picked: false,
-
-    pickedBy: null,
-
-    pickedAt: null,
-
-    locked: false,
-
-    lockedBy: null,
-
-    lockedAt: null,
-
-    reserved: false,
-
-    reservedBy: null,
-
-    reservedAt: null
-
-}
-
-    );
-
+    await callable({
+        boxId,
+        month,
+        year
+    });
 }
 
 export async function revealDrawBox(
