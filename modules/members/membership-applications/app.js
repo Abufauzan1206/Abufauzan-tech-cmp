@@ -9,9 +9,28 @@ import {
 import {
     normalizeRole
 } from "../../../js/components/roleAuthorization.js";
+import {
+    auth
+} from "../../../js/firebase-config.js";
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+const authReadyUser =
+    await new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (user) => {
+                unsubscribe();
+                resolve(user);
+            }
+        );
+    });
 
 const session =
-    await getAuthenticatedProfile();
+    authReadyUser
+        ? await getAuthenticatedProfile()
+        : null;
 
 if (!session) {
     window.location.href =
