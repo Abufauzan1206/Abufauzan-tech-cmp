@@ -215,12 +215,7 @@ for (let i = 0; i < slotCount; i++) {
 
         groupId,
 
-        memberId: member.id,
-
-        memberNumber: member.memberNumber,
-
-        fullName:
-        `${member.firstName} ${member.lastName}`
+        memberId: member.id
 
     });
 

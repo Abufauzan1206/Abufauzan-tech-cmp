@@ -17,68 +17,33 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-export async function createDrawBox(boxData) {
-
-    const existingBoxes =
-    await getGroupBoxes(
-        boxData.groupId
-    );
-
-    const boxNumber =
-    existingBoxes.length + 1;
-
-    boxData.boxNumber =
-    boxNumber;
-
-    boxData.displayNumber =
-    String(boxNumber)
-    .padStart(2, "0");
-    
-    boxData.month = null;
-
-boxData.year = null;
-
-boxData.participantId = null;
-
-boxData.participantName = null;
-
-boxData.slotNumber = null;
-
-boxData.revealed = false;
-
-boxData.picked = false;
-
-boxData.locked = false;
-
-boxData.pickedBy = null;
-
-boxData.pickedAt = null;
-
-boxData.lockedBy = null;
-
-boxData.lockedAt = null;
-
-    boxData.createdAt =
-    serverTimestamp();
-
-    boxData.status =
-    "Available";
-
-    const docRef =
-    await addDoc(
-
-        collection(
-            db,
-            "drawBoxes"
-        ),
-
-        boxData
-
-    );
-
-    return docRef.id;
-
+import {
+    getFunctions,
+    httpsCallable
 }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js";
+
+const functions = getFunctions();
+
+export async function createDrawBox(boxData) {
+    const callable =
+        httpsCallable(
+            functions,
+            "createDrawBox"
+        );
+
+    const result =
+        await callable({
+            groupId:
+                boxData?.groupId,
+            memberId:
+                boxData?.memberId
+        });
+
+    return result.data?.boxId;
+}
+
+
 
 export async function getGroupBoxes(groupId) {
 
