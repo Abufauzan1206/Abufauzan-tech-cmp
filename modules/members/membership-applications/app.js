@@ -3,6 +3,34 @@ import {
     approveMembershipApplication,
     rejectMembershipApplication
 } from "../../../js/services/membershipApplicationService.js";
+import {
+    getAuthenticatedProfile
+} from "../../../js/controllers/accessController.js";
+import {
+    normalizeRole
+} from "../../../js/components/roleAuthorization.js";
+
+const session =
+    await getAuthenticatedProfile();
+
+if (!session) {
+    window.location.href =
+        "../../../login.html";
+    throw new Error(
+        "Authentication required."
+    );
+}
+
+if (
+    normalizeRole(session.profile?.role) !==
+    "cooperative_admin"
+) {
+    window.location.href =
+        "../index.html";
+    throw new Error(
+        "Only Cooperative Admins can access membership applications."
+    );
+}
 
 const applicationsBody =
     document.getElementById("applicationsBody");
